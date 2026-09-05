@@ -1,7 +1,9 @@
 import type { Commit } from "@/lib/knowledge-tree/operations";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, ChevronRight, FolderTree, Home, MoreHorizontal, Plus } from "lucide-react";
 import { useAsk } from "./confirm";
+import { Modal } from "./modal";
+import * as Popover from "@radix-ui/react-popover";
 
 import { NODE_STATUS_LABEL, NODE_STATUS_MARK } from "@/lib/knowledge-tree/factory";
 import { nodeLabel, prioLabel } from "@/lib/knowledge-tree/display";
@@ -56,16 +58,14 @@ export function TreePage({
     return () => window.clearTimeout(t);
   }, [pendingDel]);
 
+  const focusId = focus?.id;
   useEffect(() => {
-    if (!focus) return;
+    if (!focusId) return;
     document.querySelector(".branch")?.scrollIntoView({ block: "start" });
-  }, [focus?.id]);
+  }, [focusId]);
 
   const searching = q.length > 0;
-  const searchHits = useMemo(() => {
-    if (!searching) return [];
-    return tree.nodes.filter((n) => matchesQuery(n, q) && matchesFilters(n, ws));
-  }, [searching, tree.nodes, q, ws.ui.treeStatus, ws.ui.treePrio]);
+  const searchHits = searching ? tree.nodes.filter(n => matchesQuery(n,q) && matchesFilters(n,ws)) : [];
 
   return (
     <>
@@ -90,12 +90,12 @@ export function TreePage({
           <div className="filters">
             <input
               className="search"
+              aria-label={t("searchTree")}
               placeholder={t("searchTree")}
               value={ws.ui.treeQuery}
               onChange={(e) => commit("patchUi", { treeQuery: e.target.value })}
             />
-            {!focus ? (
-              <>
+            <>
                 <div className="filter-row">
                   {([["", t("allStatus")], ["todo", t("stTodo")], ["doing", t("stDoing")], ["done", t("stDone")]] as const).map(([v, l]) => (
                     <button key={v || "all-st"} type="button" className={`chip ${ws.ui.treeStatus === v ? "on" : ""}`} onClick={() => commit("patchUi", { treeStatus: v })}>{l}</button>
@@ -106,8 +106,8 @@ export function TreePage({
                     <button key={v || "all-p"} type="button" className={`chip ${ws.ui.treePrio === v ? "on" : ""}`} onClick={() => commit("patchUi", { treePrio: v })}>{l}</button>
                   ))}
                 </div>
-              </>
-            ) : null}
+            </>
+            {(ws.ui.treeStatus || ws.ui.treePrio) && <p className="active-filters">当前筛选：{ws.ui.treeStatus ? NODE_STATUS_LABEL[ws.ui.treeStatus] : "全部状态"} · {ws.ui.treePrio ? `P${ws.ui.treePrio}` : "全部优先级"} <button className="btn ghost" onClick={() => commit("patchUi", { treeStatus: "", treePrio: "" })}>清除筛选</button></p>}
           </div>
           {searching ? (
             <SearchResults hits={searchHits} tree={tree} ws={ws} commit={commit} pendingDel={pendingDel} setPendingDel={setPendingDel} />
@@ -139,7 +139,6 @@ export function TreePage({
 function Crumbs({
   tree,
   focus,
-  ws,
   commit,
   onOpenOutline,
 }: {
@@ -175,10 +174,11 @@ function Crumbs({
           <button type="button" onClick={goRoot}>{section.title}</button>
         </>
       ) : null}
-      {chain.map((n, i) => (
+      {chain.length > 4 && <details className="crumb-full"><summary>完整路径 · {chain.length} 层</summary><ol>{chain.map((n,i) => <li key={n.id}><button onClick={() => commit("focusNode",n.id)}>{i+1}. {nodeLabel(n)}</button></li>)}</ol></details>}
+      {(chain.length > 4 ? chain.slice(-2) : chain).map((n) => (
         <span key={n.id} className="crumb-node">
           <span className="crumb-sep" aria-hidden="true">/</span>
-          {i === chain.length - 1 ? (
+          {n.id === focus?.id ? (
             <span className="here">{nodeLabel(n)}</span>
           ) : (
             <button type="button" onClick={() => commit("focusNode", n.id)}>{nodeLabel(n)}</button>
@@ -225,7 +225,7 @@ function Outline({
     const current = focus === n.id;
     return (
       <div key={n.id} className="ol-block">
-        <div className={`ol-row ${current ? "current" : ""}`} style={{ paddingLeft: 8 + depth * 12 }}>
+        <div className={`ol-row ${current ? "current" : ""}`} style={{ paddingLeft: 8 + Math.min(depth, 5) * 12 }}>
           {kids.length ? (
             <button type="button" className="ol-twist" aria-label={on ? "收起" : "展开"} onClick={() => toggle(n.id, path.has(n.id))}>
               {on ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -233,9 +233,9 @@ function Outline({
           ) : (
             <span className="ol-twist ghost" />
           )}
-          <button type="button" className="ol-label" onClick={() => pick(n.id)}>
+          <button type="button" className="ol-label" title={`${depth} 层 · ${ancestorChain(tree.nodes,n.id).map(nodeLabel).join(" / ")}`} onClick={() => pick(n.id)}>
             <span className={`ol-mark ${n.status}`}>{NODE_STATUS_MARK[n.status]}</span>
-            <span className="ol-title">{nodeLabel(n)}</span>
+            <span className="ol-title">{depth > 5 ? `${depth}层 · ` : ""}{nodeLabel(n)}</span>
             {kids.length ? <span className="ol-count">{kids.length}</span> : null}
           </button>
         </div>
@@ -280,11 +280,7 @@ function Outline({
     <>
       <div className="outline-desktop">{renderOutline()}</div>
       {mobileOpen ? (
-        <div className="modal-back outline-back" onClick={onClose}>
-          <div className="outline-sheet" onClick={(e) => e.stopPropagation()}>
-            {renderOutline()}
-          </div>
-        </div>
+        <Modal title={t("outline")} onClose={onClose}>{renderOutline()}</Modal>
       ) : null}
     </>
   );
@@ -322,7 +318,6 @@ function RootView({
           ).filter((n) => matchesFilters(n, ws));
           const allInSec = tree.nodes.filter((n) => n.sectionId === sec.id);
           const p = progressOf(allInSec);
-          if (!ws.ui.editing && !roots.length && (ws.ui.treeStatus || ws.ui.treePrio)) return null;
           return (
             <section className="section" key={sec.id}>
               <div className="section-hd">
@@ -351,6 +346,7 @@ function RootView({
                 sec.description ? <p className="brief">{sec.description}</p> : null
               )}
               <div className="bar"><i style={{ width: `${p.pct}%` }} /></div>
+              {!roots.length && <p className="empty">{allInSec.length ? "本分区有节点，当前根层筛选无匹配。可清除筛选或在全树中搜索。" : "本分区还没有节点。"}</p>}
               {roots.map((n) => (
                 <NodeCard
                   key={n.id}
@@ -408,29 +404,30 @@ function BranchView({
           <p className="branch-kicker">{t("thisBranch")}</p>
           <h2 className="branch-title">
             <PrioSeal priority={node.priority} />
-            <input
+            {ws.ui.editing ? <textarea rows={3}
               value={node.title}
               onChange={(e) => commit("patchNode", node.id, { title: e.target.value })}
               aria-label={t("name")}
-            />
+            /> : <span className="branch-title-text">{node.title}</span>}
           </h2>
-          <input
+          {ws.ui.editing ? <textarea rows={2}
             className="hint-input"
             value={node.hint}
             placeholder={t("hintEmpty")}
             onChange={(e) => commit("patchNode", node.id, { hint: e.target.value })}
             aria-label={t("intro")}
-          />
+          /> : node.hint ? <p className="hint">{node.hint}</p> : null}
           <p className="branch-meta">
             {allKids.length} {t("childNodes")} · {sub.done}/{sub.done + sub.doing + sub.todo} {t("masteredShort")} · {sub.pct}%
           </p>
-          <div className="filter-row" style={{ marginTop: 8 }}>
+          <div className="branch-actions"><button className="btn" onClick={() => commit("patchUi",{editing: !ws.ui.editing})}>{ws.ui.editing ? "完成编辑" : "编辑节点"}</button><button className="btn primary" onClick={() => commit("addLog",{title: `实践：${node.title}`, question: node.hint, linkedNodeIds:[node.id]})}>记录一次实践</button></div>
+          {ws.ui.editing && <div className="filter-row" style={{ marginTop: 8 }}>
             {([0, 1, 2, 3] as const).map((p0) => (
               <button key={p0} type="button" className={`chip ${node.priority === p0 ? "on" : ""}`} onClick={() => commit("patchNode", node.id, { priority: p0 })}>
                 {prioLabel(p0)}
               </button>
             ))}
-          </div>
+          </div>}
         </div>
         <div className="item-side">
           <StructureMenu node={node} tree={tree} ws={ws} commit={commit} pendingDel={pendingDel} setPendingDel={setPendingDel} />
@@ -439,6 +436,7 @@ function BranchView({
           <label>
             {t("branchNote")}
             <textarea
+              aria-label={t("branchNote")}
               value={node.note}
               placeholder={t("branchNoteHint")}
               onChange={(e) => commit("patchNode", node.id, { note: e.target.value })}
@@ -447,7 +445,7 @@ function BranchView({
           <div className="links">
             {rel.length
               ? <>{t("relatedLogs")}{rel.map((l) => (
-                <button key={l.id} type="button" onClick={() => commit("patchUi", { tab: "log", expandedLogs: { ...ws.ui.expandedLogs, [l.id]: true }, scrollLogId: l.id })}>{l.title || t("untitledLog")}</button>
+                <button key={l.id} type="button" onClick={() => commit("patchUi", { tab: "log", logQuery: "", logStatus: "", expandedLogs: { ...ws.ui.expandedLogs, [l.id]: true }, scrollLogId: l.id })}>{l.title || t("untitledLog")}</button>
               ))}</>
               : <span>{t("noLinkedLogs")}</span>}
           </div>
@@ -472,7 +470,7 @@ function BranchView({
           setPendingDel={setPendingDel}
         />
       )) : (
-        <p className="empty">{t("noChildren")}</p>
+        <p className="empty">{allKids.length ? "有子节点，但当前筛选无匹配。" : t("noChildren")}</p>
       )}
       <button type="button" className="btn primary add-child" onClick={() => commit("addNode", node.sectionId, node.id)}>
         <Plus size={15} strokeWidth={1.8} />
@@ -505,7 +503,7 @@ function SearchResults({
         <div className="meta">{hits.length} 条</div>
       </div>
       {hits.map((n) => {
-        const path = ancestorChain(tree.nodes, n.id).slice(0, -1).map(nodeLabel).join(" / ");
+        const path = [tree.title, tree.sections.find(s => s.id === n.sectionId)?.title, ...ancestorChain(tree.nodes,n.id).map(nodeLabel)].filter(Boolean).join(" / ");
         return (
           <div key={n.id}>
             {path ? <p className="search-path">{path}</p> : null}
@@ -588,20 +586,20 @@ function StructureMenu({
   const parent = node.parentId ? tree.nodes.find((n) => n.id === node.parentId) : null;
   const desc = subtreeIds(tree.nodes, node.id).length - 1;
   const armed = pendingDel === node.id;
+  if (!ws.ui.editing) return null;
 
   return (
-    <div className="struct-menu">
-      <button
+    <Popover.Root open={open} onOpenChange={setOpen}>
+      <Popover.Trigger asChild><button
         type="button"
         className="btn ghost struct-toggle"
         aria-label={t("structure")}
         aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
       >
         <MoreHorizontal size={18} strokeWidth={1.8} />
-      </button>
-      {open ? (
-        <div className="struct-sheet" role="menu">
+      </button></Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content className="struct-sheet" align="end" sideOffset={6} collisionPadding={12} aria-label={t("structure")} onEscapeKeyDown={e => e.stopPropagation()}>
           <p className="struct-kicker">{t("structure")}</p>
           <select
             value={node.sectionId}
@@ -648,8 +646,8 @@ function StructureMenu({
               {desc > 0 ? ` · ${desc}` : ""}
             </button>
           )}
-        </div>
-      ) : null}
-    </div>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } fr
 import { CustomFields } from "./custom-fields";
 import { ConfirmCtx, ConfirmModal, useAsk, type ConfirmRequest } from "./confirm";
 import { TreePage } from "./tree-page";
+import { Modal } from "./modal";
 import { dismissPeachBoot } from "./peach-boot";
 import { SettingsPage } from "./settings";
 import { InkDock, type ShellTab } from "./dock";
@@ -287,9 +288,7 @@ function KnowledgeShell() {
         />
       )}
       {renameId && (
-        <div className="modal-back" onClick={() => setRenameId(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2>{t("renameTree")}</h2>
+        <Modal title={t("renameTree")} onClose={() => setRenameId(null)}>
             <div className="form">
               <label>{t("name")} <input value={renameTitle} onChange={(e) => setRenameTitle(e.target.value)} /></label>
               <label>{t("intro")} <textarea value={renameDesc} onChange={(e) => setRenameDesc(e.target.value)} /></label>
@@ -297,8 +296,7 @@ function KnowledgeShell() {
                 {t("save")}
               </button>
             </div>
-          </div>
-        </div>
+        </Modal>
       )}
       <DataTools />
       <div className={`toast ${toast ? "show" : ""}`}>{toast}</div>
@@ -325,9 +323,7 @@ function Switcher({
   const ask = useAsk();
   const { t } = useI18n();
   return (
-    <div className="modal-back" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h2>{t("myTreesTitle")}</h2>
+    <Modal title={t("myTreesTitle")} onClose={onClose}>
         {Object.values(ws.trees).map((tr) => (
           <div key={tr.id} className="tree-row">
             <button
@@ -365,8 +361,7 @@ function Switcher({
           <button className="btn" onClick={onImport}>{t("importJson")}</button>
         </div>
 
-      </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -407,18 +402,21 @@ function WeekPage({
         <button className="btn" onClick={() => commit("shiftWeek", 1)}>{t("nextWeek")}</button>
       </div>
       <div className="summary">
-        <div className="stat"><b>{sum.newlyDone.length}</b><span>{t("newlyDone")}</span></div>
-        <div className="stat"><b>{sum.newlyDoing.length}</b><span>{t("newlyDoing")}</span></div>
-        <div className="stat"><b>{sum.stalled.length}</b><span>{t("stalled")}</span></div>
+        <div className="stat"><b>{sum.historyKnown ? sum.newlyDone.length : "未知"}</b><span>{t("newlyDone")}</span></div>
+        <div className="stat"><b>{sum.historyKnown ? sum.newlyDoing.length : "未知"}</b><span>{t("newlyDoing")}</span></div>
+        <div className="stat"><b>{sum.stalled.length}</b><span>当前滞留</span></div>
         <div className="stat"><b>{sum.weekLogs.length}</b><span>{t("weekLogs")}</span></div>
       </div>
+      <p className="brief">所选周的状态事件保留当时名称与优先级；同一节点当周重复标记只计一次。{!sum.historyKnown && "该周历史不完整，下方只列已知记录，不能视为总量。"} 实践按创建时间归周，内容显示当前版本。</p>
       {sum.unknownDoing ? <p className="empty">{t("unknownDoing", { n: sum.unknownDoing })}</p> : null}
       {isFuture ? <p className="empty">{t("futureEmpty")}</p> : null}
-      {list(t("weekMastered"), sum.newlyDone.map((n) => <div className="row" key={n.id}><span>{nodeLabel(n)}</span><small>P{n.priority}</small></div>), t("weekMasteredEmpty"))}
-      {list(t("stalled"), sum.stalled.map(({ node, days }) => <div className="row" key={node.id}><span>{nodeLabel(node)}</span><small>{Math.floor(days)} 天</small></div>), t("stalledEmpty"))}
-      {list(t("p0focus"), sum.p0focus.map((n) => <div className="row" key={n.id}><span>{nodeLabel(n)}</span><small>{NODE_STATUS_MARK[n.status]} {t(n.status === "todo" ? "statusTodo" : n.status === "doing" ? "statusDoing" : "statusDone")}</small></div>), t("p0focusEmpty"))}
+      {list(t("weekMastered"), sum.newlyDone.map((n) => <button className="row" key={n.id} disabled={!n.exists} onClick={() => commit("focusNode",n.id)}><span>{nodeLabel(n)}</span><small>{n.exists ? `P${n.priority} · 返回节点` : "节点已删除 · 保留历史"}</small></button>), t("weekMasteredEmpty"))}
+      <h2 className="current-diagnostics">当前诊断 · 今天</h2>
+      <p className="brief">下面的滞留与 P0 清单反映当前状态，不是所选周的历史快照。</p>
+      {list("当前滞留超过 14 天", sum.stalled.map(({ node, days }) => <button className="row" key={node.id} onClick={() => commit("focusNode",node.id)}><span>{nodeLabel(node)}</span><small>{Math.floor(days)} 天 · 返回节点</small></button>), t("stalledEmpty"))}
+      {list(t("p0focus"), sum.p0focus.map((n) => <button className="row" key={n.id} onClick={() => commit("focusNode",n.id)}><span>{nodeLabel(n)}</span><small>{NODE_STATUS_MARK[n.status]} {t(n.status === "todo" ? "statusTodo" : n.status === "doing" ? "statusDoing" : "statusDone")}</small></button>), t("p0focusEmpty"))}
       {list(t("weekPractice"), sum.weekLogs.map((e) => (
-        <button className="row" key={e.id} onClick={() => commit("patchUi", { tab: "log", expandedLogs: { ...ws.ui.expandedLogs, [e.id]: true }, scrollLogId: e.id })}>
+        <button className="row" key={e.id} onClick={() => commit("patchUi", { tab: "log", logQuery: "", logStatus: "", expandedLogs: { ...ws.ui.expandedLogs, [e.id]: true }, scrollLogId: e.id })}>
           <span>{e.title || t("untitledLog")}</span><small>{e.date} · {LOG_STATUS_LABEL[e.status]}</small>
         </button>
       )), t("weekPracticeEmpty"))}
@@ -469,10 +467,10 @@ function WeekPage({
       </section>
       <section>
         <h2 className="serif" style={{ fontSize: "1.05rem", margin: "0 0 4px" }}>六个月月度进度</h2>
-        <p className="brief">各月新标 ✓ 的增量。没有时间戳的旧掌握不计，显示 0。</p>
+        <p className="brief">各月可确认的首次标为掌握数量，复学或重复标记不重复计数。历史不完整或首次时间无法确认时显示“未知”。</p>
         <div className="months">
           {months.map((m) => (
-            <div className="month" key={m.key}><span>{m.key} · {m.label}</span><b>{doneIncrement(tree, m.y, m.m)}</b></div>
+            <div className="month" key={m.key}><span>{m.key} · {m.label}</span><b>{doneIncrement(tree, m.y, m.m) ?? "未知"}</b></div>
           ))}
         </div>
       </section>
@@ -597,6 +595,7 @@ function LogCard({
               onChange={(id, value) => commit("patchLog", exp.id, { custom: { [id]: value } })}
             />
           ) : null}
+          <div className="links practice-return">{exp.linkedNodeIds.map(id => { const n = tree.nodes.find(x => x.id === id); return n ? <button className="btn" key={id} onClick={() => commit("focusNode",id)}>返回节点：{nodeLabel(n)}</button> : null; })}</div>
           <div className="field">
             关联知识节点
             <input type="text" placeholder="搜索 id / 名称" value={linkQ} onChange={(e) => setLinkQ(e.target.value)} />

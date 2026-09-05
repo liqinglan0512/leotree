@@ -1,0 +1,35 @@
+Learning loop 390 Search full path opens readable 20-level detail and clears overlay
+Learning loop 390 Visible filters distinguish hidden children from empty children
+Learning loop 390 Node → note → state → linked practice → evidence → node
+Learning loop 390 Review draft contains recorded facts and returns to source node
+Learning loop 390 20-level outline has bounded indentation; dialog traps and restores focus
+Learning loop 390 Structure menus at head and list end remain inside viewport; move changes sibling order
+Learning loop 390 New child remains visible under prior filters and has contiguous sibling order
+Learning loop 390 Text input survives keyboard-occupied viewport simulation
+Learning loop 390 Reload preserves completed learning loop
+Learning loop 390 Template, switcher, rename and delete dialogs close without committing cancellation
+Learning loop 430 Search full path opens readable 20-level detail and clears overlay
+Learning loop 430 Visible filters distinguish hidden children from empty children
+Learning loop 430 Node → note → state → linked practice → evidence → node
+Learning loop 430 Review draft contains recorded facts and returns to source node
+Learning loop 430 20-level outline has bounded indentation; dialog traps and restores focus
+Learning loop 430 Structure menus at head and list end remain inside viewport; move changes sibling order
+Learning loop 430 New child remains visible under prior filters and has contiguous sibling order
+Learning loop 430 Text input survives keyboard-occupied viewport simulation
+Learning loop 430 Reload preserves completed learning loop
+Learning loop 430 Template, switcher, rename and delete dialogs close without committing cancellation
+Learning loop 1280 Search full path opens readable 20-level detail and clears overlay
+Learning loop 1280 Visible filters distinguish hidden children from empty children
+Learning loop 1280 Node → note → state → linked practice → evidence → node
+Learning loop 1280 Review draft contains recorded facts and returns to source node
+Learning loop 1280 20-level outline has bounded indentation; dialog traps and restores focus
+Learning loop 1280 Structure menus at head and list end remain inside viewport; move changes sibling order
+Learning loop 1280 New child remains visible under prior filters and has contiguous sibling order
+Learning loop 1280 Text input survives keyboard-occupied viewport simulation
+Learning loop 1280 Reload preserves completed learning loop
+Learning loop 1280 Template, switcher, rename and delete dialogs close without committing cancellation
+Large font and landscape 390 Maximum product font displays unbroken long titles and 44px primary targets
+Large font and landscape 390 Landscape dialog close action is visible and works
+Large font and landscape 430 Maximum product font displays unbroken long titles and 44px primary targets
+Large font and landscape 430 Landscape dialog close action is visible and works
+{"pass":5,"fail":0,"evidence":"release-evidence/lt1-browser-2026-09-05T13-17-32-402Z.json"}

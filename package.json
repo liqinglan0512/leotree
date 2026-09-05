@@ -21,7 +21,8 @@
     "format": "prettier --write .",
     "test:product": "node scripts/product-tests.mjs",
     "test:platform": "node scripts/platform-tests.mjs",
-    "test:browser:data": "node --experimental-strip-types scripts/rc-data-browser.mjs"
+    "test:browser:data": "node --experimental-strip-types scripts/rc-data-browser.mjs",
+    "test:browser:learning": "node --experimental-strip-types scripts/rc-learning-browser.mjs"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.4",

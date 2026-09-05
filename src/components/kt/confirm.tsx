@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 import { useI18n } from "@/lib/i18n";
+import { Modal } from "./modal";
 
 export type ConfirmRequest = {
   title: string;
@@ -18,15 +19,7 @@ export function ConfirmModal({ req, onClose }: { req: ConfirmRequest | null; onC
   const { t } = useI18n();
   if (!req) return null;
   return (
-    <div
-      className="modal-back"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="confirm-title"
-    >
-      <div className="modal confirm-modal" onClick={(e) => e.stopPropagation()}>
-        <h2 id="confirm-title">{req.title}</h2>
+    <Modal title={req.title} onClose={onClose}>
         {req.body ? <p className="brief">{req.body}</p> : null}
         <div className="hero-actions" style={{ justifyContent: "flex-end", marginTop: 16 }}>
           <button type="button" className="btn" onClick={onClose}>
@@ -43,7 +36,6 @@ export function ConfirmModal({ req, onClose }: { req: ConfirmRequest | null; onC
             {req.confirmLabel || t("confirmDelete")}
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

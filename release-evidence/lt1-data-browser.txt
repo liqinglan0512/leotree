@@ -1,0 +1,54 @@
+npm notice run test:browser:data
+npm notice run node --experimental-strip-types scripts/rc-data-browser.mjs
+FAIL Empty profile creates, writes and reloads durable knowledge locator.click: Timeout 15000ms exceeded.
+Call log:
+  - waiting for getByRole('button', { name: '新建知识树', exact: true })
+
+FAIL Existing v3 loads without source writes and preserves migration source locator.click: Timeout 15000ms exceeded.
+Call log:
+  - waiting for locator('.grove-card').filter({ hasText: 'Audit tree' })
+
+FAIL Legacy v2 custom node and SNN template survive migration locator.click: Timeout 15000ms exceeded.
+Call log:
+  - waiting for locator('.grove-card').filter({ hasText: 'SNN' })
+
+FAIL Corrupt source recovery downloads exact raw and requires validated confirmation locator.innerText: Timeout 15000ms exceeded.
+Call log:
+  - waiting for locator('.recovery-panel strong')
+
+FAIL Real two-tab concurrent fields and UI-only search/tab cannot erase domain locator.click: Timeout 15000ms exceeded.
+Call log:
+  - waiting for locator('.grove-card').filter({ hasText: 'Audit tree' })
+    - waiting for "http://localhost:8080/" navigation to finish...
+    - navigated to "http://localhost:8080/"
+    - locator resolved to <button type="button" class="grove-card current">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div id="leo-boot" aria-hidden="true">…</div> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div id="leo-boot" aria-hidden="true">…</div> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    - waiting for element to be visible, enabled and stable
+    - element is visible, enabled and stable
+    - scrolling into view if needed
+    - done scrolling
+    - <div id="leo-boot" aria-hidden="true">…</div> intercepts pointer events
+  - retrying click action
+    - waiting 500ms
+    - waiting for element to be visible, enabled and stable
+
+PASS Upload + note + tree switch keeps target identity and committed note
+PASS UI copy has independent attachment IDs and deleting copy preserves original
+PASS Import preview commits only after confirmation and default creates new ID
+PASS Quota failure exposes rescue export and retains draft, retry succeeds
+PASS Browser ZIP download restores exact notes and real IndexedDB bytes into empty profile
+{"pass":5,"fail":5,"evidence":"release-evidence/lt0-browser-2026-09-05T13-04-46-252Z.json"}

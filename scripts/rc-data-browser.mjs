@@ -11,7 +11,7 @@ const browser=await chromium.launch({channel:"chrome",headless:true});
 let ws=addNode(createBlankTree(emptyWorkspace(),"Audit tree"),"sec-1");
 const treeId=ws.currentTreeId; const nodeId=ws.trees[treeId].nodes[0].id;
 ws=patchNode(ws,nodeId,{title:"Evidence node",note:"original note"});
-ws=createBlankTree(ws,"Second tree"); const secondId=ws.currentTreeId; ws=setCurrentTree(ws,treeId);
+ws=createBlankTree(ws,"Second tree"); ws=setCurrentTree(ws,treeId);
 const seed={ [ACTIVE_KEY]:encodeRecord(ws,1) };
 async function context(data=seed) {
   const c=await browser.newContext({viewport:{width:1280,height:900},acceptDownloads:true});
@@ -35,7 +35,7 @@ try {
 await run("Empty profile creates, writes and reloads durable knowledge",async c=>{
   await c.close();c=await context({});try{
     const p=await pageIn(c);await p.getByRole("button",{name:"新建知识树",exact:true}).click();await saved(p);
-    await p.getByRole("button",{name:"在此分区新增节点"}).click();await p.locator(".node-enter").click();
+    await p.getByRole("button",{name:"在此分区新增节点"}).click();await p.getByLabel(/本枝记录/).waitFor();
     await p.getByLabel(/本枝记录/).fill("今天写下的知识，明天还在。");await saved(p);
     const before=await stored(p);await p.reload({waitUntil:"networkidle"});await p.locator(".grove-card").click();await p.locator(".node-enter").click();
     assert.equal(await p.getByLabel(/本枝记录/).inputValue(),"今天写下的知识，明天还在。");assert.deepEqual((await stored(p)).workspace,before.workspace);
@@ -68,7 +68,7 @@ await run("Corrupt source recovery downloads exact raw and requires validated co
   }finally{await c.close();}
 });
 await run("Real two-tab concurrent fields and UI-only search/tab cannot erase domain",async c=>{
-  const a=await pageIn(c);const b=await pageIn(c);await openTree(a);await openNode(a);await openTree(b);await openNode(b);
+  const a=await pageIn(c);const b=await pageIn(c);await openTree(a);await openNode(a);await openTree(b);await openNode(b);await b.getByRole("button",{name:"编辑节点",exact:true}).click();
   await Promise.all([a.getByLabel(/本枝记录/).fill("A concurrent note"),b.getByLabel("名称",{exact:true}).fill("B concurrent title")]);await Promise.all([saved(a),saved(b)]);
   const t=(await stored(a)).workspace.trees[treeId];assert.equal(t.nodes[0].note,"A concurrent note");assert.equal(t.nodes[0].title,"B concurrent title");
   await b.getByRole("button",{name:"实践日志",exact:true}).click();

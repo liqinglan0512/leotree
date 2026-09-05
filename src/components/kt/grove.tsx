@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Modal } from "./modal";
 import { progressOf } from "@/lib/knowledge-tree/progress";
 import { TEMPLATES } from "@/lib/knowledge-tree/templates";
 import type { KnowledgeTree, Workspace } from "@/lib/knowledge-tree/types";
@@ -56,9 +57,7 @@ export function GrovePage({
         <p className="empty">{t("groveEmpty")}</p>
       )}
       {tplOpen ? (
-        <div className="modal-back" onClick={() => setTplOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2>{t("fromTemplateStart")}</h2>
+        <Modal title={t("fromTemplateStart")} onClose={() => setTplOpen(false)}>
             <ul className="tpl-list">
               {templates.map((tpl) => (
                 <li key={tpl.id}>
@@ -79,8 +78,7 @@ export function GrovePage({
             <button type="button" className="btn ghost" onClick={() => setTplOpen(false)}>
               {t("cancel")}
             </button>
-          </div>
-        </div>
+        </Modal>
       ) : null}
     </div>
   );

@@ -1,0 +1,213 @@
+{
+  "origin": "http://localhost:8080",
+  "browser": "152.0.7977.77",
+  "scope": "Real desktop Chrome; mobile viewport, touch and keyboard-occupied viewport simulation. No physical phone.",
+  "fixture": {
+    "depth": 20,
+    "children": 100,
+    "longTitleCharacters": 175
+  },
+  "results": [
+    {
+      "name": "Learning loop 390",
+      "status": "FAIL",
+      "width": 390,
+      "height": 844,
+      "font": "md",
+      "steps": [
+        "Search full path opens readable 20-level detail and clears overlay",
+        "Visible filters distinguish hidden children from empty children",
+        "Node → note → state → linked practice → evidence → node",
+        "Review draft contains recorded facts and returns to source node",
+        "20-level outline has bounded indentation; dialog traps and restores focus",
+        "Structure menus at head and list end remain inside viewport; move changes sibling order",
+        "New child remains visible under prior filters and has contiguous sibling order",
+        "Text input survives keyboard-occupied viewport simulation",
+        "Reload preserves completed learning loop"
+      ],
+      "error": "locator.click: Timeout 18000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('dialog[open] .tree-row').first().getByRole('button', { name: '重命名', exact: true })\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-learning-browser.mjs:104:97\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-learning-browser.mjs:41:55)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-learning-browser.mjs:46:97",
+      "pageErrors": [],
+      "geometry": {
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "scrollX": 0,
+          "scrollY": 0,
+          "scale": 1,
+          "offsetLeft": 0,
+          "pageLeft": 0,
+          "offsetTop": 0
+        },
+        "root": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 19118.53125,
+          "top": 0,
+          "right": 390,
+          "bottom": 19118.53125,
+          "left": 0
+        },
+        "body": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 19118.53125,
+          "top": 0,
+          "right": 390,
+          "bottom": 19118.53125,
+          "left": 0
+        },
+        "active": "<button type=\"button\" class=\"btn\" aria-label=\"关闭对话框\">关闭</button>",
+        "clicks": [
+          "<span class=\"grove-art\" style=\"background-image: url(&quot;/theme/mei.jpg&quot;);\"></span>",
+          "<button type=\"button\" class=\"node-enter\">检索靶点：膜电位与概率校准——从可检验问题走向可复现证据。检索靶点：膜电位与概率校准——从可检验问题走向可复现证据。检索靶点：膜电位与概率校准——从可检验问题走向可复现证据。 LongUnbrokenTitleXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+          "<button class=\"tree-switch\">切换知识树 ▾</button>"
+        ],
+        "offenders": []
+      }
+    },
+    {
+      "name": "Learning loop 430",
+      "status": "FAIL",
+      "width": 430,
+      "height": 932,
+      "font": "md",
+      "steps": [
+        "Search full path opens readable 20-level detail and clears overlay",
+        "Visible filters distinguish hidden children from empty children",
+        "Node → note → state → linked practice → evidence → node",
+        "Review draft contains recorded facts and returns to source node",
+        "20-level outline has bounded indentation; dialog traps and restores focus",
+        "Structure menus at head and list end remain inside viewport; move changes sibling order",
+        "New child remains visible under prior filters and has contiguous sibling order",
+        "Text input survives keyboard-occupied viewport simulation",
+        "Reload preserves completed learning loop"
+      ],
+      "error": "locator.click: Timeout 18000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('dialog[open] .tree-row').first().getByRole('button', { name: '重命名', exact: true })\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-learning-browser.mjs:104:97\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-learning-browser.mjs:41:55)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-learning-browser.mjs:46:97",
+      "pageErrors": [],
+      "geometry": {
+        "viewport": {
+          "width": 430,
+          "height": 932,
+          "scrollX": 0,
+          "scrollY": 0,
+          "scale": 1,
+          "offsetLeft": 0,
+          "pageLeft": 0,
+          "offsetTop": 0
+        },
+        "root": {
+          "x": 0,
+          "y": 0,
+          "width": 430,
+          "height": 19056.53125,
+          "top": 0,
+          "right": 430,
+          "bottom": 19056.53125,
+          "left": 0
+        },
+        "body": {
+          "x": 0,
+          "y": 0,
+          "width": 430,
+          "height": 19056.53125,
+          "top": 0,
+          "right": 430,
+          "bottom": 19056.53125,
+          "left": 0
+        },
+        "active": "<button type=\"button\" class=\"btn\" aria-label=\"关闭对话框\">关闭</button>",
+        "clicks": [
+          "<span class=\"grove-art\" style=\"background-image: url(&quot;/theme/mei.jpg&quot;);\"></span>",
+          "<button type=\"button\" class=\"node-enter\">检索靶点：膜电位与概率校准——从可检验问题走向可复现证据。检索靶点：膜电位与概率校准——从可检验问题走向可复现证据。检索靶点：膜电位与概率校准——从可检验问题走向可复现证据。 LongUnbrokenTitleXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+          "<button class=\"tree-switch\">切换知识树 ▾</button>"
+        ],
+        "offenders": []
+      }
+    },
+    {
+      "name": "Learning loop 1280",
+      "status": "FAIL",
+      "width": 1280,
+      "height": 900,
+      "font": "md",
+      "steps": [
+        "Search full path opens readable 20-level detail and clears overlay",
+        "Visible filters distinguish hidden children from empty children",
+        "Node → note → state → linked practice → evidence → node",
+        "Review draft contains recorded facts and returns to source node",
+        "20-level outline has bounded indentation; dialog traps and restores focus",
+        "Structure menus at head and list end remain inside viewport; move changes sibling order",
+        "New child remains visible under prior filters and has contiguous sibling order",
+        "Text input survives keyboard-occupied viewport simulation",
+        "Reload preserves completed learning loop"
+      ],
+      "error": "locator.click: Timeout 18000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('dialog[open] .tree-row').first().getByRole('button', { name: '重命名', exact: true })\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-learning-browser.mjs:104:97\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-learning-browser.mjs:41:55)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-learning-browser.mjs:46:97",
+      "pageErrors": [],
+      "geometry": {
+        "viewport": {
+          "width": 1280,
+          "height": 900,
+          "scrollX": 0,
+          "scrollY": 0,
+          "scale": 1,
+          "offsetLeft": 0,
+          "pageLeft": 0,
+          "offsetTop": 0
+        },
+        "root": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 11873.921875,
+          "top": 0,
+          "right": 1280,
+          "bottom": 11873.921875,
+          "left": 0
+        },
+        "body": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 11873.921875,
+          "top": 0,
+          "right": 1280,
+          "bottom": 11873.921875,
+          "left": 0
+        },
+        "active": "<button type=\"button\" class=\"btn\" aria-label=\"关闭对话框\">关闭</button>",
+        "clicks": [
+          "<span class=\"grove-art\" style=\"background-image: url(&quot;/theme/mei.jpg&quot;);\"></span>",
+          "<button type=\"button\" class=\"node-enter\">检索靶点：膜电位与概率校准——从可检验问题走向可复现证据。检索靶点：膜电位与概率校准——从可检验问题走向可复现证据。检索靶点：膜电位与概率校准——从可检验问题走向可复现证据。 LongUnbrokenTitleXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+          "<button class=\"tree-switch\">切换知识树 ▾</button>"
+        ],
+        "offenders": []
+      }
+    },
+    {
+      "name": "Large font and landscape 390",
+      "status": "PASS",
+      "width": 390,
+      "height": 844,
+      "font": "xl",
+      "steps": [
+        "Maximum product font displays unbroken long titles and 44px primary targets",
+        "Landscape dialog close action is visible and works"
+      ],
+      "durationMs": 2342
+    },
+    {
+      "name": "Large font and landscape 430",
+      "status": "PASS",
+      "width": 430,
+      "height": 932,
+      "font": "xl",
+      "steps": [
+        "Maximum product font displays unbroken long titles and 44px primary targets",
+        "Landscape dialog close action is visible and works"
+      ],
+      "durationMs": 2420
+    }
+  ]
+}

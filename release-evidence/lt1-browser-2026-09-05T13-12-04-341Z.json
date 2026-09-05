@@ -1,0 +1,138 @@
+{
+  "origin": "http://localhost:8080",
+  "browser": "152.0.7977.77",
+  "scope": "Real desktop Chrome; mobile viewport, touch and keyboard-occupied viewport simulation. No physical phone.",
+  "fixture": {
+    "depth": 20,
+    "children": 100,
+    "longTitleCharacters": 175
+  },
+  "results": [
+    {
+      "name": "Learning loop 390",
+      "status": "FAIL",
+      "width": 390,
+      "height": 844,
+      "font": "md",
+      "steps": [
+        "Search full path opens readable 20-level detail and clears overlay",
+        "Visible filters distinguish hidden children from empty children",
+        "Node → note → state → linked practice → evidence → node",
+        "Review draft contains recorded facts and returns to source node",
+        "20-level outline has bounded indentation; dialog traps and restores focus"
+      ],
+      "error": "locator.click: Timeout 18000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.branch > .item:not(.branch-head)').last().locator('.struct-toggle')\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" aria-label=\"结构操作\" data-state=\"closed\" aria-expanded=\"false\" aria-haspopup=\"dialog\" class=\"btn ghost struct-toggle\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <button type=\"button\" aria-label=\"结构操作\" data-state=\"closed\" aria-expanded=\"false\" aria-haspopup=\"dialog\" class=\"btn ghost struct-toggle\">…</button> from <article class=\"item p1\">…</article> subtree intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <button type=\"button\" class=\"node-enter\">子节点 099：实验与证据</button> from <article class=\"item p1\">…</article> subtree intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"item-side\">…</div> from <article class=\"item p1\">…</article> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    8 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"item-side\">…</div> from <article class=\"item p1\">…</article> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n\u001b[2m      - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <p class=\"branch-meta faint\">可再分枝</p> from <article class=\"item p1\">…</article> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n\u001b[2m      - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <article class=\"item p1\">…</article> intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n\u001b[2m      - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"item-side\">…</div> from <article class=\"item p1\">…</article> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <div class=\"item-side\">…</div> from <article class=\"item p1\">…</article> subtree intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <p class=\"branch-meta faint\">可再分枝</p> from <article class=\"item p1\">…</article> subtree intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <article class=\"item p1\">…</article> intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 500ms\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-learning-browser.mjs:84:89\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-learning-browser.mjs:41:55)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-learning-browser.mjs:46:97",
+      "pageErrors": [],
+      "geometry": {
+        "viewport": {
+          "width": 695,
+          "height": 1505,
+          "scrollX": 0,
+          "scrollY": 17237,
+          "scale": 1,
+          "offsetLeft": 146,
+          "pageLeft": 146,
+          "offsetTop": 615
+        },
+        "root": {
+          "x": 0,
+          "y": -17237,
+          "width": 390,
+          "height": 18742.203125,
+          "top": -17237,
+          "right": 390,
+          "bottom": 1505.203125,
+          "left": 0
+        },
+        "body": {
+          "x": 0,
+          "y": -17237,
+          "width": 390,
+          "height": 18742.203125,
+          "top": -17237,
+          "right": 390,
+          "bottom": 1505.203125,
+          "left": 0
+        },
+        "active": "<button class=\"btn\">完成编辑</button>",
+        "clicks": [
+          "<circle cx=\"19\" cy=\"12\" r=\"1\"></circle>",
+          "<button class=\"btn\">完成编辑</button>",
+          "<summary>完整路径 · 20 层</summary>",
+          "<summary>完整路径 · 20 层</summary>",
+          "<button class=\"btn\">编辑节点</button>"
+        ],
+        "offenders": []
+      }
+    },
+    {
+      "name": "Learning loop 430",
+      "status": "FAIL",
+      "width": 430,
+      "height": 932,
+      "font": "md",
+      "steps": [
+        "Search full path opens readable 20-level detail and clears overlay",
+        "Visible filters distinguish hidden children from empty children"
+      ],
+      "error": "locator.waitFor: Timeout 18000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('本枝记录', { exact: true }) to be visible\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-learning-browser.mjs:63:94\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-learning-browser.mjs:41:55)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-learning-browser.mjs:46:97",
+      "pageErrors": [],
+      "geometry": {
+        "viewport": {
+          "width": 430,
+          "height": 932,
+          "scrollX": 0,
+          "scrollY": 718,
+          "scale": 1,
+          "offsetLeft": 0,
+          "pageLeft": 0,
+          "offsetTop": 0
+        },
+        "root": {
+          "x": 0,
+          "y": -718,
+          "width": 430,
+          "height": 2484.578125,
+          "top": -718,
+          "right": 430,
+          "bottom": 1766.578125,
+          "left": 0
+        },
+        "body": {
+          "x": 0,
+          "y": -718,
+          "width": 430,
+          "height": 2484.578125,
+          "top": -718,
+          "right": 430,
+          "bottom": 1766.578125,
+          "left": 0
+        },
+        "active": "<button class=\"btn\">返回节点：检索靶点：膜电位与概率校准——从可检验问题走向可复现证据。检索靶点：膜电位与概率校准——从可检验问题走向可复现证据。检索靶点：膜电位与概率校准——从可检验问题走向可复现证据。 LongUnbrokenTitleXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</button>",
+        "clicks": [
+          "<button class=\"btn ghost\">清除筛选</button>",
+          "<button class=\"mark todo\" title=\"未学\">□</button>",
+          "<button class=\"mark doing\" title=\"正在学\">△</button>",
+          "<button class=\"btn primary\">记录一次实践</button>",
+          "<body><div id=\"leo-boot\" aria-hidden=\"true\" style=\"--p: 0.9921;\" class=\"out\" hidden=\"\"><style>\n#leo-boot{\n  position:fixed;inset:0;z-index:60;\n  display:flex;flex-direction:column;"
+        ],
+        "offenders": [
+          {
+            "tag": "SPAN",
+            "cls": "",
+            "rect": {
+              "x": 63,
+              "y": 1640.5625,
+              "width": 652.46875,
+              "height": 61.03125,
+              "top": 1640.5625,
+              "right": 715.46875,
+              "bottom": 1701.59375,
+              "left": 63
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,210 @@
+Learning loop 390 Search full path opens readable 20-level detail and clears overlay
+Learning loop 390 Visible filters distinguish hidden children from empty children
+before return {
+  viewport: {
+    width: 390,
+    height: 844,
+    scrollX: 0,
+    scrollY: 640,
+    scale: 1,
+    offsetLeft: 0,
+    pageLeft: 0,
+    offsetTop: 0
+  },
+  root: {
+    x: 0,
+    y: -640,
+    width: 390,
+    height: 2530.203125,
+    top: -640,
+    right: 390,
+    bottom: 1890.203125,
+    left: 0
+  },
+  body: {
+    x: 0,
+    y: -640,
+    width: 390,
+    height: 2530.203125,
+    top: -640,
+    right: 390,
+    bottom: 1890.203125,
+    left: 0
+  },
+  active: '<textarea>保留过程与证据，结论通过复核。</textarea>',
+  clicks: [
+    '<button type="button" class="chip ">✓ 掌握</button>',
+    '<button class="btn ghost">清除筛选</button>',
+    '<button class="mark todo" title="未学">□</button>',
+    '<button class="mark doing" title="正在学">△</button>',
+    '<button class="btn primary">记录一次实践</button>'
+  ],
+  offenders: [ { tag: 'SPAN', cls: '', rect: [Object] } ]
+}
+Learning loop 390 Node → note → state → linked practice → evidence → node
+Learning loop 390 Review draft contains recorded facts and returns to source node
+Learning loop 390 20-level outline has bounded indentation; dialog traps and restores focus
+before last menu {
+  viewport: {
+    width: 695,
+    height: 1505,
+    scrollX: 0,
+    scrollY: 376,
+    scale: 1,
+    offsetLeft: 0,
+    pageLeft: 0,
+    offsetTop: 0
+  },
+  root: {
+    x: 0,
+    y: -376,
+    width: 390,
+    height: 18742.203125,
+    top: -376,
+    right: 390,
+    bottom: 18366.203125,
+    left: 0
+  },
+  body: {
+    x: 0,
+    y: -376,
+    width: 390,
+    height: 18742.203125,
+    top: -376,
+    right: 390,
+    bottom: 18366.203125,
+    left: 0
+  },
+  active: '<button class="btn">完成编辑</button>',
+  clicks: [
+    '<circle cx="19" cy="12" r="1"></circle>',
+    '<button class="btn">完成编辑</button>',
+    '<summary>完整路径 · 20 层</summary>',
+    '<summary>完整路径 · 20 层</summary>',
+    '<button class="btn">编辑节点</button>'
+  ],
+  offenders: []
+}
+FAIL Learning loop 390 locator.click: Timeout 18000ms exceeded.
+Call log:
+  - waiting for locator('.branch > .item:not(.branch-head)').last().locator('.struct-toggle')
+    - locator resolved to <button type="button" aria-label="结构操作" data-state="closed" aria-expanded="false" aria-haspopup="dialog" class="btn ghost struct-toggle">…</button>
+  - attempting click action
+    - waiting for element to be visible, enabled and stable
+    - element is visible, enabled and stable
+    - scrolling into view if needed
+    - done scrolling
+    - <button type="button" aria-label="结构操作" data-state="closed" aria-expanded="false" aria-haspopup="dialog" class="btn ghost struct-toggle">…</button> from <article class="item p1">…</article> subtree intercepts pointer events
+  - retrying click action
+    - waiting for element to be visible, enabled and stable
+    - element is visible, enabled and stable
+    - scrolling into view if needed
+    - done scrolling
+    - <button type="button" class="node-enter">子节点 099：实验与证据</button> from <article class="item p1">…</article> subtree intercepts pointer events
+  - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="item-side">…</div> from <article class="item p1">…</article> subtree intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    8 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="item-side">…</div> from <article class="item p1">…</article> subtree intercepts pointer events
+    - retrying click action
+      - waiting 500ms
+      - waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <p class="branch-meta faint">可再分枝</p> from <article class="item p1">…</article> subtree intercepts pointer events
+    - retrying click action
+      - waiting 500ms
+      - waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <article class="item p1">…</article> intercepts pointer events
+    - retrying click action
+      - waiting 500ms
+      - waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="item-side">…</div> from <article class="item p1">…</article> subtree intercepts pointer events
+    - retrying click action
+      - waiting 500ms
+    - waiting for element to be visible, enabled and stable
+    - element is visible, enabled and stable
+    - scrolling into view if needed
+    - done scrolling
+    - <div class="item-side">…</div> from <article class="item p1">…</article> subtree intercepts pointer events
+  - retrying click action
+    - waiting 500ms
+    - waiting for element to be visible, enabled and stable
+    - element is visible, enabled and stable
+    - scrolling into view if needed
+    - done scrolling
+    - <p class="branch-meta faint">可再分枝</p> from <article class="item p1">…</article> subtree intercepts pointer events
+  - retrying click action
+    - waiting 500ms
+    - waiting for element to be visible, enabled and stable
+    - element is visible, enabled and stable
+    - scrolling into view if needed
+    - done scrolling
+    - <article class="item p1">…</article> intercepts pointer events
+  - retrying click action
+    - waiting 500ms
+
+Learning loop 430 Search full path opens readable 20-level detail and clears overlay
+Learning loop 430 Visible filters distinguish hidden children from empty children
+before return {
+  viewport: {
+    width: 430,
+    height: 932,
+    scrollX: 0,
+    scrollY: 625,
+    scale: 1,
+    offsetLeft: 0,
+    pageLeft: 0,
+    offsetTop: 0
+  },
+  root: {
+    x: 0,
+    y: -625,
+    width: 430,
+    height: 2484.578125,
+    top: -625,
+    right: 430,
+    bottom: 1859.578125,
+    left: 0
+  },
+  body: {
+    x: 0,
+    y: -625,
+    width: 430,
+    height: 2484.578125,
+    top: -625,
+    right: 430,
+    bottom: 1859.578125,
+    left: 0
+  },
+  active: '<textarea>保留过程与证据，结论通过复核。</textarea>',
+  clicks: [
+    '<button type="button" class="chip ">✓ 掌握</button>',
+    '<button class="btn ghost">清除筛选</button>',
+    '<button class="mark todo" title="未学">□</button>',
+    '<button class="mark doing" title="正在学">△</button>',
+    '<button class="btn primary">记录一次实践</button>'
+  ],
+  offenders: [ { tag: 'SPAN', cls: '', rect: [Object] } ]
+}
+FAIL Learning loop 430 locator.waitFor: Timeout 18000ms exceeded.
+Call log:
+  - waiting for getByLabel('本枝记录', { exact: true }) to be visible
+
+{"pass":0,"fail":2,"evidence":"release-evidence/lt1-browser-2026-09-05T13-12-04-341Z.json"}

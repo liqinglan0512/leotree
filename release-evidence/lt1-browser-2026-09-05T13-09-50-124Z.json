@@ -1,0 +1,84 @@
+{
+  "origin": "http://localhost:8080",
+  "browser": "152.0.7977.77",
+  "scope": "Real desktop Chrome; mobile viewport, touch and keyboard-occupied viewport simulation. No physical phone.",
+  "fixture": {
+    "depth": 20,
+    "children": 100,
+    "longTitleCharacters": 175
+  },
+  "results": [
+    {
+      "name": "Learning loop 390",
+      "status": "FAIL",
+      "width": 390,
+      "height": 844,
+      "font": "md",
+      "steps": [
+        "Search full path opens readable 20-level detail and clears overlay",
+        "Visible filters distinguish hidden children from empty children",
+        "Node → note → state → linked practice → evidence → node",
+        "Review draft contains recorded facts and returns to source node",
+        "20-level outline has bounded indentation; dialog traps and restores focus"
+      ],
+      "error": "locator.click: Timeout 18000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.branch > .item:not(.branch-head)').last().locator('.struct-toggle')\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" aria-label=\"结构操作\" data-state=\"closed\" aria-expanded=\"false\" aria-haspopup=\"dialog\" class=\"btn ghost struct-toggle\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <button type=\"button\" aria-label=\"结构操作\" data-state=\"closed\" aria-expanded=\"false\" aria-haspopup=\"dialog\" class=\"btn ghost struct-toggle\">…</button> from <article class=\"item p1\">…</article> subtree intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <button type=\"button\" class=\"node-enter\">子节点 099：实验与证据</button> from <article class=\"item p1\">…</article> subtree intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"item-side\">…</div> from <article class=\"item p1\">…</article> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    8 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"item-side\">…</div> from <article class=\"item p1\">…</article> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n\u001b[2m      - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <p class=\"branch-meta faint\">可再分枝</p> from <article class=\"item p1\">…</article> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n\u001b[2m      - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <article class=\"item p1\">…</article> intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n\u001b[2m      - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"item-side\">…</div> from <article class=\"item p1\">…</article> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <div class=\"item-side\">…</div> from <article class=\"item p1\">…</article> subtree intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <p class=\"branch-meta faint\">可再分枝</p> from <article class=\"item p1\">…</article> subtree intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <article class=\"item p1\">…</article> intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 500ms\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-learning-browser.mjs:79:89\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-learning-browser.mjs:38:55)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-learning-browser.mjs:43:63",
+      "pageErrors": []
+    },
+    {
+      "name": "Learning loop 430",
+      "status": "FAIL",
+      "width": 430,
+      "height": 932,
+      "font": "md",
+      "steps": [
+        "Search full path opens readable 20-level detail and clears overlay",
+        "Visible filters distinguish hidden children from empty children"
+      ],
+      "error": "locator.waitFor: Timeout 18000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('本枝记录', { exact: true }) to be visible\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-learning-browser.mjs:59:94\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-learning-browser.mjs:38:55)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-learning-browser.mjs:43:63",
+      "pageErrors": []
+    },
+    {
+      "name": "Learning loop 1280",
+      "status": "PASS",
+      "width": 1280,
+      "height": 900,
+      "font": "md",
+      "steps": [
+        "Search full path opens readable 20-level detail and clears overlay",
+        "Visible filters distinguish hidden children from empty children",
+        "Node → note → state → linked practice → evidence → node",
+        "Review draft contains recorded facts and returns to source node",
+        "20-level outline has bounded indentation; dialog traps and restores focus",
+        "Structure menus at head and list end remain inside viewport",
+        "New child remains visible under prior filters and has contiguous sibling order",
+        "Text input survives keyboard-occupied viewport simulation",
+        "Reload preserves completed learning loop"
+      ],
+      "durationMs": 7067
+    },
+    {
+      "name": "Large font and landscape 390",
+      "status": "PASS",
+      "width": 390,
+      "height": 844,
+      "font": "xl",
+      "steps": [
+        "Maximum product font displays unbroken long titles and 44px primary targets",
+        "Landscape dialog close action is visible and works"
+      ],
+      "durationMs": 2248
+    },
+    {
+      "name": "Large font and landscape 430",
+      "status": "PASS",
+      "width": 430,
+      "height": 932,
+      "font": "xl",
+      "steps": [
+        "Maximum product font displays unbroken long titles and 44px primary targets",
+        "Landscape dialog close action is visible and works"
+      ],
+      "durationMs": 2622
+    }
+  ]
+}
