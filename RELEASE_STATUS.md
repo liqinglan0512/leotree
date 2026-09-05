@@ -1,12 +1,11 @@
-# RC1 execution checkpoint
+# Leo Tree v1.0 RC1 — V1_RC_READY
 
-LT-0: PASS. LT-1: PASS. LT-2: PASS. Verdict: V1_RELEASE_BLOCKED (final clean install and independent RC package verification still UNVERIFIED).
+LT-0: PASS. LT-1: PASS. LT-2: PASS. RC acceptance: 15/15 PASS.
 
-LT-0: release-evidence/LT0_ACCEPTANCE.md; post-learning browser rerun lt0-browser-2026-09-05T13-06-39-018Z.json 10/10.
-LT-1: release-evidence/LT1_ACCEPTANCE.md; final Chrome learning run lt1-browser-2026-09-05T13-17-32-402Z.json 5/5. User accepted viewport/touch/keyboard-space simulation; no physical-device claim. All earlier failures remain as evidence.
+58 product PASS; 236 applicable platform PASS; 0 FAIL. Four unavailable generated-document checks explicitly SKIP; product skips 0. Typecheck and lint exit 0, lint 13 Fast Refresh warnings.
 
-LT-2: release-evidence/LT2_ACCEPTANCE.md; production run rc-production-2026-09-05T13-34-43-659Z.json 6/6, including actual browser/server restart and child data 10/10 + learning 5/5.
+Clean install/build: release-evidence/RC_CLEAN_CHECK.json, commit 916cdf2. Independently extracted production runtime: rc-production-2026-09-05T13-44-34-935Z.json 6/6, including data 10/10 (lt0-browser-2026-09-05T13-44-58-082Z.json), learning 5/5 (lt1-browser-2026-09-05T13-45-33-429Z.json), real account transitions and actual browser/server restart. Later changes are test/documentation only; runtime source matches the clean build.
 
-Tests: 58 product PASS; 236 applicable platform PASS, 4 explicit generated-document SKIP. Typecheck/lint exit 0; 13 Fast Refresh advisories. See PLATFORM_TEST_SCOPE.md.
+Mobile scope: real desktop Chrome 390/430px touch/input and keyboard-occupied viewport simulation, as explicitly accepted by the user. No physical phone/native IME/iOS Safari claim. Failed runs remain preserved.
 
-Next: clean install, clean production build, independent portable runtime validation, final RC report and packaging. No deployment.
+Full A–L report: V1_RC1_RELEASE_REPORT.md. All fifteen checks: release-evidence/RC_ACCEPTANCE.md. User guide: USER_GUIDE.md. Delivery folder: C:\Users\lijiahao\Desktop\LeoTree-v1.0-RC1-release. Runtime ZIP was verified and extracted there; local app is available at http://localhost:8080. No public deployment.

@@ -15,4 +15,4 @@ Production packaging failure was discovered and retained: the first build exited
 
 Final scope checks before clean-room verification: `lt2-tests-final.txt` = 58 product PASS, 236 applicable platform PASS, 4 generated-document SKIP, 0 FAIL; typecheck/lint exit 0 (13 existing Fast Refresh advisories). Screenshots `rc-public-data-guide.png`, `rc-community-preview.png`, `rc-configured-account.png`, `rc-after-restart.png` document the public contract. The guide screenshot was visually inspected.
 
-Remaining release work is clean install/build plus independent extracted runtime verification and final packaging. This gate PASS alone is not a public deployment claim.
+Final release closure is recorded in RC_ACCEPTANCE.md: clean install/build PASS; independently extracted runtime production test `rc-production-2026-09-05T13-44-34-935Z.json` 6/6 PASS with data 10/10 and learning 5/5. A test predicate initially read a pending node too early; it now waits for persisted attachment metadata and asserts exact title/note. Failed run `rc-production-2026-09-05T13-43-24-177Z.json` is retained. Runtime code was unchanged by that test correction. No public deployment is claimed.

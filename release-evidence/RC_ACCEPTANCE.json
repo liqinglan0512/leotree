@@ -1,0 +1,101 @@
+{
+  "version": "1.0.0-rc.1",
+  "gates": {
+    "LT-0": "PASS",
+    "LT-1": "PASS",
+    "LT-2": "PASS"
+  },
+  "verdict": "V1_RC_READY",
+  "checks": [
+    {
+      "id": 1,
+      "name": "clean install / clean build",
+      "status": "PASS",
+      "evidence": "RC_CLEAN_CHECK.json"
+    },
+    {
+      "id": 2,
+      "name": "empty-profile startup",
+      "status": "PASS",
+      "evidence": "lt0-browser-2026-09-05T13-44-58-082Z.json"
+    },
+    {
+      "id": 3,
+      "name": "existing v3 migration",
+      "status": "PASS",
+      "evidence": "lt0-browser-2026-09-05T13-44-58-082Z.json"
+    },
+    {
+      "id": 4,
+      "name": "legacy v2 migration",
+      "status": "PASS",
+      "evidence": "lt0-browser-2026-09-05T13-44-58-082Z.json"
+    },
+    {
+      "id": 5,
+      "name": "corrupted-data recovery",
+      "status": "PASS",
+      "evidence": "lt0-browser-2026-09-05T13-44-58-082Z.json"
+    },
+    {
+      "id": 6,
+      "name": "full-backup restore into empty profile",
+      "status": "PASS",
+      "evidence": "lt0-browser-2026-09-05T13-44-58-082Z.json; import-backup.test.ts"
+    },
+    {
+      "id": 7,
+      "name": "multi-tab adversarial test",
+      "status": "PASS",
+      "evidence": "lt0-browser-2026-09-05T13-44-58-082Z.json; service.test.ts"
+    },
+    {
+      "id": 8,
+      "name": "attachment copy/delete test",
+      "status": "PASS",
+      "evidence": "lt0-browser-2026-09-05T13-44-58-082Z.json"
+    },
+    {
+      "id": 9,
+      "name": "import conflict test",
+      "status": "PASS",
+      "evidence": "lt0-browser-2026-09-05T13-44-58-082Z.json; import-backup.test.ts"
+    },
+    {
+      "id": 10,
+      "name": "390px mobile complete learning loop",
+      "status": "PASS",
+      "evidence": "lt1-browser-2026-09-05T13-45-33-429Z.json"
+    },
+    {
+      "id": 11,
+      "name": "430px mobile complete learning loop",
+      "status": "PASS",
+      "evidence": "lt1-browser-2026-09-05T13-45-33-429Z.json"
+    },
+    {
+      "id": 12,
+      "name": "desktop smoke",
+      "status": "PASS",
+      "evidence": "lt1-browser-2026-09-05T13-45-33-429Z.json"
+    },
+    {
+      "id": 13,
+      "name": "logout/login local-data behavior",
+      "status": "PASS",
+      "evidence": "rc-production-2026-09-05T13-44-34-935Z.json"
+    },
+    {
+      "id": 14,
+      "name": "restart persistence",
+      "status": "PASS",
+      "evidence": "rc-production-2026-09-05T13-44-34-935Z.json"
+    },
+    {
+      "id": 15,
+      "name": "all regression tests",
+      "status": "PASS",
+      "evidence": "rc-clean-tests.txt; rc-extracted-production-final.txt"
+    }
+  ]
+}

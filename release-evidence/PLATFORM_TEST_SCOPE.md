@@ -2,7 +2,7 @@
 
 `npm test` runs `test:product` and then `test:platform`. Neither runner uses a hard-coded list of product test files: `scripts/product-tests.mjs` includes all knowledge-tree `*.test.ts`, including `tree.test.ts`. The platform runner discovers all `scripts/*.test.mjs` and the three existing app-data/auth helper suites.
 
-Current checkpoint: product 56 PASS, platform 236 PASS, 4 SKIP, 0 FAIL (`lt1-final-tests.txt`). Typecheck exit 0. Lint exit 0 with 13 React Fast Refresh module-export warnings; these are development reload advisories, not disabled correctness rules (`lt1-lint.txt`).
+Final clean RC checkpoint: product 58 PASS, platform 236 PASS, 4 SKIP, 0 FAIL (`rc-clean-tests.txt`). Typecheck exit 0. Lint exit 0 with 13 React Fast Refresh module-export warnings; these are development reload advisories, not disabled correctness rules (`rc-clean-lint.txt`).
 
 The four explicit skips check generated documents omitted from the supplied review bundle: three `brand-check.test.mjs` assertions require generated AGENTS/OG skill documents, and one `write-atomic.test.mjs` assertion requires `.grok/skills/og/references`. These do not validate Leo Tree runtime behavior. Their test names and missing-input reason remain visible. Product tests have zero skips.
 
