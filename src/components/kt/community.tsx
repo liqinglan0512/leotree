@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   GARDEN_COVERS,
   addGardenComment,
@@ -10,9 +10,7 @@ import {
   type GardenState,
   type Planted,
 } from "@/lib/garden-store";
-import { coverRef } from "@/lib/garden-art";
-import { MAX_FILE_BYTES, putBlob, sniffKind } from "@/lib/knowledge-tree/files";
-import { uid } from "@/lib/knowledge-tree/ids";
+import { CoverDraft } from "@/lib/knowledge-tree/cover-draft";
 import { GardenArt } from "./garden-art";
 import { useI18n } from "@/lib/i18n";
 import { progressOf } from "@/lib/knowledge-tree/progress";
@@ -169,20 +167,24 @@ function CreateGardenModal({
   const [blurb, setBlurb] = useState("");
   const [art, setArt] = useState(GARDEN_COVERS[4]);
   const [err, setErr] = useState("");
+  const [draft] = useState(() => new CoverDraft());
+  const [busy,setBusy] = useState(false);
+  const previewUrl = useRef<string | null>(null);
+  useEffect(() => () => { draft.cancel(); if(previewUrl.current) URL.revokeObjectURL(previewUrl.current); }, [draft]);
   async function onPng(file: File | undefined) {
     if (!file) return;
     setErr("");
-    if (file.size > MAX_FILE_BYTES) {
-      setErr(t("fileTooBig"));
-      return;
-    }
-    if (sniffKind(file) !== "png") {
-      setErr(t("coverPngOnly"));
-      return;
-    }
-    const id = uid("cover");
-    await putBlob(id, file);
-    setArt(coverRef(id));
+    try {
+      const blob = await draft.select(file); if (!blob) return;
+      if (previewUrl.current) URL.revokeObjectURL(previewUrl.current);
+      previewUrl.current = URL.createObjectURL(blob); setArt(previewUrl.current);
+    } catch(e) { setErr(String(e)); }
+  }
+  async function create() {
+    setBusy(true);setErr("");
+    try { if (art.startsWith("blob:")) await draft.save(ref => onCreate(title,blurb,ref)); else onCreate(title,blurb,art); }
+    catch(e) { setErr(`封面未保存：${String(e)}`); }
+    finally { setBusy(false); }
   }
   return (
     <div className="modal-back" onClick={onClose}>
@@ -212,7 +214,7 @@ function CreateGardenModal({
             ))}
           </div>
           <div
-            className={`file-tray cover-tray ${art.startsWith("cover:") ? "on" : ""}`}
+            className={`file-tray cover-tray ${art.startsWith("blob:") ? "on" : ""}`}
             onClick={() => fileRef.current?.click()}
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
@@ -223,7 +225,7 @@ function CreateGardenModal({
             tabIndex={0}
           >
             <span className="file-tray-mark" aria-hidden="true" />
-            {art.startsWith("cover:") ? <GardenArt art={art} className="cover-preview" /> : null}
+            {art.startsWith("blob:") ? <GardenArt art={art} className="cover-preview" /> : null}
             <span className="file-tray-copy">
               <span className="file-tray-kicker">{t("uploadCover")}</span>
               <span className="file-tray-cta">{t("dropCover")}</span>
@@ -239,7 +241,7 @@ function CreateGardenModal({
           <p className="file-tray-hint">{t("coverPngHint")}</p>
           {err ? <p className="file-tray-err">{err}</p> : null}
           <div className="hero-actions" style={{ justifyContent: "flex-start" }}>
-            <button type="button" className="btn primary" onClick={() => onCreate(title, blurb, art)}>
+            <button type="button" className="btn primary" disabled={busy} onClick={() => void create()}>
               {t("createGarden")}
             </button>
             <button type="button" className="btn ghost" onClick={onClose}>
