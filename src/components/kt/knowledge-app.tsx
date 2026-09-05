@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
+import type { Commit } from "@/lib/knowledge-tree/operations";
+import { DataBoundary, DataTools, useDataActions, useWorkspaceService, downloadData } from "./data-boundary";
+import { useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 import { CustomFields } from "./custom-fields";
 import { ConfirmCtx, ConfirmModal, useAsk, type ConfirmRequest } from "./confirm";
 import { TreePage } from "./tree-page";
@@ -12,33 +14,13 @@ import { I18nProvider, useI18n } from "@/lib/i18n";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { enterGuest, leaveGuest, readGuest } from "@/lib/guest";
 import { loadGardens, type GardenState } from "@/lib/garden-store";
-import {
-  addLog,
-  createBlankTree,
-  createTreeFromTemplate,
-  currentTree,
-  deleteLog,
-  deleteTree,
-  duplicateTree,
-  focusNode,
-  focusParent,
-  patchLog,
-  patchReview,
-  patchUi,
-  renameTree,
-  resetCurrentTreeProgress,
-  setCurrentTree,
-  shiftWeek,
-} from "@/lib/knowledge-tree/engine";
-import { emptyReview, LOG_STATUS_LABEL, NODE_STATUS_LABEL, NODE_STATUS_MARK } from "@/lib/knowledge-tree/factory";
+import { currentTree } from "@/lib/knowledge-tree/engine";
+import { emptyReview, LOG_STATUS_LABEL, NODE_STATUS_MARK } from "@/lib/knowledge-tree/factory";
 import {
   exportTree,
   exportWorkspace,
   filenameForTree,
-  loadWorkspace,
-  persistWorkspace,
 } from "@/lib/knowledge-tree/storage";
-import { mergeTreeIntoWorkspace } from "@/lib/knowledge-tree/migrate";
 import { buildWeekDraft, doneIncrement, monthWindow, progressOf, weekSummary } from "@/lib/knowledge-tree/progress";
 import { addDays, fmtDay, weekBounds, weekIdFromDate } from "@/lib/knowledge-tree/dates";
 import { getRuntime, getTemplate, TEMPLATES } from "@/lib/knowledge-tree/templates";
@@ -46,12 +28,7 @@ import { nodeLabel } from "@/lib/knowledge-tree/display";
 import { treeLogFields, treeReviewFields } from "@/lib/knowledge-tree/fields";
 import type { KnowledgeTree, LogStatus, PracticeLog, Workspace } from "@/lib/knowledge-tree/types";
 
-function download(name: string, text: string) {
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([text], { type: "application/json" }));
-  a.download = name;
-  a.click();
-}
+const download = downloadData;
 
 function snippet(s: string, n: number) {
   const t = String(s || "").replace(/\s+/g, " ").trim();
@@ -61,7 +38,7 @@ function snippet(s: string, n: number) {
 export function KnowledgeApp() {
   return (
     <I18nProvider>
-      <KnowledgeShell />
+      <DataBoundary><KnowledgeShell /></DataBoundary>
     </I18nProvider>
   );
 }
@@ -69,7 +46,10 @@ export function KnowledgeApp() {
 function KnowledgeShell() {
   const { t } = useI18n();
   const { user, isPending } = useCurrentUserState();
-  const [ws, setWs] = useState<Workspace>(() => loadWorkspace());
+  const service = useWorkspaceService();
+  const { pickImport, openImport } = useDataActions();
+  const { workspace: ws } = useSyncExternalStore(service.subscribe, service.getSnapshot, service.getSnapshot);
+  const commit = useMemo(() => service.bind(ws), [service,ws]);
   const [toast, setToast] = useState("");
   const [renameId, setRenameId] = useState<string | null>(null);
   const [renameTitle, setRenameTitle] = useState("");
@@ -88,7 +68,6 @@ function KnowledgeShell() {
     }
     return "mine";
   });
-  const fileRef = useRef<HTMLInputElement>(null);
   const ask = (req: ConfirmRequest) => setConfirmReq(req);
 
   useEffect(() => {
@@ -111,10 +90,6 @@ function KnowledgeShell() {
     }
   }
 
-  function commit(next: Workspace) {
-    persistWorkspace(next);
-    setWs(next);
-  }
   function flash(msg: string) {
     setToast(msg);
     window.setTimeout(() => setToast(""), 1800);
@@ -128,47 +103,26 @@ function KnowledgeShell() {
     setGroveOpen(true);
   }
   function openTree(id: string) {
-    commit(setCurrentTree(ws, id));
+    commit("setCurrentTree", id);
     setGroveOpen(false);
   }
   function adoptPlanted(snapshot: KnowledgeTree) {
-    const copy = structuredClone(snapshot);
-    copy.id = `tree-${Date.now().toString(36)}`;
-    commit(mergeTreeIntoWorkspace(ws, copy));
-    flash(t("planted"));
-    changeShell("mine");
-    setGroveOpen(true);
+    openImport({ schemaVersion: 3, tree: snapshot });
+    changeShell("mine"); setGroveOpen(true);
   }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       if (ws.ui.switcherOpen) {
-        commit(patchUi(ws, { switcherOpen: false }));
+        commit("patchUi", { switcherOpen: false });
         return;
       }
-      if (ws.ui.focusNodeId) commit(focusParent(ws));
+      if (ws.ui.focusNodeId) commit("focusParent");
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [ws]);
-
-  function onImport(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const raw = JSON.parse(String(reader.result));
-        commit(mergeTreeIntoWorkspace(ws, raw));
-        flash(t("imported"));
-      } catch (err) {
-        flash(t("importFail", { err: err instanceof Error ? err.message : t("parseFail") }));
-      }
-    };
-    reader.readAsText(file);
-  }
+  }, [ws, commit]);
 
   if (isPending) return null;
 
@@ -186,7 +140,7 @@ function KnowledgeShell() {
   const chrome = (
     <>
       <InkDock tab={shell} onChange={changeShell} />
-      <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={onImport} />
+      <DataTools />
       <div className={`toast ${toast ? "show" : ""}`}>{toast}</div>
       <ConfirmModal req={confirmReq} onClose={() => setConfirmReq(null)} />
     </>
@@ -233,14 +187,14 @@ function KnowledgeShell() {
             ws={ws}
             onOpen={openTree}
             onNewBlank={() => {
-              commit(createBlankTree(ws, t("untitled")));
+              commit("createBlankTree", t("untitled"));
               setGroveOpen(false);
             }}
             onFromTemplate={(id) => {
-              commit(createTreeFromTemplate(ws, id));
+              commit("createTreeFromTemplate", id);
               setGroveOpen(false);
             }}
-            onImport={() => fileRef.current?.click()}
+            onImport={() => pickImport()}
           />
         </div>
         {chrome}
@@ -262,14 +216,14 @@ function KnowledgeShell() {
           <h1>{tree.title || t("untitled")}</h1>
           {tree.description ? <p>{tree.description}</p> : null}
           <div className="hero-wave" aria-hidden="true" />
-          <button className="tree-switch" onClick={() => commit(patchUi(ws, { switcherOpen: true }))}>
+          <button className="tree-switch" onClick={() => commit("patchUi", { switcherOpen: true })}>
             {t("switchTree")} ▾
           </button>
         </div>
         <div className="hero-actions">
           <button
             className={`btn ${ws.ui.editing ? "on" : ""}`}
-            onClick={() => commit(patchUi(ws, { editing: !ws.ui.editing, tab: "tree" }))}
+            onClick={() => commit("patchUi", { editing: !ws.ui.editing, tab: "tree" })}
           >
             {ws.ui.editing ? t("doneEdit") : t("editStructure")}
           </button>
@@ -279,7 +233,7 @@ function KnowledgeShell() {
           <button className="btn" onClick={() => download("knowledge-tree-workspace.json", exportWorkspace(ws))}>
             {t("exportAll")}
           </button>
-          <button className="btn" onClick={() => fileRef.current?.click()}>
+          <button className="btn" onClick={() => pickImport()}>
             {t("import")}
           </button>
           <button
@@ -290,7 +244,7 @@ function KnowledgeShell() {
                 body: t("clearProgressBody"),
                 confirmLabel: t("clearProgressOk"),
                 onConfirm: () => {
-                  commit(resetCurrentTreeProgress(ws));
+                  commit("resetCurrentTreeProgress");
                   flash(t("cleared"));
                 },
               });
@@ -305,7 +259,7 @@ function KnowledgeShell() {
           <button
             key={tab}
             className={`tab ${ws.ui.tab === tab ? "on" : ""}`}
-            onClick={() => commit(patchUi(ws, { tab, editing: tab === "tree" ? ws.ui.editing : false }))}
+            onClick={() => commit("patchUi", { tab, editing: tab === "tree" ? ws.ui.editing : false })}
           >
             {tab === "tree" ? t("tabTree") : tab === "week" ? t("tabWeek") : t("tabLog")}
           </button>
@@ -322,8 +276,8 @@ function KnowledgeShell() {
         <Switcher
           ws={ws}
           commit={commit}
-          flash={flash}
-          onClose={() => commit(patchUi(ws, { switcherOpen: false }))}
+          onImport={pickImport}
+          onClose={() => commit("patchUi", { switcherOpen: false })}
           onRename={(id) => {
             const t = ws.trees[id];
             setRenameId(id);
@@ -339,14 +293,14 @@ function KnowledgeShell() {
             <div className="form">
               <label>{t("name")} <input value={renameTitle} onChange={(e) => setRenameTitle(e.target.value)} /></label>
               <label>{t("intro")} <textarea value={renameDesc} onChange={(e) => setRenameDesc(e.target.value)} /></label>
-              <button className="btn primary" onClick={() => { commit(renameTree(ws, renameId, renameTitle, renameDesc)); setRenameId(null); }}>
+              <button className="btn primary" onClick={() => { commit("renameTree", renameId, renameTitle, renameDesc); setRenameId(null); }}>
                 {t("save")}
               </button>
             </div>
           </div>
         </div>
       )}
-      <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={onImport} />
+      <DataTools />
       <div className={`toast ${toast ? "show" : ""}`}>{toast}</div>
       <ConfirmModal req={confirmReq} onClose={() => setConfirmReq(null)} />
     </div>
@@ -358,17 +312,16 @@ function KnowledgeShell() {
 function Switcher({
   ws,
   commit,
-  flash,
+  onImport,
   onClose,
   onRename,
 }: {
   ws: Workspace;
-  commit: (w: Workspace) => void;
-  flash: (s: string) => void;
+  commit: Commit;
+  onImport: () => void;
   onClose: () => void;
   onRename: (id: string) => void;
 }) {
-  const fileRef = useRef<HTMLInputElement>(null);
   const ask = useAsk();
   const { t } = useI18n();
   return (
@@ -379,21 +332,21 @@ function Switcher({
           <div key={tr.id} className="tree-row">
             <button
               className={`tree-pick ${ws.currentTreeId === tr.id ? "current" : ""}`}
-              onClick={() => commit(setCurrentTree(ws, tr.id))}
+              onClick={() => commit("setCurrentTree", tr.id)}
             >
               {tr.title}
               <small>{tr.description || t("noIntro")} · {t("nodesCount", { n: tr.nodes.length })}</small>
             </button>
             <div className="hero-actions">
               <button className="btn ghost" onClick={() => onRename(tr.id)}>{t("rename")}</button>
-              <button className="btn ghost" onClick={() => commit(duplicateTree(ws, tr.id))}>{t("duplicate")}</button>
+              <button className="btn ghost" onClick={() => commit("duplicateTree", tr.id)}>{t("duplicate")}</button>
               <button
                 className="btn danger"
                 onClick={() => {
                   ask({
                     title: t("deleteTreeTitle", { title: tr.title }),
                     body: t("deleteTreeBody"),
-                    onConfirm: () => commit(deleteTree(ws, tr.id)),
+                    onConfirm: () => commit("deleteTree", tr.id),
                   });
                 }}
               >
@@ -403,35 +356,15 @@ function Switcher({
           </div>
         ))}
         <div className="hero-actions" style={{ marginTop: 14, justifyContent: "flex-start" }}>
-          <button className="btn primary" onClick={() => commit(createBlankTree(ws))}>{t("newBlankShort")}</button>
+          <button className="btn primary" onClick={() => commit("createBlankTree")}>{t("newBlankShort")}</button>
           {TEMPLATES.filter((tpl) => tpl.id !== "blank").map((tpl) => (
-            <button key={tpl.id} className="btn" onClick={() => commit(createTreeFromTemplate(ws, tpl.id))}>
+            <button key={tpl.id} className="btn" onClick={() => commit("createTreeFromTemplate", tpl.id)}>
               {t("fromTemplate", { title: tpl.title })}
             </button>
           ))}
-          <button className="btn" onClick={() => fileRef.current?.click()}>{t("importJson")}</button>
+          <button className="btn" onClick={onImport}>{t("importJson")}</button>
         </div>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="application/json,.json"
-          hidden
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            e.target.value = "";
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = () => {
-              try {
-                commit(mergeTreeIntoWorkspace(ws, JSON.parse(String(reader.result))));
-                flash(t("importedOk"));
-              } catch {
-                flash(t("importFailed"));
-              }
-            };
-            reader.readAsText(file);
-          }}
-        />
+
       </div>
     </div>
   );
@@ -447,7 +380,7 @@ function WeekPage({
   ws: Workspace;
   tree: KnowledgeTree;
   weekId: string;
-  commit: (w: Workspace) => void;
+  commit: Commit;
   flash: (s: string) => void;
 }) {
   const { start, isFuture, isCurrent } = weekBounds(weekId);
@@ -469,9 +402,9 @@ function WeekPage({
   return (
     <>
       <div className="week-nav">
-        <button className="btn" onClick={() => commit(shiftWeek(ws, -1))}>{t("prevWeek")}</button>
+        <button className="btn" onClick={() => commit("shiftWeek", -1)}>{t("prevWeek")}</button>
         <strong>{fmtDay(start)} ～ {fmtDay(endShow)}{isCurrent ? ` · ${t("thisWeek")}` : isFuture ? ` · ${t("future")}` : ""}</strong>
-        <button className="btn" onClick={() => commit(shiftWeek(ws, 1))}>{t("nextWeek")}</button>
+        <button className="btn" onClick={() => commit("shiftWeek", 1)}>{t("nextWeek")}</button>
       </div>
       <div className="summary">
         <div className="stat"><b>{sum.newlyDone.length}</b><span>{t("newlyDone")}</span></div>
@@ -485,7 +418,7 @@ function WeekPage({
       {list(t("stalled"), sum.stalled.map(({ node, days }) => <div className="row" key={node.id}><span>{nodeLabel(node)}</span><small>{Math.floor(days)} 天</small></div>), t("stalledEmpty"))}
       {list(t("p0focus"), sum.p0focus.map((n) => <div className="row" key={n.id}><span>{nodeLabel(n)}</span><small>{NODE_STATUS_MARK[n.status]} {t(n.status === "todo" ? "statusTodo" : n.status === "doing" ? "statusDoing" : "statusDone")}</small></div>), t("p0focusEmpty"))}
       {list(t("weekPractice"), sum.weekLogs.map((e) => (
-        <button className="row" key={e.id} onClick={() => commit(patchUi(ws, { tab: "log", expandedLogs: { ...ws.ui.expandedLogs, [e.id]: true }, scrollLogId: e.id }))}>
+        <button className="row" key={e.id} onClick={() => commit("patchUi", { tab: "log", expandedLogs: { ...ws.ui.expandedLogs, [e.id]: true }, scrollLogId: e.id })}>
           <span>{e.title || t("untitledLog")}</span><small>{e.date} · {LOG_STATUS_LABEL[e.status]}</small>
         </button>
       )), t("weekPracticeEmpty"))}
@@ -498,7 +431,7 @@ function WeekPage({
             onClick={() => {
               const has = [r.focus, r.stuck, r.nextMain, r.nextP2, r.risk, r.summary].some((x) => String(x || "").trim());
               const fill = () => {
-                commit(patchReview(ws, weekId, { summary: buildWeekDraft(tree, weekId, leakHint) }));
+                commit("patchReview", weekId, { summary: buildWeekDraft(tree, weekId, leakHint) });
                 flash(t("draftFilled"));
               };
               if (!has) {
@@ -517,21 +450,21 @@ function WeekPage({
           </button>
         </div>
         <div className="form">
-          <label>本周真正推进的一件事 <input value={r.focus} onChange={(e) => commit(patchReview(ws, weekId, { focus: e.target.value }))} /></label>
-          <label>卡住的地方 <textarea value={r.stuck} onChange={(e) => commit(patchReview(ws, weekId, { stuck: e.target.value }))} /></label>
+          <label>本周真正推进的一件事 <input value={r.focus} onChange={(e) => commit("patchReview", weekId, { focus: e.target.value })} /></label>
+          <label>卡住的地方 <textarea value={r.stuck} onChange={(e) => commit("patchReview", weekId, { stuck: e.target.value })} /></label>
           <div className="form-grid">
-            <label>下周只允许的 1 个主问题 <input value={r.nextMain} onChange={(e) => commit(patchReview(ws, weekId, { nextMain: e.target.value }))} /></label>
-            <label>下周只允许的 1 个探索项（可空） <input value={r.nextP2} onChange={(e) => commit(patchReview(ws, weekId, { nextP2: e.target.value }))} /></label>
+            <label>下周只允许的 1 个主问题 <input value={r.nextMain} onChange={(e) => commit("patchReview", weekId, { nextMain: e.target.value })} /></label>
+            <label>下周只允许的 1 个探索项（可空） <input value={r.nextP2} onChange={(e) => commit("patchReview", weekId, { nextP2: e.target.value })} /></label>
           </div>
-          <label>本周发现的错误 / 风险 / 需要复查的地方 <textarea value={r.risk} onChange={(e) => commit(patchReview(ws, weekId, { risk: e.target.value }))} /></label>
+          <label>本周发现的错误 / 风险 / 需要复查的地方 <textarea value={r.risk} onChange={(e) => commit("patchReview", weekId, { risk: e.target.value })} /></label>
           {reviewFields.length ? (
             <CustomFields
               defs={reviewFields}
               values={r.custom}
-              onChange={(id, value) => commit(patchReview(ws, weekId, { custom: { ...r.custom, [id]: value } }))}
+              onChange={(id, value) => commit("patchReview", weekId, { custom: { [id]: value } })}
             />
           ) : null}
-          <label>可编辑周总结 <textarea value={r.summary} onChange={(e) => commit(patchReview(ws, weekId, { summary: e.target.value }))} /></label>
+          <label>可编辑周总结 <textarea value={r.summary} onChange={(e) => commit("patchReview", weekId, { summary: e.target.value })} /></label>
         </div>
       </section>
       <section>
@@ -555,7 +488,7 @@ function LogPage({
 }: {
   ws: Workspace;
   tree: KnowledgeTree;
-  commit: (w: Workspace) => void;
+  commit: Commit;
   flash: (s: string) => void;
 }) {
   const runtime = getRuntime(tree.templateId);
@@ -572,19 +505,19 @@ function LogPage({
   useEffect(() => {
     if (!ws.ui.scrollLogId) return;
     document.getElementById(`log-${ws.ui.scrollLogId}`)?.scrollIntoView({ block: "start" });
-    commit(patchUi(ws, { scrollLogId: "" }));
+    commit("patchUi", { scrollLogId: "" });
   }, [ws.ui.scrollLogId, commit, ws]);
 
   return (
     <>
       <div className="hero-actions" style={{ marginBottom: 12, justifyContent: "flex-start" }}>
-        <button className="btn primary" onClick={() => commit(addLog(ws))}>新建记录</button>
+        <button className="btn primary" onClick={() => commit("addLog")}>新建记录</button>
         <button
           className="btn"
           onClick={() => {
             const q = (review.nextMain || review.focus || "").trim();
             if (!q) { flash("本周还没有填写主问题或推进的一事，先去周回顾写一句。"); return; }
-            commit(addLog(ws, { title: q.slice(0, 80), hypothesis: q, question: q }));
+            commit("addLog", { title: q.slice(0, 80), hypothesis: q, question: q });
             flash("已生成草稿");
           }}
         >
@@ -592,9 +525,9 @@ function LogPage({
         </button>
       </div>
       <div className="filters">
-        <input className="search" placeholder="搜索标题 / 假设 / 结论" value={ws.ui.logQuery} onChange={(e) => commit(patchUi(ws, { logQuery: e.target.value }))} />
+        <input className="search" placeholder="搜索标题 / 假设 / 结论" value={ws.ui.logQuery} onChange={(e) => commit("patchUi", { logQuery: e.target.value })} />
         {([["", "全部状态"], ["idea", "构思"], ["running", "进行中"], ["done", "完成"], ["dropped", "放弃"]] as const).map(([v, l]) => (
-          <button key={v} className={`chip ${ws.ui.logStatus === v ? "on" : ""}`} onClick={() => commit(patchUi(ws, { logStatus: v as "" | LogStatus }))}>{l}</button>
+          <button key={v} className={`chip ${ws.ui.logStatus === v ? "on" : ""}`} onClick={() => commit("patchUi", { logStatus: v as "" | LogStatus })}>{l}</button>
         ))}
       </div>
       {vis.length ? vis.map((exp) => (
@@ -614,7 +547,7 @@ function LogCard({
   exp: PracticeLog;
   tree: KnowledgeTree;
   ws: Workspace;
-  commit: (w: Workspace) => void;
+  commit: Commit;
   hasRisk: boolean;
 }) {
   const open = !!ws.ui.expandedLogs[exp.id];
@@ -631,7 +564,7 @@ function LogCard({
   );
   return (
     <article className={`exp ${hasRisk ? "warn" : ""}`} id={`log-${exp.id}`}>
-      <div className="exp-hd" onClick={() => commit(patchUi(ws, { expandedLogs: { ...ws.ui.expandedLogs, [exp.id]: !open } }))}>
+      <div className="exp-hd" onClick={() => commit("patchUi", { expandedLogs: { ...ws.ui.expandedLogs, [exp.id]: !open } })}>
         <div>
           <h3>{exp.title || "未命名记录"}</h3>
           <div className="meta">{exp.date} · {LOG_STATUS_LABEL[exp.status]}{hasRisk ? " · 风险未确认" : ""}</div>
@@ -645,23 +578,23 @@ function LogCard({
       {open && (
         <div className="form" style={{ marginTop: 12 }}>
           <div className="form-grid">
-            <label>标题 <input value={exp.title} onChange={(e) => commit(patchLog(ws, exp.id, { title: e.target.value }))} /></label>
-            <label>日期 <input type="date" value={exp.date} onChange={(e) => commit(patchLog(ws, exp.id, { date: e.target.value }))} /></label>
+            <label>标题 <input value={exp.title} onChange={(e) => commit("patchLog", exp.id, { title: e.target.value })} /></label>
+            <label>日期 <input type="date" value={exp.date} onChange={(e) => commit("patchLog", exp.id, { date: e.target.value })} /></label>
           </div>
           <label>状态
-            <select value={exp.status} onChange={(e) => commit(patchLog(ws, exp.id, { status: e.target.value as LogStatus }))}>
+            <select value={exp.status} onChange={(e) => commit("patchLog", exp.id, { status: e.target.value as LogStatus })}>
               {Object.entries(LOG_STATUS_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           </label>
-          <label>问题 / 目标 <textarea value={exp.question} onChange={(e) => commit(patchLog(ws, exp.id, { question: e.target.value }))} /></label>
-          <label>假设 / 预期 <textarea value={exp.hypothesis} onChange={(e) => commit(patchLog(ws, exp.id, { hypothesis: e.target.value }))} /></label>
-          <label>过程 / 证据 <textarea value={exp.process} onChange={(e) => commit(patchLog(ws, exp.id, { process: e.target.value }))} /></label>
-          <label>结论 <textarea value={exp.conclusion} onChange={(e) => commit(patchLog(ws, exp.id, { conclusion: e.target.value }))} /></label>
+          <label>问题 / 目标 <textarea value={exp.question} onChange={(e) => commit("patchLog", exp.id, { question: e.target.value })} /></label>
+          <label>假设 / 预期 <textarea value={exp.hypothesis} onChange={(e) => commit("patchLog", exp.id, { hypothesis: e.target.value })} /></label>
+          <label>过程 / 证据 <textarea value={exp.process} onChange={(e) => commit("patchLog", exp.id, { process: e.target.value })} /></label>
+          <label>结论 <textarea value={exp.conclusion} onChange={(e) => commit("patchLog", exp.id, { conclusion: e.target.value })} /></label>
           {logFields.length ? (
             <CustomFields
               defs={logFields}
               values={exp.custom}
-              onChange={(id, value) => commit(patchLog(ws, exp.id, { custom: { ...exp.custom, [id]: value } }))}
+              onChange={(id, value) => commit("patchLog", exp.id, { custom: { [id]: value } })}
             />
           ) : null}
           <div className="field">
@@ -677,7 +610,7 @@ function LogCard({
                       const set = new Set(exp.linkedNodeIds);
                       if (e.target.checked) set.add(n.id);
                       else set.delete(n.id);
-                      commit(patchLog(ws, exp.id, { linkedNodeIds: Array.from(set) }));
+                      commit("patchLog", exp.id, { linkedNodeIds: Array.from(set) });
                     }}
                   />
                   <span>{nodeLabel(n)}</span>
@@ -685,14 +618,14 @@ function LogCard({
               ))}
             </div>
           </div>
-          <label>标签（逗号分隔） <input value={(exp.tags || []).join(", ")} onChange={(e) => commit(patchLog(ws, exp.id, { tags: e.target.value.split(/[,，]/).map((s) => s.trim()).filter(Boolean) }))} /></label>
-          <label>附件说明 <input value={exp.attachmentNote} onChange={(e) => commit(patchLog(ws, exp.id, { attachmentNote: e.target.value }))} /></label>
+          <label>标签（逗号分隔） <input value={(exp.tags || []).join(", ")} onChange={(e) => commit("patchLog", exp.id, { tags: e.target.value.split(/[,，]/).map((s) => s.trim()).filter(Boolean) })} /></label>
+          <label>附件说明 <input value={exp.attachmentNote} onChange={(e) => commit("patchLog", exp.id, { attachmentNote: e.target.value })} /></label>
           <div>
             <button className="btn danger" onClick={() => {
               ask({
                 title: `删除实践日志「${exp.title || "未命名记录"}」？`,
                 body: "此操作无法撤销。",
-                onConfirm: () => commit(deleteLog(ws, exp.id)),
+                onConfirm: () => commit("deleteLog", exp.id),
               });
             }}>删除</button>
           </div>

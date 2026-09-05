@@ -50,6 +50,16 @@ test("F02/F04: section mismatch, duplicate IDs, cycles and unrelated imports are
     await assert.rejects(()=>previewImport(service,invalid)); assert.equal(adapter.read(ACTIVE_KEY),before);
   }
 });
+test("F01/F02: legacy source changes at revision zero still invalidate an import preview", async () => {
+  const {ws,treeId}=fixture();const adapter=memoryAdapter({"knowledge-tree-workspace-v3":JSON.stringify(ws)});
+  const service=new WorkspaceService({adapter,blobs:memoryBlobStore(),exclusive:memoryExclusive(),delay:60000});
+  const preview=await previewImport(service,ws.trees[treeId]);
+  const changed=structuredClone(ws);changed.trees[treeId].nodes[0].note="changed by old client";
+  adapter.write("knowledge-tree-workspace-v3",JSON.stringify(changed));
+  assert.equal(await service.acceptPreview(preview,true),false);
+  assert.equal(adapter.read(ACTIVE_KEY),null);
+  assert.equal(loadWorkspace(adapter).trees[treeId].nodes[0].note,"changed by old client");
+});
 test("F07: full ZIP → empty storage → restore keeps all knowledge, metadata and byte hashes", async () => {
   const {service,adapter,treeId,nodeId} = fixture();
   await service.addFiles(treeId,nodeId,[new File(["attachment one"],"one.md"),new File(["%PDF-1.7\nexample"],"two.pdf")]);

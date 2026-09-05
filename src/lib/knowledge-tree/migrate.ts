@@ -216,10 +216,10 @@ function hydrateUi(raw: unknown): WorkspaceUi {
 export function coerceTree(raw: KnowledgeTree, fallbackId: string): KnowledgeTree {
   if (!isRecord(raw) || !Array.isArray(raw.sections) || !Array.isArray(raw.nodes)) throw new DataError("SCHEMA_INVALID", "Tree needs sections and nodes arrays");
   const tree = {
-    ...raw, id: raw.id ?? fallbackId,
+    ...raw, id: raw.id === undefined ? fallbackId : raw.id,
     title: raw.title ?? "未命名知识树", description: raw.description ?? "",
     createdAt: raw.createdAt ?? nowISO(), updatedAt: raw.updatedAt ?? nowISO(),
-    templateId: raw.templateId ?? null, reviews: raw.reviews ?? {}, logs: raw.logs ?? [], settings: raw.settings ?? {},
+    templateId: raw.templateId ?? null, reviews: raw.reviews === undefined ? {} : raw.reviews, logs: raw.logs === undefined ? [] : raw.logs, settings: raw.settings === undefined ? {} : raw.settings,
   };
   assertTree(tree);
   return normalizeOrders(tree);

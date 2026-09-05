@@ -111,3 +111,25 @@ test("F01/F08: coalesced text changes and structural operations replay stable ID
   assert.equal(await a.flush(),true);
   assert.equal(writes,1); assert.equal(loadWorkspace(adapter).trees[treeId].nodes.at(-1)!.id,child.id);
 });
+test("F08: serialization failure precedes writes and preserves rescueable draft", async () => {
+  const {a,adapter,treeId,nodeId} = setup(); const before=adapter.read(ACTIVE_KEY);
+  a.bind(a.getSnapshot().workspace)("patchNode",nodeId,{note:"serialization rescue"});
+  const original=JSON.stringify;
+  JSON.stringify=((value:unknown,...args:unknown[])=>{
+    if(value && typeof value==="object" && "formatVersion" in value) throw new TypeError("Injected serialization failure");
+    return (original as (...args:any[])=>string)(value,...args);
+  }) as typeof JSON.stringify;
+  try {assert.equal(await a.flush(),false);} finally {JSON.stringify=original;}
+  assert.equal(adapter.read(ACTIVE_KEY),before);
+  assert.equal(JSON.parse(JSON.stringify(a.getSnapshot().workspace)).trees[treeId].nodes[0].note,"serialization rescue");
+  assert.equal(a.getSnapshot().status,"SAVE_FAILED");
+  assert.equal(await a.retry(),true);
+});
+test("F05: command replay preserves reset null timestamps and notes", async () => {
+  const {a,adapter,treeId,nodeId}=setup();
+  a.bind(a.getSnapshot().workspace)("patchNode",nodeId,{note:"retain"});
+  a.bind(a.getSnapshot().workspace)("setNodeStatus",nodeId,"doing");await a.flush();
+  a.bind(a.getSnapshot().workspace)("resetCurrentTreeProgress");assert.equal(await a.flush(),true);
+  const node=loadWorkspace(adapter).trees[treeId].nodes[0];
+  assert.equal(node.statusChangedAt,null);assert.equal(node.firstSeenDoingAt,null);assert.equal(node.note,"retain");
+});

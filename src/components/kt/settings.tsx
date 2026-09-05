@@ -1,6 +1,7 @@
+import type { Commit } from "@/lib/knowledge-tree/operations";
 import { SignInGate, UserButton } from "@/lib/auth/gates";
 import { progressOf } from "@/lib/knowledge-tree/progress";
-import { setCurrentTree } from "@/lib/knowledge-tree/engine";
+
 import type { Workspace } from "@/lib/knowledge-tree/types";
 import { useI18n, type FontSize } from "@/lib/i18n";
 import { SignInPanel } from "./sign-in-panel";
@@ -15,7 +16,7 @@ export function SettingsPage({
   onOpenTree,
 }: {
   ws: Workspace;
-  commit: (w: Workspace) => void;
+  commit: Commit;
   guest: boolean;
   onLeaveGuest: () => void;
   onOpenTree: (id: string) => void;
@@ -92,7 +93,7 @@ export function SettingsPage({
                     type="button"
                     className={`tree-pick ${current ? "current" : ""}`}
                     onClick={() => {
-                      commit(setCurrentTree(ws, tree.id));
+                      commit("setCurrentTree", tree.id);
                       onOpenTree(tree.id);
                     }}
                   >

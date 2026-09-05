@@ -87,7 +87,7 @@ export const BOOT_TICK_JS = `(function(){
 
 export function PeachBoot() {
   return (
-    <div id="leo-boot" aria-hidden="true">
+    <div id="leo-boot" aria-hidden="true" suppressHydrationWarning>
       <style dangerouslySetInnerHTML={{ __html: BOOT_CSS }} />
       <img className="leo-cover" src="/theme/boot-cover.jpg" alt="" />
       <div className="leo-ink-bar">

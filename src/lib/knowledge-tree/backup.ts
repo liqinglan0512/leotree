@@ -1,6 +1,6 @@
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
-import { domainPayload } from "./storage.ts";
-import { emptyUi } from "./factory.ts";
+import { domainPayload, workspaceContent } from "./storage.ts";
+import { emptyUi, emptyWorkspace } from "./factory.ts";
 import { migrateToV3 } from "./migrate.ts";
 import { attachmentIds, type WorkspaceService } from "./service.ts";
 import type { KnowledgeTree, Workspace } from "./types.ts";
@@ -60,7 +60,7 @@ export async function createBackup(service: WorkspaceService, rescue = false): P
   };
   return rescue ? build() : service.exclusive(build);
 }
-export interface BackupPreview { workspace: Workspace; baseRevision: number; files: Array<[string,Blob]>; manifest: BackupManifest; gardenRaw: string | null; }
+export interface BackupPreview { workspace: Workspace; baseRevision: number; baseContent: string; files: Array<[string,Blob]>; manifest: BackupManifest; gardenRaw: string | null; }
 export async function readBackup(bytes: Uint8Array, baseRevision: number): Promise<BackupPreview> {
   if (bytes.byteLength > 300 * 1024 * 1024) throw new DataError("SCHEMA_INVALID", "Backup exceeds 300 MiB import limit");
   let total = 0;
@@ -89,13 +89,14 @@ export async function readBackup(bytes: Uint8Array, baseRevision: number): Promi
   }
   if (needed.size || files.length !== manifest.attachmentCount) throw new DataError("MISSING_ATTACHMENT", "Backup is missing attachment bytes");
   for (const t of Object.values(workspace.trees)) for (const n of t.nodes) for (const a of n.attachments ?? []) if (files.find(([id]) => id === a.id)?.[1].size !== a.size) throw new DataError("SCHEMA_INVALID", "Attachment metadata size differs from bytes");
-  return { workspace: { ...workspace, retainedGardenData: gardenRaw, ui: emptyUi() },baseRevision,files,manifest,gardenRaw };
+  return { workspace: { ...workspace, retainedGardenData: gardenRaw, ui: emptyUi() },baseRevision,baseContent:workspaceContent(emptyWorkspace()),files,manifest,gardenRaw };
 }
 
 /** Existing bytes are never overwritten when restoring over a used profile. */
 export async function previewBackupRestore(service: WorkspaceService, bytes: Uint8Array): Promise<BackupPreview> {
   if (!await service.flush()) throw new DataError("SAVE_FAILED", "Save or rescue pending edits before restoring");
   const result = await readBackup(bytes, Number(service.getSnapshot().workspace.workspaceRevision ?? 0));
+  result.baseContent = workspaceContent(service.getSnapshot().workspace);
   const replacements = new Map<string,string>();
   for (const [id] of result.files) if (await service.blobs.get(id)) replacements.set(id, `file-${crypto.randomUUID()}`);
   const remapTree = (tree: KnowledgeTree) => { for (const n of tree.nodes) for (const a of n.attachments ?? []) a.id = replacements.get(a.id) ?? a.id; };

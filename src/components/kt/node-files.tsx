@@ -1,8 +1,7 @@
+import { useWorkspaceService } from "./data-boundary";
 import { useEffect, useRef, useState } from "react";
 import { Trash2 } from "lucide-react";
 import {
-  addFile,
-  deleteBlob,
   formatSize,
   getBlob,
   type NodeAttachment,
@@ -13,42 +12,29 @@ const ACCEPT = ".png,.md,.pdf,.docx,image/png,application/pdf,application/vnd.op
 
 export function NodeFiles({
   files,
-  onChange,
+  treeId, nodeId,
 }: {
   files: NodeAttachment[];
-  onChange: (next: NodeAttachment[]) => void;
+  treeId: string; nodeId: string;
 }) {
   const { t } = useI18n();
+  const service = useWorkspaceService();
   const inputRef = useRef<HTMLInputElement>(null);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [over, setOver] = useState(false);
 
   async function onPick(list: FileList | null) {
-    if (!list?.length) return;
-    setErr("");
-    setBusy(true);
-    try {
-      const next = [...files];
-      for (const file of Array.from(list)) {
-        try {
-          next.push(await addFile(file));
-        } catch (e) {
-          const name = e instanceof Error ? e.name : "";
-          setErr(name === "size" ? t("fileTooBig") : t("fileTypeDenied"));
-        }
-      }
-      onChange(next);
-    } finally {
-      setBusy(false);
-      if (inputRef.current) inputRef.current.value = "";
+    if (!list?.length || busy) return;
+    setErr(""); setBusy(true);
+    const ok = await service.addFiles(treeId,nodeId,Array.from(list));
+    if (!ok) {
+      const state = service.getSnapshot();
+      setErr(state.errorCode === "FILE_TOO_LARGE" ? t("fileTooBig") : state.errorCode === "FILE_UNSUPPORTED" ? t("fileTypeDenied") : `附件未保存：${state.message}。请重试或使用救援导出。`);
     }
+    setBusy(false); if(inputRef.current) inputRef.current.value="";
   }
-
-  async function remove(id: string) {
-    await deleteBlob(id);
-    onChange(files.filter((f) => f.id !== id));
-  }
+  function remove(id: string) { service.removeFile(treeId,nodeId,id); }
 
   return (
     <div className="node-files">
@@ -111,7 +97,7 @@ function FileRow({ file, onRemove }: { file: NodeAttachment; onRemove: () => voi
       if (gone || !blob) return;
       objectUrl = URL.createObjectURL(blob);
       setUrl(objectUrl);
-    });
+    }).catch(() => { if (!gone) setUrl(null); });
     return () => {
       gone = true;
       if (objectUrl) URL.revokeObjectURL(objectUrl);

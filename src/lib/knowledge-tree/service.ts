@@ -2,7 +2,7 @@ import { emptyUi, emptyWorkspace } from "./factory.ts";
 import { indexedBlobStore, prepareFile, type BlobStore, type NodeAttachment } from "./files.ts";
 import { uid } from "./ids.ts";
 import { applyOperation, prepareOperation, uiOperations, type Commit, type Invocation, type UiInvocation } from "./operations.ts";
-import { ACTIVE_KEY, SAFE_KEY, activateRecovery, localStorageAdapter, readSource, readWorkspace, writeRecord, type ReadResult, type StorageAdapter } from "./storage.ts";
+import { ACTIVE_KEY, SAFE_KEY, activateRecovery, localStorageAdapter, readSource, readWorkspace, writeRecord, workspaceContent, type ReadResult, type StorageAdapter } from "./storage.ts";
 import type { KnowledgeTree, Workspace } from "./types.ts";
 import { assertTree, assertWorkspace, DataError, isRecord, validateTree } from "./validation.ts";
 
@@ -90,7 +90,14 @@ export class WorkspaceService {
     const used = attachmentIds(active);
     const safe = readSource(this.adapter, SAFE_KEY);
     if (safe.code !== "MISSING" && !safe.workspace) throw new DataError("CLEANUP_DEFERRED", "Unreadable recovery copy; attachment cleanup deferred");
-    if (safe.workspace) attachmentIds(safe.workspace).forEach(id => used.add(id));
+    if (safe.workspace) {
+      attachmentIds(safe.workspace).forEach(id => used.add(id));
+      if (typeof safe.workspace.retainedGardenData === "string") {
+        const previous = JSON.parse(safe.workspace.retainedGardenData);
+        for (const g of previous.gardens ?? []) if (typeof g.art === "string" && g.art.startsWith("cover:")) used.add(g.art.slice(6));
+        for (const p of previous.planted ?? []) for (const n of p.snapshot.nodes) for (const a of n.attachments ?? []) used.add(a.id);
+      }
+    }
     const raw = Object.hasOwn(active,"retainedGardenData") ? active.retainedGardenData as string | null : this.adapter.read("leo-tree-gardens-v1");
     if (raw !== null) {
       let gardens: unknown;
@@ -214,13 +221,13 @@ export class WorkspaceService {
     } catch (error) { this.fail(error); return false; }
   }
   /** Import/restore entry point requires a validated preview and exact reviewed domain revision. */
-  async acceptPreview(preview: { workspace: Workspace; baseRevision: number; files: Array<[string,Blob]> }, confirmed: boolean): Promise<boolean> {
+  async acceptPreview(preview: { workspace: Workspace; baseRevision: number; baseContent: string; files: Array<[string,Blob]> }, confirmed: boolean): Promise<boolean> {
     try {
       if (!confirmed) throw new DataError("CONFIRMATION_REQUIRED", "Confirm the preview first");
       assertWorkspace(preview.workspace);
       if (this.pending.length) throw new DataError("CONFLICT", "Save pending edits and regenerate the preview");
       this.enqueue({ label: "AcceptImportPreview", apply: latest => {
-        if (Number(latest.workspaceRevision ?? 0) !== preview.baseRevision) throw new DataError("CONFLICT", "Workspace changed after preview; regenerate it");
+        if (Number(latest.workspaceRevision ?? 0) !== preview.baseRevision || workspaceContent(latest) !== preview.baseContent) throw new DataError("CONFLICT", "Workspace changed after preview; regenerate it");
         return { ...preview.workspace, ui: latest.ui };
       } }, preview.files);
       return await this.flush();

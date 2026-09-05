@@ -100,3 +100,8 @@ export function filenameForTree(title: string): string {
   const slug = title.trim().replace(/\s+/g, "-").replace(/[\\/:*?"<>|]/g, "") || "knowledge-tree";
   return `${slug}-knowledge-tree.json`;
 }
+
+export function workspaceContent(ws: Workspace): string {
+  const { ui: _ui, currentTreeId: _selected, workspaceRevision: _revision, ...content } = ws;
+  return JSON.stringify(content);
+}

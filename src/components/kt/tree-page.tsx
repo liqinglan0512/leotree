@@ -1,21 +1,8 @@
+import type { Commit } from "@/lib/knowledge-tree/operations";
 import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, ChevronRight, FolderTree, Home, MoreHorizontal, Plus } from "lucide-react";
 import { useAsk } from "./confirm";
-import {
-  addNode,
-  addSection,
-  cycleNodeStatus,
-  deleteNode,
-  deleteSection,
-  focusNode,
-  moveNode,
-  moveNodeToSection,
-  moveSection,
-  patchNode,
-  patchSection,
-  patchUi,
-  setNodeParent,
-} from "@/lib/knowledge-tree/engine";
+
 import { NODE_STATUS_LABEL, NODE_STATUS_MARK } from "@/lib/knowledge-tree/factory";
 import { nodeLabel, prioLabel } from "@/lib/knowledge-tree/display";
 import { nodeAttachments } from "@/lib/knowledge-tree/files";
@@ -54,7 +41,7 @@ export function TreePage({
   ws: Workspace;
   tree: KnowledgeTree;
   tot: { pct: number; done: number; doing: number; todo: number };
-  commit: (w: Workspace) => void;
+  commit: Commit;
 }) {
   const ask = useAsk();
   const { t } = useI18n();
@@ -105,18 +92,18 @@ export function TreePage({
               className="search"
               placeholder={t("searchTree")}
               value={ws.ui.treeQuery}
-              onChange={(e) => commit(patchUi(ws, { treeQuery: e.target.value }))}
+              onChange={(e) => commit("patchUi", { treeQuery: e.target.value })}
             />
             {!focus ? (
               <>
                 <div className="filter-row">
                   {([["", t("allStatus")], ["todo", t("stTodo")], ["doing", t("stDoing")], ["done", t("stDone")]] as const).map(([v, l]) => (
-                    <button key={v || "all-st"} type="button" className={`chip ${ws.ui.treeStatus === v ? "on" : ""}`} onClick={() => commit(patchUi(ws, { treeStatus: v }))}>{l}</button>
+                    <button key={v || "all-st"} type="button" className={`chip ${ws.ui.treeStatus === v ? "on" : ""}`} onClick={() => commit("patchUi", { treeStatus: v })}>{l}</button>
                   ))}
                 </div>
                 <div className="filter-row">
                   {([["", t("allPrio")], ["0", t("p0")], ["1", t("p1")], ["2", t("p2")], ["3", t("p3")]] as const).map(([v, l]) => (
-                    <button key={v || "all-p"} type="button" className={`chip ${ws.ui.treePrio === v ? "on" : ""}`} onClick={() => commit(patchUi(ws, { treePrio: v }))}>{l}</button>
+                    <button key={v || "all-p"} type="button" className={`chip ${ws.ui.treePrio === v ? "on" : ""}`} onClick={() => commit("patchUi", { treePrio: v })}>{l}</button>
                   ))}
                 </div>
               </>
@@ -159,12 +146,12 @@ function Crumbs({
   tree: KnowledgeTree;
   focus: KnowledgeNode | null;
   ws: Workspace;
-  commit: (w: Workspace) => void;
+  commit: Commit;
   onOpenOutline: () => void;
 }) {
   const chain = focus ? ancestorChain(tree.nodes, focus.id) : [];
   const section = focus ? tree.sections.find((s) => s.id === focus.sectionId) : null;
-  const goRoot = () => commit(focusNode(ws, null));
+  const goRoot = () => commit("focusNode", null);
   const { t } = useI18n();
   return (
     <nav className="crumbs" aria-label="路径">
@@ -194,7 +181,7 @@ function Crumbs({
           {i === chain.length - 1 ? (
             <span className="here">{nodeLabel(n)}</span>
           ) : (
-            <button type="button" onClick={() => commit(focusNode(ws, n.id))}>{nodeLabel(n)}</button>
+            <button type="button" onClick={() => commit("focusNode", n.id)}>{nodeLabel(n)}</button>
           )}
         </span>
       ))}
@@ -211,7 +198,7 @@ function Outline({
 }: {
   tree: KnowledgeTree;
   ws: Workspace;
-  commit: (w: Workspace) => void;
+  commit: Commit;
   mobileOpen: boolean;
   onClose: () => void;
 }) {
@@ -225,10 +212,10 @@ function Outline({
     return fallback;
   }
   function toggle(id: string, fallback: boolean) {
-    commit(patchUi(ws, { outlineOpen: { ...ws.ui.outlineOpen, [id]: !opened(id, fallback) } }));
+    commit("patchUi", { outlineOpen: { ...ws.ui.outlineOpen, [id]: !opened(id, fallback) } });
   }
   function pick(id: string | null) {
-    commit(focusNode(ws, id));
+    commit("focusNode", id);
     onClose();
   }
 
@@ -313,7 +300,7 @@ function RootView({
 }: {
   tree: KnowledgeTree;
   ws: Workspace;
-  commit: (w: Workspace) => void;
+  commit: Commit;
   pendingDel: string | null;
   setPendingDel: (id: string | null) => void;
   ask: ReturnType<typeof useAsk>;
@@ -322,7 +309,7 @@ function RootView({
     <>
       {ws.ui.editing && (
         <div className="hero-actions" style={{ justifyContent: "flex-start", marginBottom: 12 }}>
-          <button className="btn" onClick={() => commit(addSection(ws))}>新增分区</button>
+          <button className="btn" onClick={() => commit("addSection")}>新增分区</button>
         </div>
       )}
       {tree.sections
@@ -345,17 +332,17 @@ function RootView({
               {ws.ui.editing ? (
                 <div className="form" style={{ marginBottom: 10 }}>
                   <div className="form-grid">
-                    <label>分区名称 <input value={sec.title} onChange={(e) => commit(patchSection(ws, sec.id, { title: e.target.value }))} /></label>
-                    <label>分区说明 <input value={sec.description} onChange={(e) => commit(patchSection(ws, sec.id, { description: e.target.value }))} /></label>
+                    <label>分区名称 <input value={sec.title} onChange={(e) => commit("patchSection", sec.id, { title: e.target.value })} /></label>
+                    <label>分区说明 <input value={sec.description} onChange={(e) => commit("patchSection", sec.id, { description: e.target.value })} /></label>
                   </div>
                   <div className="edit-row">
-                    <button className="btn" onClick={() => commit(moveSection(ws, sec.id, -1))}>上移</button>
-                    <button className="btn" onClick={() => commit(moveSection(ws, sec.id, 1))}>下移</button>
+                    <button className="btn" onClick={() => commit("moveSection", sec.id, -1)}>上移</button>
+                    <button className="btn" onClick={() => commit("moveSection", sec.id, 1)}>下移</button>
                     <button className="btn danger" onClick={() => {
                       ask({
                         title: `删除分区「${sec.title}」？`,
                         body: "该分区下的全部节点都会一起删除，无法撤销。",
-                        onConfirm: () => commit(deleteSection(ws, sec.id)),
+                        onConfirm: () => commit("deleteSection", sec.id),
                       });
                     }}>删除分区</button>
                   </div>
@@ -375,7 +362,7 @@ function RootView({
                   setPendingDel={setPendingDel}
                 />
               ))}
-              <button type="button" className="btn add-child" onClick={() => commit(addNode(ws, sec.id))}>
+              <button type="button" className="btn add-child" onClick={() => commit("addNode", sec.id)}>
                 <Plus size={15} strokeWidth={1.8} />
                 在此分区新增节点
               </button>
@@ -397,7 +384,7 @@ function BranchView({
   node: KnowledgeNode;
   tree: KnowledgeTree;
   ws: Workspace;
-  commit: (w: Workspace) => void;
+  commit: Commit;
   pendingDel: string | null;
   setPendingDel: (id: string | null) => void;
 }) {
@@ -413,7 +400,7 @@ function BranchView({
         <button
           className={`mark ${node.status}`}
           title={NODE_STATUS_LABEL[node.status]}
-          onClick={() => commit(cycleNodeStatus(ws, node.id))}
+          onClick={() => commit("cycleNodeStatus", node.id)}
         >
           {NODE_STATUS_MARK[node.status]}
         </button>
@@ -423,7 +410,7 @@ function BranchView({
             <PrioSeal priority={node.priority} />
             <input
               value={node.title}
-              onChange={(e) => commit(patchNode(ws, node.id, { title: e.target.value }))}
+              onChange={(e) => commit("patchNode", node.id, { title: e.target.value })}
               aria-label={t("name")}
             />
           </h2>
@@ -431,7 +418,7 @@ function BranchView({
             className="hint-input"
             value={node.hint}
             placeholder={t("hintEmpty")}
-            onChange={(e) => commit(patchNode(ws, node.id, { hint: e.target.value }))}
+            onChange={(e) => commit("patchNode", node.id, { hint: e.target.value })}
             aria-label={t("intro")}
           />
           <p className="branch-meta">
@@ -439,7 +426,7 @@ function BranchView({
           </p>
           <div className="filter-row" style={{ marginTop: 8 }}>
             {([0, 1, 2, 3] as const).map((p0) => (
-              <button key={p0} type="button" className={`chip ${node.priority === p0 ? "on" : ""}`} onClick={() => commit(patchNode(ws, node.id, { priority: p0 }))}>
+              <button key={p0} type="button" className={`chip ${node.priority === p0 ? "on" : ""}`} onClick={() => commit("patchNode", node.id, { priority: p0 })}>
                 {prioLabel(p0)}
               </button>
             ))}
@@ -454,19 +441,19 @@ function BranchView({
             <textarea
               value={node.note}
               placeholder={t("branchNoteHint")}
-              onChange={(e) => commit(patchNode(ws, node.id, { note: e.target.value }))}
+              onChange={(e) => commit("patchNode", node.id, { note: e.target.value })}
             />
           </label>
           <div className="links">
             {rel.length
               ? <>{t("relatedLogs")}{rel.map((l) => (
-                <button key={l.id} type="button" onClick={() => commit(patchUi(ws, { tab: "log", expandedLogs: { ...ws.ui.expandedLogs, [l.id]: true }, scrollLogId: l.id }))}>{l.title || t("untitledLog")}</button>
+                <button key={l.id} type="button" onClick={() => commit("patchUi", { tab: "log", expandedLogs: { ...ws.ui.expandedLogs, [l.id]: true }, scrollLogId: l.id })}>{l.title || t("untitledLog")}</button>
               ))}</>
               : <span>{t("noLinkedLogs")}</span>}
           </div>
           <NodeFiles
             files={nodeAttachments(node)}
-            onChange={(attachments) => commit(patchNode(ws, node.id, { attachments }))}
+            treeId={tree.id} nodeId={node.id}
           />
         </div>
       </article>
@@ -487,7 +474,7 @@ function BranchView({
       )) : (
         <p className="empty">{t("noChildren")}</p>
       )}
-      <button type="button" className="btn primary add-child" onClick={() => commit(addNode(ws, node.sectionId, node.id))}>
+      <button type="button" className="btn primary add-child" onClick={() => commit("addNode", node.sectionId, node.id)}>
         <Plus size={15} strokeWidth={1.8} />
         {t("addChildHere")}
       </button>
@@ -506,7 +493,7 @@ function SearchResults({
   hits: KnowledgeNode[];
   tree: KnowledgeTree;
   ws: Workspace;
-  commit: (w: Workspace) => void;
+  commit: Commit;
   pendingDel: string | null;
   setPendingDel: (id: string | null) => void;
 }) {
@@ -541,13 +528,13 @@ function NodeCard({
   n: KnowledgeNode;
   tree: KnowledgeTree;
   ws: Workspace;
-  commit: (w: Workspace) => void;
+  commit: Commit;
   pendingDel: string | null;
   setPendingDel: (id: string | null) => void;
 }) {
   const kids = childCount(tree.nodes, n.id);
   const sub = kids ? subtreeProgress(tree.nodes, n.id) : null;
-  const enter = () => commit(focusNode(ws, n.id));
+  const enter = () => commit("focusNode", n.id);
   const { t } = useI18n();
   const files = nodeAttachments(n);
   return (
@@ -555,7 +542,7 @@ function NodeCard({
       <button
         className={`mark ${n.status}`}
         title={NODE_STATUS_LABEL[n.status]}
-        onClick={() => commit(cycleNodeStatus(ws, n.id))}
+        onClick={() => commit("cycleNodeStatus", n.id)}
       >
         {NODE_STATUS_MARK[n.status]}
       </button>
@@ -592,7 +579,7 @@ function StructureMenu({
   node: KnowledgeNode;
   tree: KnowledgeTree;
   ws: Workspace;
-  commit: (w: Workspace) => void;
+  commit: Commit;
   pendingDel: string | null;
   setPendingDel: (id: string | null) => void;
 }) {
@@ -620,7 +607,7 @@ function StructureMenu({
             value={node.sectionId}
             aria-label={t("moveToSection")}
             onChange={(e) => {
-              commit(moveNodeToSection(ws, node.id, e.target.value));
+              commit("moveNodeToSection", node.id, e.target.value);
               setOpen(false);
             }}
           >
@@ -628,13 +615,13 @@ function StructureMenu({
               <option key={s.id} value={s.id}>{s.title}</option>
             ))}
           </select>
-          <button type="button" className="btn" onClick={() => commit(moveNode(ws, node.id, -1))}>{t("moveUp")}</button>
-          <button type="button" className="btn" onClick={() => commit(moveNode(ws, node.id, 1))}>{t("moveDown")}</button>
+          <button type="button" className="btn" onClick={() => commit("moveNode", node.id, -1)}>{t("moveUp")}</button>
+          <button type="button" className="btn" onClick={() => commit("moveNode", node.id, 1)}>{t("moveDown")}</button>
           {parent ? (
-            <button type="button" className="btn" onClick={() => commit(setNodeParent(ws, node.id, parentIdOf(parent)))}>{t("moveUpLevel")}</button>
+            <button type="button" className="btn" onClick={() => commit("setNodeParent", node.id, parentIdOf(parent))}>{t("moveUpLevel")}</button>
           ) : null}
           {!isRootNode(node) ? (
-            <button type="button" className="btn" onClick={() => commit(setNodeParent(ws, node.id, null))}>{t("promoteRoot")}</button>
+            <button type="button" className="btn" onClick={() => commit("setNodeParent", node.id, null)}>{t("promoteRoot")}</button>
           ) : null}
           {armed ? (
             <div className="node-del-arm">
@@ -643,7 +630,7 @@ function StructureMenu({
                 type="button"
                 className="btn danger solid"
                 onClick={() => {
-                  commit(deleteNode(ws, node.id));
+                  commit("deleteNode", node.id);
                   setPendingDel(null);
                   setOpen(false);
                 }}

@@ -69,7 +69,7 @@ function invoke(ws: Workspace, op: Operation): Workspace {
       const old = before.nodes.find(x => x.id === n.id);
       if (!old || old.updatedAt === n.updatedAt) return n;
       return { ...n, updatedAt: op.at,
-        statusChangedAt: n.statusChangedAt !== old.statusChangedAt ? op.at : n.statusChangedAt,
+        statusChangedAt: n.statusChangedAt && n.statusChangedAt !== old.statusChangedAt ? op.at : n.statusChangedAt,
         firstSeenDoingAt: n.firstSeenDoingAt && !old.firstSeenDoingAt ? op.at : n.firstSeenDoingAt,
         statusHistory: n.statusHistory.length && n.statusHistory !== old.statusHistory ? n.statusHistory.map((h,i) => i === n.statusHistory.length - 1 ? { ...h, at: op.at } : h) : n.statusHistory,
       };

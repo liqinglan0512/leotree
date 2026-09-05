@@ -1,3 +1,4 @@
+import { workspaceContent } from "./storage.ts";
 import { parseImport } from "./migrate.ts";
 import { uid } from "./ids.ts";
 import type { KnowledgeTree, Workspace } from "./types.ts";
@@ -6,7 +7,7 @@ import type { WorkspaceService } from "./service.ts";
 
 export type ImportMode = "new" | "restore" | "merge";
 export type Conflict = { treeId: string; nodeId?: string; kind: "same-tree" | "same-node" | "newer" | "older" | "structure" | "attachment"; detail: string };
-export interface ImportPreview { workspace: Workspace; baseRevision: number; files: Array<[string,Blob]>; conflicts: Conflict[]; mode: ImportMode; omittedAttachments: number; }
+export interface ImportPreview { workspace: Workspace; baseRevision: number; baseContent: string; files: Array<[string,Blob]>; conflicts: Conflict[]; mode: ImportMode; omittedAttachments: number; }
 const same = (a: unknown,b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 export function analyzeImport(ws: Workspace, incoming: KnowledgeTree[]): Conflict[] {
   const conflicts: Conflict[] = [];
@@ -69,5 +70,5 @@ export async function previewImport(service: WorkspaceService, raw: unknown, mod
   }
   const workspace = { ...ws, trees, currentTreeId };
   assertWorkspace(workspace); // Merging valid inputs can still produce an invalid cross-input graph.
-  return { workspace, baseRevision: Number(ws.workspaceRevision ?? 0), files, conflicts, mode, omittedAttachments };
+  return { workspace, baseRevision: Number(ws.workspaceRevision ?? 0), baseContent: workspaceContent(ws), files, conflicts, mode, omittedAttachments };
 }
