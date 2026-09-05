@@ -4,6 +4,8 @@ Leo Tree 是保存和整理个人知识树的本机应用。围绕「查找 → 
 
 本包是 **1.0.0-beta.1**。当前验证和部署进度见 [BETA_STATUS.md](BETA_STATUS.md)，服务器运维见 [ECS_DEPLOYMENT.md](docs/ECS_DEPLOYMENT.md)。RC1 报告和原交付包是历史证据，继续保留。原 review README 保存在 [docs/archive/REVIEW_SNAPSHOT_README.md](docs/archive/REVIEW_SNAPSHOT_README.md)。
 
+公网网页版：[立即使用 Leo Tree](https://8.130.33.10/)；[版本与下载页](https://8.130.33.10/download)。无需安装或登录，知识仍保存在当前浏览器。
+
 ## 启动
 
 已验证环境：Windows、Node.js 24.16.0、npm 锁定安装、Chrome 152。在本目录打开 PowerShell：

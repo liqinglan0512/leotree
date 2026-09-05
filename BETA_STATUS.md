@@ -1,6 +1,6 @@
 # Leo Tree 1.0.0-beta.1
 
-代码完成，ECS 服务和可信 HTTPS 已部署；公网 443 入口待放行后完成最终外网验收。当前不能把它标记为已经向公众可用。
+公网已开放：**https://8.130.33.10/** 。用户放行安全组后，直接外网 HTTPS 返回 200，Chrome 使用正常证书校验通过 TLS 1.3，安全上下文和 Web Locks 均验证可用。浏览器回归结果见下表。
 
 源代码提交：cc8ba79。RC1 冻结点：v1.0.0-rc.1 / 65da948。
 
@@ -28,12 +28,18 @@
 | ECS 可信证书、续期演练、服务守护 | PASS | beta-cert-renew-dry-run.txt、beta-server-verification.txt |
 | ECS 实际 Linux 服务，经 SSH 隧道 | 数据 10/10、学习 5/5、新体验 5/5 PASS | beta-ecs-tunnel-data.txt、beta-ecs-tunnel-learning.txt、beta-ecs-tunnel-first-minute.txt |
 | ECS 运行文件完整性、真实服务重启 | 410 个文件全部 SHA256 相同；重启后 HTTPS 正常 | beta-remote-integrity-and-restart.txt、beta-runtime-manifest.json |
+| 公网 HTTPS、证书、安全保存能力、下载页、HTTP 跳转 | PASS | beta-public-https.json |
+| 公网数据安全 | 10 / 10 PASS | lt0-browser-2026-09-05T15-28-20-743Z.json |
+| 公网学习流程及手机尺寸、横屏 | 5 / 5 PASS | lt1-browser-2026-09-05T15-29-16-738Z.json |
+| 公网首分钟体验、创建、备份提示、错误文案 | 5 / 5 PASS | beta-browser-2026-09-05T15-29-51-837Z.json |
 
-ECS 隧道验证 origin 为 http://localhost:8085，它证明实际服务器构建的行为，不证明公网 443 可达。公网直接访问首轮 0/5，全部在建立连接时超时，见 beta-browser-2026-09-05T15-08-32-166Z.json。服务内通过正常证书验证的 HTTPS 返回 200，安全组放行后仍必须补做直接外网验收。
+ECS 隧道验证 origin 为 http://localhost:8085，它证明实际服务器构建的行为。早期公网检查 0/5 全部在建立连接时超时，历史记录 beta-browser-2026-09-05T15-08-32-166Z.json 继续保留。用户放行 443 后，直接访问 https://8.130.33.10/ 已通过，见 beta-public-https.json；本次公网验证没有使用 SSH 隧道、代理或跳过证书校验。
 
 所有路径均相对于 release-evidence（首行完整路径除外）。生产服务 6 项包含两个子集的汇总，不能将它们相加虚报为互相独立的用例数。
 
 Beta 本次复验更新的通用截图和下载样本收在 release-evidence/public-beta/，索引为 ARTIFACT_INDEX.json；RC1 同名原文件已按标签内容恢复，避免旧报告的证据被新版截图替换。
+
+2026-09-05 公网验收的截图和下载样本单独收在 release-evidence/public-live/，索引为 ARTIFACT_INDEX.json。公网三组共 20 项全部通过，使用隔离的测试浏览器和合成知识；未操作用户浏览器中的真实知识。上线不改变原有 34 个核心文件，也没有重新构建不同的运行版本。
 
 本轮失败记录继续保留：初次引导返回位置已修复；恢复副本按钮文案变更后的旧选择器已更新；结构菜单焦点测试等待 Radix 关闭完成后再判断，仍检查真实焦点回到原按钮，未改数据实现。公网首次检查的超时记录不属于通过证据。
 

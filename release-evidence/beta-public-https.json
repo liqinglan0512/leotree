@@ -1,0 +1,25 @@
+{
+  "checkedAt": "2026-09-05T15:28:48.327Z",
+  "browser": "152.0.7977.77",
+  "transport": "Direct public HTTPS; default certificate verification; no SSH tunnel or certificate bypass",
+  "status": 200,
+  "tls": {
+    "issuer": "YE2",
+    "protocol": "TLS 1.3",
+    "subjectName": "",
+    "validFrom": 1788616987,
+    "validTo": 1789192986
+  },
+  "secureContext": true,
+  "webLocks": true,
+  "lockAcquired": true,
+  "origin": "https://8.130.33.10",
+  "capabilities": {
+    "emailPassword": false,
+    "oauth": []
+  },
+  "downloadStatus": 200,
+  "httpStatus": 302,
+  "httpLocation": "https://8.130.33.10/",
+  "verdict": "PASS"
+}

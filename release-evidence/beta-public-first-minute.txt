@@ -1,0 +1,8 @@
+npm notice run leo-tree@1.0.0-beta.1 test:browser:beta
+npm notice run node scripts/beta-browser.mjs
+PASS First minute, creation drafts and backup reminder 390
+PASS First minute, creation drafts and backup reminder 430
+PASS First minute, creation drafts and backup reminder 1280
+PASS Template and import start without premature writes
+PASS Recovery explains the problem without raw status codes
+{"pass":5,"fail":0,"evidence":"release-evidence/beta-browser-2026-09-05T15-29-51-837Z.json"}

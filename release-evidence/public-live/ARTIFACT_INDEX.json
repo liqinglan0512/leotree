@@ -1,0 +1,107 @@
+[
+  {
+    "publicCapture": "release-evidence/public-live/downloads/LeoTree-backup.zip",
+    "historicalPath": "release-evidence/downloads/LeoTree-backup.zip",
+    "sha256": "c08d16f6c72540f805b025262bd1d10be4a218b4a1bce250e28f6def9ac4f508"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/downloads/rescue-browser.json",
+    "historicalPath": "release-evidence/downloads/rescue-browser.json",
+    "sha256": "fe965e265b3bbab5b189cdf597e073684aef64554b820a8a0801f4eb8c2fce46"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/beta-1280-creation-card.png",
+    "historicalPath": "release-evidence/screenshots/beta-1280-creation-card.png",
+    "sha256": "82cd3f27c0ab66abe05aeaea1881da0d0de33dc6c133669cde71dcc711729be5"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/beta-390-creation-card.png",
+    "historicalPath": "release-evidence/screenshots/beta-390-creation-card.png",
+    "sha256": "bbef35ddc83af860e8c60635104455502de9cfada8386d9906815c1495b95f8d"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/beta-430-creation-card.png",
+    "historicalPath": "release-evidence/screenshots/beta-430-creation-card.png",
+    "sha256": "144458c975d3dda3bdf95ffba676174583aea16c0446a5849f4a7a9525233b93"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/lt0-import-preview.png",
+    "historicalPath": "release-evidence/screenshots/lt0-import-preview.png",
+    "sha256": "707c1331c5b16e26f49d8a4a4fa7b188981a486b7ffdea435a9ca88d7db13f52"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/lt0-recovered.png",
+    "historicalPath": "release-evidence/screenshots/lt0-recovered.png",
+    "sha256": "45e7b36445e1309b8007d1d7fc091b04981be12d5aaca10cf7727d22b31895e8"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/lt0-restored-empty-profile.png",
+    "historicalPath": "release-evidence/screenshots/lt0-restored-empty-profile.png",
+    "sha256": "4f4b04df5110e50b304edf5e25c898dbd546991e6e190c90886b42ae5f1eee28"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/lt0-save-failed.png",
+    "historicalPath": "release-evidence/screenshots/lt0-save-failed.png",
+    "sha256": "5f399825a9dc8d52bf22f186dfb84816027c7028a9e60d3769862ac458705b5f"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/lt1-1280-learning-detail.png",
+    "historicalPath": "release-evidence/screenshots/lt1-1280-learning-detail.png",
+    "sha256": "743cdf5097d548f455ea348e6f83760bc54c41d5fae9e75c8da919addd83ec2c"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/lt1-1280-structure.png",
+    "historicalPath": "release-evidence/screenshots/lt1-1280-structure.png",
+    "sha256": "59932708a820689debe05a717f179371be988863613237b2ecf5255cc5778127"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/lt1-390-font-xl.png",
+    "historicalPath": "release-evidence/screenshots/lt1-390-font-xl.png",
+    "sha256": "25c4820454b25948b77d208df8fe2ba7e129cf82ddf3f3f27a7aea0709ddc491"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/lt1-390-keyboard-simulated.png",
+    "historicalPath": "release-evidence/screenshots/lt1-390-keyboard-simulated.png",
+    "sha256": "cb854b6744b19d1fd4bdca1340522ff83160d693d5f139340dcfb6cfb257a70e"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/lt1-390-landscape-dialog.png",
+    "historicalPath": "release-evidence/screenshots/lt1-390-landscape-dialog.png",
+    "sha256": "d76a98888ffd2a1e0a11b4ca247f2bf7e28219915c013a2b98243089829221b5"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/lt1-390-learning-detail.png",
+    "historicalPath": "release-evidence/screenshots/lt1-390-learning-detail.png",
+    "sha256": "64b086665da487d88de9b97617a5df7d90b60c95b138e6aacc043ed9ddd33392"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/lt1-390-structure.png",
+    "historicalPath": "release-evidence/screenshots/lt1-390-structure.png",
+    "sha256": "175663aeac5ff4aa5f091992726cd760fef824ad72e4a3fbadbe2eb47c5da976"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/lt1-430-font-xl.png",
+    "historicalPath": "release-evidence/screenshots/lt1-430-font-xl.png",
+    "sha256": "e0c7b97e04355eec097c54acf934c2b94b93444d60428784113da139ab2fbd11"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/lt1-430-keyboard-simulated.png",
+    "historicalPath": "release-evidence/screenshots/lt1-430-keyboard-simulated.png",
+    "sha256": "6981eb7cdced443d1f3a8552d7a0d95e5c34e89d8e32b946f0c44bc58f44406b"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/lt1-430-landscape-dialog.png",
+    "historicalPath": "release-evidence/screenshots/lt1-430-landscape-dialog.png",
+    "sha256": "8d948cebd1029a5fcafda7857dd73463435ed8c53756863a92a91e176bbd8a15"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/lt1-430-learning-detail.png",
+    "historicalPath": "release-evidence/screenshots/lt1-430-learning-detail.png",
+    "sha256": "7f338b66193ab76f37e8e2590aed87e2cecb77ea78bb487e5a634e6b43569ffa"
+  },
+  {
+    "publicCapture": "release-evidence/public-live/screenshots/lt1-430-structure.png",
+    "historicalPath": "release-evidence/screenshots/lt1-430-structure.png",
+    "sha256": "dcf1c2e0cccb34dcfe0df6d98ac91b3e34d8a0a72b5010d05c3a1043b1a1e0f2"
+  }
+]
