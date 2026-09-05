@@ -1,0 +1,9 @@
+leotree-beta1-20260905.tar.gz: OK
+Created symlink /etc/systemd/system/multi-user.target.wants/leotree.service → /etc/systemd/system/leotree.service.
+nginx: [warn] conflicting server name "_" on 0.0.0.0:80, ignored
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+Created symlink /etc/systemd/system/timers.target.wants/leotree-cert-renew.timer → /etc/systemd/system/leotree-cert-renew.timer.
+{"emailPassword":false,"oauth":[]}{"emailPassword":false,"oauth":[]}active
+active
+active

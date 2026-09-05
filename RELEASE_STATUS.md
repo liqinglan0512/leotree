@@ -1,4 +1,6 @@
-# Leo Tree v1.0 RC1 — V1_RC_READY
+# 历史记录：Leo Tree v1.0 RC1 — V1_RC_READY
+
+以下是 RC1 发布时的记录。**当前 Public Beta 状态以 [BETA_STATUS.md](BETA_STATUS.md) 为准**，部署维护见 [docs/ECS_DEPLOYMENT.md](docs/ECS_DEPLOYMENT.md)。原 RC1 交付包不作覆盖。
 
 LT-0: PASS. LT-1: PASS. LT-2: PASS. RC acceptance: 15/15 PASS.
 

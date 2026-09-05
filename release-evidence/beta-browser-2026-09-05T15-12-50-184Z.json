@@ -1,0 +1,32 @@
+{
+  "origin": "http://localhost:8085",
+  "browser": "152.0.7977.77",
+  "scope": "Real Chrome; touch/viewport/input on mobile sizes; not a new physical-device claim",
+  "results": [
+    {
+      "name": "First minute, creation drafts and backup reminder 390",
+      "status": "PASS",
+      "width": 390
+    },
+    {
+      "name": "First minute, creation drafts and backup reminder 430",
+      "status": "PASS",
+      "width": 430
+    },
+    {
+      "name": "First minute, creation drafts and backup reminder 1280",
+      "status": "PASS",
+      "width": 1280
+    },
+    {
+      "name": "Template and import start without premature writes",
+      "status": "PASS",
+      "width": 430
+    },
+    {
+      "name": "Recovery explains the problem without raw status codes",
+      "status": "PASS",
+      "width": 390
+    }
+  ]
+}

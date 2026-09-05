@@ -1,0 +1,212 @@
+{
+  "baseline": "v1.0.0-rc.1",
+  "scope": "Every existing knowledge-tree file, byte-for-byte. New UI tests are additions, not baseline mutations.",
+  "status": "PASS",
+  "count": 34,
+  "files": [
+    {
+      "path": "src/lib/knowledge-tree/api.ts",
+      "baseline": "a2fec6f2d298b807a84befceb20b0343ba0608fe05141dd9eb8bf8e67c088b44",
+      "current": "a2fec6f2d298b807a84befceb20b0343ba0608fe05141dd9eb8bf8e67c088b44",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/backup.ts",
+      "baseline": "64780fa2f68b4e699e10addf93d84bb0ee3c3e670a2f24fccddb988c589bcb94",
+      "current": "64780fa2f68b4e699e10addf93d84bb0ee3c3e670a2f24fccddb988c589bcb94",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/cover-draft.ts",
+      "baseline": "0c60d77ca2bbf0a7bfaed73593a430d2aa14c5c924aee201f12aaf401c226df3",
+      "current": "0c60d77ca2bbf0a7bfaed73593a430d2aa14c5c924aee201f12aaf401c226df3",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/dates.ts",
+      "baseline": "893c012ca768f23563aeb228db9804b6a6838b5950eb660594cfb65e76040225",
+      "current": "893c012ca768f23563aeb228db9804b6a6838b5950eb660594cfb65e76040225",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/display.ts",
+      "baseline": "71f66e6b21c55928a72b4ebffb0f1dbc1ee2e281311683a0c4c86367caf525bb",
+      "current": "71f66e6b21c55928a72b4ebffb0f1dbc1ee2e281311683a0c4c86367caf525bb",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/engine.test.ts",
+      "baseline": "43d6b98e49e8d241c88c96a0abbe4dd484056facb64ee0f92da13607d7372b04",
+      "current": "43d6b98e49e8d241c88c96a0abbe4dd484056facb64ee0f92da13607d7372b04",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/engine.ts",
+      "baseline": "866470c066314702ed986a38839f877efdc0f87ba0d965fcbd4bc662c6b517f9",
+      "current": "866470c066314702ed986a38839f877efdc0f87ba0d965fcbd4bc662c6b517f9",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/factory.ts",
+      "baseline": "2e182e8618ee8959f6ff1b56954ea2941d0bbe6cd6c5c825638543c63cc3f4cd",
+      "current": "2e182e8618ee8959f6ff1b56954ea2941d0bbe6cd6c5c825638543c63cc3f4cd",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/fields.ts",
+      "baseline": "cc07554cb09405db39b009ca3f7b85f4d5f4cbfc57cca65d30701367af89ca89",
+      "current": "cc07554cb09405db39b009ca3f7b85f4d5f4cbfc57cca65d30701367af89ca89",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/files.test.ts",
+      "baseline": "5223357a50c2e5955cda66241bc8a309932191f418219498946c43a464b1b08f",
+      "current": "5223357a50c2e5955cda66241bc8a309932191f418219498946c43a464b1b08f",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/files.ts",
+      "baseline": "f2938584a09782b7b69e09013fb603edd9336a9e8e0d8f0f734c985cb3679db4",
+      "current": "f2938584a09782b7b69e09013fb603edd9336a9e8e0d8f0f734c985cb3679db4",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/history.ts",
+      "baseline": "edd87f76c60cb8b1afe1ebcaecf6f075b179af9837549908e0ed29fb5576237e",
+      "current": "edd87f76c60cb8b1afe1ebcaecf6f075b179af9837549908e0ed29fb5576237e",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/ids.ts",
+      "baseline": "5954d90c08ac8f2673830deb36b35fd5399cac85d84680027e90c3ed9881d141",
+      "current": "5954d90c08ac8f2673830deb36b35fd5399cac85d84680027e90c3ed9881d141",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/import-backup.test.ts",
+      "baseline": "8f768a2cac7fac2c2a121eae64afa9455aa91e93118b9d7c8edb462aafa12916",
+      "current": "8f768a2cac7fac2c2a121eae64afa9455aa91e93118b9d7c8edb462aafa12916",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/import.ts",
+      "baseline": "96f2c5557931305b3b81b74aac231646107cea6c5fbf5ed7e51b7d59dd01c61c",
+      "current": "96f2c5557931305b3b81b74aac231646107cea6c5fbf5ed7e51b7d59dd01c61c",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/index.ts",
+      "baseline": "720850310ab9aac63bf3513098bbc2be86bf9bd5bb0d4e67f0a8dd14aef90fc2",
+      "current": "720850310ab9aac63bf3513098bbc2be86bf9bd5bb0d4e67f0a8dd14aef90fc2",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/invariants.test.ts",
+      "baseline": "0a62efc23c34ee3014e9d7643fe93ee6ce68fb1ea75a4a783368475d2c81c80c",
+      "current": "0a62efc23c34ee3014e9d7643fe93ee6ce68fb1ea75a4a783368475d2c81c80c",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/learning-loop.test.ts",
+      "baseline": "013468b07f3bb5e06e8b3267d5e7933c54a27c9fefe3e372697b5e129eae7b2b",
+      "current": "013468b07f3bb5e06e8b3267d5e7933c54a27c9fefe3e372697b5e129eae7b2b",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/migrate.test.ts",
+      "baseline": "c47aa4cc57a97db4348cb676353e0cfeb945558db700577fe069aba2bdfeaefc",
+      "current": "c47aa4cc57a97db4348cb676353e0cfeb945558db700577fe069aba2bdfeaefc",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/migrate.ts",
+      "baseline": "835dd4475c44ad865c6a4256bb680dc983af9f19caec9b79822608522ebdfc9d",
+      "current": "835dd4475c44ad865c6a4256bb680dc983af9f19caec9b79822608522ebdfc9d",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/operations.ts",
+      "baseline": "f3218fd8ec0dea05d4d124b610ef23a08381cd61b4a09b5a820e695366e85490",
+      "current": "f3218fd8ec0dea05d4d124b610ef23a08381cd61b4a09b5a820e695366e85490",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/progress.ts",
+      "baseline": "5b78fda7adbb62ff4e4a1b4b709ae432324b36b2ca5e700d7168ec754cc6148b",
+      "current": "5b78fda7adbb62ff4e4a1b4b709ae432324b36b2ca5e700d7168ec754cc6148b",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/public-contract.test.ts",
+      "baseline": "ab2af76520c23685689a3572123e27d48bae951e2183ef7983972876d523fe2b",
+      "current": "ab2af76520c23685689a3572123e27d48bae951e2183ef7983972876d523fe2b",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/recovery.test.ts",
+      "baseline": "ae077bf3322b94e91852d21e068cbc82058928400735a62f1738a6309fe0a6ce",
+      "current": "ae077bf3322b94e91852d21e068cbc82058928400735a62f1738a6309fe0a6ce",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/service.test.ts",
+      "baseline": "b1e525d0d7838953089b4ba39fbfd46be4be611a206f72023cd65fb0279c3222",
+      "current": "b1e525d0d7838953089b4ba39fbfd46be4be611a206f72023cd65fb0279c3222",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/service.ts",
+      "baseline": "e9cb14345b4da0c90fdbe095045d7f9390b89bafe906034a3bbf62b1684e275c",
+      "current": "e9cb14345b4da0c90fdbe095045d7f9390b89bafe906034a3bbf62b1684e275c",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/storage.ts",
+      "baseline": "74d9a3a6f849564c36708842a10f27d5ce38dc82f480276f895c0faa156b01ce",
+      "current": "74d9a3a6f849564c36708842a10f27d5ce38dc82f480276f895c0faa156b01ce",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/templates/blank.ts",
+      "baseline": "fc17b3bf8b03239ccb467ee88d82e223fdc1b3df6b404a56ff8fa48c92e12c8b",
+      "current": "fc17b3bf8b03239ccb467ee88d82e223fdc1b3df6b404a56ff8fa48c92e12c8b",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/templates/index.ts",
+      "baseline": "4172f87ea2c878f754cbdb98d28300020138032d2d24e7090e70b8649f23133c",
+      "current": "4172f87ea2c878f754cbdb98d28300020138032d2d24e7090e70b8649f23133c",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/templates/snn.ts",
+      "baseline": "0a4178c9cde7d2c41a7932b36141a0149b2059d0624557db53a5fbc8305449e0",
+      "current": "0a4178c9cde7d2c41a7932b36141a0149b2059d0624557db53a5fbc8305449e0",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/tree.test.ts",
+      "baseline": "df0f92b071f663127ae64e56a13406e4fce77f89bf13cadab82ad11e8831ffc9",
+      "current": "df0f92b071f663127ae64e56a13406e4fce77f89bf13cadab82ad11e8831ffc9",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/tree.ts",
+      "baseline": "6e89624c5050c38f37283dddd35be933ed1f2208b088acab8a350636cc792cca",
+      "current": "6e89624c5050c38f37283dddd35be933ed1f2208b088acab8a350636cc792cca",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/types.ts",
+      "baseline": "aa478a5f1c159e13908ddb8c9fff8885639c3aa395136bb53bfd2f810f0a7a6a",
+      "current": "aa478a5f1c159e13908ddb8c9fff8885639c3aa395136bb53bfd2f810f0a7a6a",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/knowledge-tree/validation.ts",
+      "baseline": "98c690e4cb259d3452e71c9acb3b56e742b322d102be3564487956c0dad736ab",
+      "current": "98c690e4cb259d3452e71c9acb3b56e742b322d102be3564487956c0dad736ab",
+      "unchanged": true
+    }
+  ]
+}

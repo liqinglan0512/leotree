@@ -1,0 +1,37 @@
+{
+  "origin": "https://8.130.33.10",
+  "browser": "152.0.7977.77",
+  "scope": "Real Chrome; touch/viewport/input on mobile sizes; not a new physical-device claim",
+  "results": [
+    {
+      "name": "First minute, creation drafts and backup reminder 390",
+      "status": "FAIL",
+      "error": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://8.130.33.10/\", waiting until \"networkidle\"\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\beta-browser.mjs:20:11\n    at run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\beta-browser.mjs:15:14)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/beta-browser.mjs:19:35",
+      "errors": []
+    },
+    {
+      "name": "First minute, creation drafts and backup reminder 430",
+      "status": "FAIL",
+      "error": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://8.130.33.10/\", waiting until \"networkidle\"\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\beta-browser.mjs:20:11\n    at run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\beta-browser.mjs:15:14)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/beta-browser.mjs:19:35",
+      "errors": []
+    },
+    {
+      "name": "First minute, creation drafts and backup reminder 1280",
+      "status": "FAIL",
+      "error": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://8.130.33.10/\", waiting until \"networkidle\"\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\beta-browser.mjs:20:11\n    at run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\beta-browser.mjs:15:14)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/beta-browser.mjs:19:35",
+      "errors": []
+    },
+    {
+      "name": "Template and import start without premature writes",
+      "status": "FAIL",
+      "error": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://8.130.33.10/\", waiting until \"networkidle\"\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\beta-browser.mjs:56:11\n    at run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\beta-browser.mjs:15:14)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/beta-browser.mjs:55:1",
+      "errors": []
+    },
+    {
+      "name": "Recovery explains the problem without raw status codes",
+      "status": "FAIL",
+      "error": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://8.130.33.10/\", waiting until \"networkidle\"\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\beta-browser.mjs:65:85\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\beta-browser.mjs:15:8)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/beta-browser.mjs:64:1",
+      "errors": []
+    }
+  ]
+}

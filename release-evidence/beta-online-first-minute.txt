@@ -1,0 +1,23 @@
+npm notice run leo-tree@1.0.0-beta.1 test:browser:beta
+npm notice run node scripts/beta-browser.mjs
+FAIL First minute, creation drafts and backup reminder 390 page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://8.130.33.10/", waiting until "networkidle"
+
+FAIL First minute, creation drafts and backup reminder 430 page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://8.130.33.10/", waiting until "networkidle"
+
+FAIL First minute, creation drafts and backup reminder 1280 page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://8.130.33.10/", waiting until "networkidle"
+
+FAIL Template and import start without premature writes page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://8.130.33.10/", waiting until "networkidle"
+
+FAIL Recovery explains the problem without raw status codes page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://8.130.33.10/", waiting until "networkidle"
+
+{"pass":0,"fail":5,"evidence":"release-evidence/beta-browser-2026-09-05T15-08-32-166Z.json"}

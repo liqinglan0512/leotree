@@ -1,0 +1,56 @@
+{
+  "origin": "http://localhost:8085",
+  "browser": "152.0.7977.77",
+  "results": [
+    {
+      "name": "Empty profile creates, writes and reloads durable knowledge",
+      "status": "PASS",
+      "durationMs": 5828
+    },
+    {
+      "name": "Existing v3 loads without source writes and preserves migration source",
+      "status": "PASS",
+      "durationMs": 3714
+    },
+    {
+      "name": "Legacy v2 custom node and SNN template survive migration",
+      "status": "PASS",
+      "durationMs": 3922
+    },
+    {
+      "name": "Corrupt source recovery downloads exact raw and requires validated confirmation",
+      "status": "PASS",
+      "durationMs": 2854
+    },
+    {
+      "name": "Real two-tab concurrent fields and UI-only search/tab cannot erase domain",
+      "status": "PASS",
+      "durationMs": 17617
+    },
+    {
+      "name": "Upload + note + tree switch keeps target identity and committed note",
+      "status": "PASS",
+      "durationMs": 4007
+    },
+    {
+      "name": "UI copy has independent attachment IDs and deleting copy preserves original",
+      "status": "PASS",
+      "durationMs": 3959
+    },
+    {
+      "name": "Import preview commits only after confirmation and default creates new ID",
+      "status": "PASS",
+      "durationMs": 2897
+    },
+    {
+      "name": "Quota failure exposes rescue export and retains draft, retry succeeds",
+      "status": "PASS",
+      "durationMs": 3547
+    },
+    {
+      "name": "Browser ZIP download restores exact notes and real IndexedDB bytes into empty profile",
+      "status": "PASS",
+      "durationMs": 5882
+    }
+  ]
+}

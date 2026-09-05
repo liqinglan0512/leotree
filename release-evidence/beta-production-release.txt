@@ -1,0 +1,12 @@
+npm notice run leo-tree@1.0.0-beta.1 test:browser:production
+npm notice run node --experimental-strip-types scripts/rc-production.mjs
+PASS F09/F14: default local mode hides unconfigured auth and mock community; legacy URL redirects without a domain write
+PASS Configured email registration succeeds without moving or rewriting local knowledge
+PASS F09: logout, rejected password, relogin and second account all preserve the same local space
+PASS Actual Chrome and production-server restart retain account credentials, local knowledge and IndexedDB bytes
+PASS Production data regressions
+Production learning failed; see release-evidence/production-learning-2026-09-05T15-05-50-892Z.txt
+
+1 !== 0
+
+{"pass":5,"fail":1,"evidence":"release-evidence/rc-production-2026-09-05T15-05-50-892Z.json"}

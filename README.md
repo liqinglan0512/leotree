@@ -1,8 +1,8 @@
-# Leo Tree v1.0 RC1
+# Leo Tree 1.0 Public Beta
 
 Leo Tree 是保存和整理个人知识树的本机应用。围绕「查找 → 记录 → 实践 → 回顾 → 返回节点 → 修整结构」工作，保留纸墨视觉、我的 / 社区 / 设置导航和 SNN 模板。
 
-本包是 **1.0.0-rc.1**。发布判定与证据见 [RELEASE_STATUS.md](RELEASE_STATUS.md) 和 [release-evidence](release-evidence/)。未执行公开部署。原 review README 保存在 [docs/archive/REVIEW_SNAPSHOT_README.md](docs/archive/REVIEW_SNAPSHOT_README.md)，审计简报不能代替本轮实现授权。
+本包是 **1.0.0-beta.1**。当前验证和部署进度见 [BETA_STATUS.md](BETA_STATUS.md)，服务器运维见 [ECS_DEPLOYMENT.md](docs/ECS_DEPLOYMENT.md)。RC1 报告和原交付包是历史证据，继续保留。原 review README 保存在 [docs/archive/REVIEW_SNAPSHOT_README.md](docs/archive/REVIEW_SNAPSHOT_README.md)。
 
 ## 启动
 
@@ -15,7 +15,7 @@ npm.cmd run test:build
 npm.cmd start
 ```
 
-访问 **http://localhost:8080**，选择「打开本机空间（无需登录）」。开发模式是 `npm.cmd run dev`。启动前确认端口未被其他程序使用。知识按浏览器资料和网站 origin 保存；更换端口、localhost / 127.0.0.1 或浏览器都会进入不同空间。切换地址前先下载完整备份。
+访问 **http://localhost:8080**，选择「立即使用网页版」或完成三屏简短引导。开发模式是 `npm.cmd run dev`。启动前确认端口未被其他程序使用。知识按浏览器资料和网站 origin 保存；更换端口、localhost / 127.0.0.1 或浏览器都会进入不同空间。切换地址前先下载完整备份。以后从本机地址转到公网地址或域名，也需要用完整 ZIP 手动迁移。
 
 便携运行包解压后只需 Node.js 24，在包根目录执行 `node --env-file-if-exists=.env.local start.mjs`，不需要安装源代码依赖。默认监听本机 127.0.0.1:8080。
 
@@ -53,4 +53,6 @@ npm.cmd run test:browser:production
 
 已有服务的单独检查是 `npm.cmd run test:browser:data` 和 `npm.cmd run test:browser:learning`，默认目标 http://localhost:8080；`RC_URL` 可指定本机测试实例。`RC_TEST_PORT_BASE` 可改验收端口，`RC_SERVER_ROOT` 可指向独立解压的运行包根目录。
 
-390/430px 验收使用真实桌面 Chrome 的移动视口、触屏和输入，键盘占用通过缩小视口模拟。未声称验证实体手机、原生软键盘、iOS Safari、离线运行或公网部署。
+390/430px 独立验收使用真实桌面 Chrome 的移动视口、触屏和输入，键盘占用通过缩小视口模拟。用户另外报告 RC1 已完成 Android/Chrome 真机、原生输入法和 Safari 实测；这属于用户提供的验收信息，不计作本轮自动化实测。公网验证情况单独记录在 BETA_STATUS.md。
+
+首页和下载页已保留双版本入口；Windows .exe 显示「即将开放」。反馈目的地按用户要求暂缓提供，当前入口可复制反馈提纲，不会发送内容；获得真实 HTTPS 反馈地址后设置 `VITE_FEEDBACK_URL` 并重新构建发布。

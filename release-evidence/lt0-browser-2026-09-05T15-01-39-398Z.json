@@ -1,0 +1,57 @@
+{
+  "origin": "http://localhost:8083",
+  "browser": "152.0.7977.77",
+  "results": [
+    {
+      "name": "Empty profile creates, writes and reloads durable knowledge",
+      "status": "PASS",
+      "durationMs": 3526
+    },
+    {
+      "name": "Existing v3 loads without source writes and preserves migration source",
+      "status": "PASS",
+      "durationMs": 2443
+    },
+    {
+      "name": "Legacy v2 custom node and SNN template survive migration",
+      "status": "PASS",
+      "durationMs": 2570
+    },
+    {
+      "name": "Corrupt source recovery downloads exact raw and requires validated confirmation",
+      "status": "FAIL",
+      "durationMs": 16534,
+      "error": "locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /预览 knowledge-tree-workspace-v3/ })\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:62:73\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:30:26)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:58:1"
+    },
+    {
+      "name": "Real two-tab concurrent fields and UI-only search/tab cannot erase domain",
+      "status": "PASS",
+      "durationMs": 16491
+    },
+    {
+      "name": "Upload + note + tree switch keeps target identity and committed note",
+      "status": "PASS",
+      "durationMs": 2805
+    },
+    {
+      "name": "UI copy has independent attachment IDs and deleting copy preserves original",
+      "status": "PASS",
+      "durationMs": 2179
+    },
+    {
+      "name": "Import preview commits only after confirmation and default creates new ID",
+      "status": "PASS",
+      "durationMs": 1663
+    },
+    {
+      "name": "Quota failure exposes rescue export and retains draft, retry succeeds",
+      "status": "PASS",
+      "durationMs": 2812
+    },
+    {
+      "name": "Browser ZIP download restores exact notes and real IndexedDB bytes into empty profile",
+      "status": "PASS",
+      "durationMs": 3486
+    }
+  ]
+}

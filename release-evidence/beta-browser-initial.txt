@@ -1,0 +1,15 @@
+FAIL First minute, creation drafts and backup reminder 390 locator.waitFor: Timeout 15000ms exceeded.
+Call log:
+  - waiting for locator('.grove') to be visible
+
+FAIL First minute, creation drafts and backup reminder 430 locator.waitFor: Timeout 15000ms exceeded.
+Call log:
+  - waiting for locator('.grove') to be visible
+
+FAIL First minute, creation drafts and backup reminder 1280 locator.waitFor: Timeout 15000ms exceeded.
+Call log:
+  - waiting for locator('.grove') to be visible
+
+PASS Template and import start without premature writes
+PASS Recovery explains the problem without raw status codes
+{"pass":2,"fail":3,"evidence":"release-evidence/beta-browser-2026-09-05T14-58-15-778Z.json"}

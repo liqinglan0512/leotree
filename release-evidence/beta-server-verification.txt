@@ -1,0 +1,17 @@
+Result=success
+ExecMainStatus=0
+notBefore=Sep  5 14:03:07 2026 GMT
+notAfter=Sep 12 06:03:06 2026 GMT
+issuer=C = US, O = Let's Encrypt, CN = YE2
+X509v3 Subject Alternative Name: critical
+    IP Address:8.130.33.10
+MainPID=2804412
+NRestarts=0
+User=leotree
+ActiveState=active
+LISTEN 0      511        127.0.0.1:3008       0.0.0.0:*          
+LISTEN 0      4096         0.0.0.0:8090       0.0.0.0:*          
+LISTEN 0      511          0.0.0.0:443        0.0.0.0:*          
+LISTEN 0      4096         0.0.0.0:8765       0.0.0.0:*          
+LISTEN 0      4096         0.0.0.0:8780       0.0.0.0:*          
+LISTEN 0      4096            [::]:8090          [::]:*          

@@ -1,0 +1,10 @@
+tcpdump: data link type LINUX_SLL2
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on any, link-type LINUX_SLL2 (Linux cooked v2), snapshot length 262144 bytes
+23:10:39.526701 eth0  Out IP 172.29.214.139.55322 > 3.238.30.69.443: Flags [P.], seq 3964129166:3964129560, ack 555076544, win 502, options [nop,nop,TS val 2282865172 ecr 699363949], length 394
+3 packets captured
+4 packets received by filter
+23:10:41.555274 eth0  Out IP 172.29.214.139.55322 > 3.238.30.69.443: Flags [.], ack 1, win 502, options [nop,nop,TS val 2282867200 ecr 699363949], length 0
+23:10:46.746743 eth0  Out IP 172.29.214.139.55322 > 3.238.30.69.443: Flags [F.], seq 394, ack 1, win 502, options [nop,nop,TS val 2282872392 ecr 699363949], length 0
+
+0 packets dropped by kernel

@@ -1,0 +1,35 @@
+{
+  "origin": "http://localhost:8084",
+  "browser": "152.0.7977.77",
+  "scope": "Real Chrome; touch/viewport/input on mobile sizes; not a new physical-device claim",
+  "results": [
+    {
+      "name": "First minute, creation drafts and backup reminder 390",
+      "status": "FAIL",
+      "error": "locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.grove') to be visible\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\beta-browser.mjs:53:91\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\beta-browser.mjs:15:8)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/beta-browser.mjs:19:35",
+      "errors": []
+    },
+    {
+      "name": "First minute, creation drafts and backup reminder 430",
+      "status": "FAIL",
+      "error": "locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.grove') to be visible\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\beta-browser.mjs:53:91\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\beta-browser.mjs:15:8)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/beta-browser.mjs:19:35",
+      "errors": []
+    },
+    {
+      "name": "First minute, creation drafts and backup reminder 1280",
+      "status": "FAIL",
+      "error": "locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.grove') to be visible\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\beta-browser.mjs:53:91\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\beta-browser.mjs:15:8)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/beta-browser.mjs:19:35",
+      "errors": []
+    },
+    {
+      "name": "Template and import start without premature writes",
+      "status": "PASS",
+      "width": 430
+    },
+    {
+      "name": "Recovery explains the problem without raw status codes",
+      "status": "PASS",
+      "width": 390
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "build": "C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\.output\\nitro.json",
+  "node": "v24.16.0",
+  "scope": "Built Node server; local loopback; synthetic email identities; isolated persistent Chrome profile",
+  "results": [
+    {
+      "name": "F09/F14: default local mode hides unconfigured auth and mock community; legacy URL redirects without a domain write",
+      "status": "PASS",
+      "browser": "152.0.7977.77"
+    },
+    {
+      "name": "Configured email registration succeeds without moving or rewriting local knowledge",
+      "status": "PASS"
+    },
+    {
+      "name": "F09: logout, rejected password, relogin and second account all preserve the same local space",
+      "status": "PASS"
+    },
+    {
+      "name": "Actual Chrome and production-server restart retain account credentials, local knowledge and IndexedDB bytes",
+      "status": "PASS",
+      "workspaceSha256": "9ff8372afaa91e944ba314e277a83363d05c6af0c216c1ceaa60e48a797d53b0",
+      "attachmentSha256": "cff6b4418ccded375fc795c5c21791ca4024d58ebf62a2b3a6ba1cbdfde12520"
+    },
+    {
+      "name": "Production acceptance",
+      "status": "FAIL",
+      "error": "AssertionError [ERR_ASSERTION]: Production data failed; see release-evidence/production-data-2026-09-05T15-01-17-419Z.txt\n\n1 !== 0\n\n    at regression (file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-production.mjs:56:10)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-production.mjs:106:3"
+    }
+  ]
+}

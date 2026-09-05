@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 3,
+  "currentTreeId": "tree-1bfd4cc6-7228-4bed-b235-e00ee5a46dac",
+  "trees": {
+    "tree-1bfd4cc6-7228-4bed-b235-e00ee5a46dac": {
+      "id": "tree-1bfd4cc6-7228-4bed-b235-e00ee5a46dac",
+      "title": "Audit tree",
+      "description": "",
+      "createdAt": "2026-09-05T15:11:16.995Z",
+      "updatedAt": "2026-09-05T15:12:04.685Z",
+      "templateId": "blank",
+      "sections": [
+        {
+          "id": "sec-1",
+          "title": "未命名分区",
+          "description": "先写这个领域要拆成哪几块。",
+          "order": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "node-9672d0f6-50b0-4382-aa6a-e1f6e311f481",
+          "sectionId": "sec-1",
+          "title": "Evidence node",
+          "hint": "",
+          "status": "todo",
+          "priority": 1,
+          "note": "rescue browser note",
+          "tags": [],
+          "order": 0,
+          "createdAt": "2026-09-05T15:11:16.995Z",
+          "updatedAt": "2026-09-05T15:12:04.685Z",
+          "statusChangedAt": null,
+          "statusHistory": [],
+          "firstSeenDoingAt": null,
+          "firstDoneAt": null,
+          "firstDoneExact": true,
+          "parentId": null,
+          "prerequisiteIds": [],
+          "relatedNodeIds": [],
+          "attachments": []
+        }
+      ],
+      "reviews": {},
+      "logs": [],
+      "learningHistory": [],
+      "historyComplete": true,
+      "historyCompleteSince": "2026-09-05T15:11:16.995Z",
+      "settings": {
+        "logFields": [],
+        "reviewFields": []
+      }
+    },
+    "tree-8d07fc39-0002-4535-8995-3b9662e7de8f": {
+      "id": "tree-8d07fc39-0002-4535-8995-3b9662e7de8f",
+      "title": "Second tree",
+      "description": "",
+      "createdAt": "2026-09-05T15:11:16.996Z",
+      "updatedAt": "2026-09-05T15:11:16.996Z",
+      "templateId": "blank",
+      "sections": [
+        {
+          "id": "sec-1",
+          "title": "未命名分区",
+          "description": "先写这个领域要拆成哪几块。",
+          "order": 0
+        }
+      ],
+      "nodes": [],
+      "reviews": {},
+      "logs": [],
+      "learningHistory": [],
+      "historyComplete": true,
+      "historyCompleteSince": "2026-09-05T15:11:16.996Z",
+      "settings": {
+        "logFields": [],
+        "reviewFields": []
+      }
+    }
+  }
+}
