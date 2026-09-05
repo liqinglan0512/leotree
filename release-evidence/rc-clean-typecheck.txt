@@ -1,0 +1,2 @@
+npm notice run leo-tree@1.0.0-rc.1 typecheck
+npm notice run tsc --noEmit

@@ -1,0 +1,63 @@
+{
+  "status": "PASS",
+  "checkedCommit": "916cdf28e2eb0234a797e39eae77d5e0984260c8",
+  "cleanWorktree": "C:\\Users\\lijiahao\\Desktop\\LeoTree-RC1-cleancheck-20260905-064056",
+  "initialNodeModulesAbsent": true,
+  "initialPrivateConfigAbsent": true,
+  "node": "v24.16.0",
+  "npm": "12.0.2",
+  "platform": "Windows / PowerShell",
+  "commands": [
+    {
+      "command": "npm.cmd ci",
+      "exitCode": 0,
+      "log": "release-evidence/rc-clean-install.txt",
+      "sha256": "12162fd847fc454650e041c54ee014c7e1a8a106be98c31776c0625d48d02dac"
+    },
+    {
+      "command": "npm.cmd run typecheck",
+      "exitCode": 0,
+      "log": "release-evidence/rc-clean-typecheck.txt",
+      "sha256": "aefdf92eaef5e4f77f25d39c74cbfba06d65a36c7dd7a120e706e6670f440ca3"
+    },
+    {
+      "command": "npm.cmd run lint",
+      "exitCode": 0,
+      "log": "release-evidence/rc-clean-lint.txt",
+      "sha256": "54faed1f7c0858dce948282fbbc64c9f40d53cf775776f3a7ffca8c0560440cf"
+    },
+    {
+      "command": "npm.cmd test",
+      "exitCode": 0,
+      "log": "release-evidence/rc-clean-tests.txt",
+      "sha256": "9c3737b31e42a72b3efe4b70dd5120023dade210b451fec737d082f69f94b40f"
+    },
+    {
+      "command": "npm.cmd run build",
+      "exitCode": 0,
+      "log": "release-evidence/rc-clean-build.txt",
+      "sha256": "a9cb48e5c94c6de666b855b185a8862af28b7970dd3ec36fc5bb60522f0d4979"
+    },
+    {
+      "command": "npm.cmd run test:build",
+      "exitCode": 0,
+      "log": "release-evidence/rc-clean-build-assets.txt",
+      "sha256": "f9c5d0b59d09939356909a1a26f8d1e3b60daef643fdf5f972f9db6d9a276223"
+    }
+  ],
+  "counts": {
+    "installedPackages": 422,
+    "auditedPackages": 423,
+    "reportedVulnerabilities": 0,
+    "productPass": 58,
+    "productFail": 0,
+    "productSkip": 0,
+    "platformPass": 236,
+    "platformFail": 0,
+    "platformSkip": 4,
+    "lintErrors": 0,
+    "lintWarnings": 13
+  },
+  "lockSha256": "2e56c21a7776a637404ddbf50485c08b481075b18a15c535ae5d759d2eb7d01a",
+  "runtimeCodeUnchangedAfterBuild": true
+}

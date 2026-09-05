@@ -1,0 +1,17 @@
+{
+  "build": "C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0-RC1-release\\LeoTree-runtime\\nitro.json",
+  "node": "v24.16.0",
+  "scope": "Built Node server; local loopback; synthetic email identities; isolated persistent Chrome profile",
+  "results": [
+    {
+      "name": "F09/F14: default local mode hides unconfigured auth and mock community; legacy URL redirects without a domain write",
+      "status": "PASS",
+      "browser": "152.0.7977.77"
+    },
+    {
+      "name": "Production acceptance",
+      "status": "FAIL",
+      "error": "page.waitForFunction: TypeError: Cannot read properties of undefined (reading 'attachments')\n    at eval (eval at predicate (eval at evaluate (:311:30)), <anonymous>:1:82)\n    at predicate (eval at evaluate (:311:30), <anonymous>:7:27)\n    at next (eval at evaluate (:311:30), <anonymous>:29:33)\n    at eval (eval at evaluate (:311:30), <anonymous>:42:13)\n    at UtilityScript.evaluate (<anonymous>:313:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-RC1-cleancheck-20260905-064056\\scripts\\rc-production.mjs:82:11"
+    }
+  ]
+}

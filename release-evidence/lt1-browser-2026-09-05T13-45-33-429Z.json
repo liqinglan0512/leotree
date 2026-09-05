@@ -1,0 +1,96 @@
+{
+  "origin": "http://localhost:8083",
+  "browser": "152.0.7977.77",
+  "scope": "Real desktop Chrome; mobile viewport, touch and keyboard-occupied viewport simulation. No physical phone.",
+  "fixture": {
+    "depth": 20,
+    "children": 100,
+    "longTitleCharacters": 175
+  },
+  "results": [
+    {
+      "name": "Learning loop 390",
+      "status": "PASS",
+      "width": 390,
+      "height": 844,
+      "font": "md",
+      "steps": [
+        "Search full path opens readable 20-level detail and clears overlay",
+        "Visible filters distinguish hidden children from empty children",
+        "Node → note → state → linked practice → evidence → node",
+        "Review draft contains recorded facts and returns to source node",
+        "20-level outline has bounded indentation; dialog traps and restores focus",
+        "Structure menus at head and list end remain inside viewport; move changes sibling order",
+        "New child remains visible under prior filters and has contiguous sibling order",
+        "Text input survives keyboard-occupied viewport simulation",
+        "Reload preserves completed learning loop",
+        "Template, switcher, rename and delete dialogs close without committing cancellation"
+      ],
+      "durationMs": 8986
+    },
+    {
+      "name": "Learning loop 430",
+      "status": "PASS",
+      "width": 430,
+      "height": 932,
+      "font": "md",
+      "steps": [
+        "Search full path opens readable 20-level detail and clears overlay",
+        "Visible filters distinguish hidden children from empty children",
+        "Node → note → state → linked practice → evidence → node",
+        "Review draft contains recorded facts and returns to source node",
+        "20-level outline has bounded indentation; dialog traps and restores focus",
+        "Structure menus at head and list end remain inside viewport; move changes sibling order",
+        "New child remains visible under prior filters and has contiguous sibling order",
+        "Text input survives keyboard-occupied viewport simulation",
+        "Reload preserves completed learning loop",
+        "Template, switcher, rename and delete dialogs close without committing cancellation"
+      ],
+      "durationMs": 8467
+    },
+    {
+      "name": "Learning loop 1280",
+      "status": "PASS",
+      "width": 1280,
+      "height": 900,
+      "font": "md",
+      "steps": [
+        "Search full path opens readable 20-level detail and clears overlay",
+        "Visible filters distinguish hidden children from empty children",
+        "Node → note → state → linked practice → evidence → node",
+        "Review draft contains recorded facts and returns to source node",
+        "20-level outline has bounded indentation; dialog traps and restores focus",
+        "Structure menus at head and list end remain inside viewport; move changes sibling order",
+        "New child remains visible under prior filters and has contiguous sibling order",
+        "Text input survives keyboard-occupied viewport simulation",
+        "Reload preserves completed learning loop",
+        "Template, switcher, rename and delete dialogs close without committing cancellation"
+      ],
+      "durationMs": 8079
+    },
+    {
+      "name": "Large font and landscape 390",
+      "status": "PASS",
+      "width": 390,
+      "height": 844,
+      "font": "xl",
+      "steps": [
+        "Maximum product font displays unbroken long titles and 44px primary targets",
+        "Landscape dialog close action is visible and works"
+      ],
+      "durationMs": 2094
+    },
+    {
+      "name": "Large font and landscape 430",
+      "status": "PASS",
+      "width": 430,
+      "height": 932,
+      "font": "xl",
+      "steps": [
+        "Maximum product font displays unbroken long titles and 44px primary targets",
+        "Landscape dialog close action is visible and works"
+      ],
+      "durationMs": 2059
+    }
+  ]
+}

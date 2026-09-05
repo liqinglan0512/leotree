@@ -1,0 +1,1 @@
+{"status":"PASS","url":"http://localhost:8080","entry":"node --env-file-if-exists=.env.local start.mjs","httpStatus":200,"capabilities":{"emailPassword":false,"oauth":[]}}

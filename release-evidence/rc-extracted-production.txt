@@ -1,0 +1,11 @@
+npm notice run leo-tree@1.0.0-rc.1 test:browser:production
+npm notice run node --experimental-strip-types scripts/rc-production.mjs
+PASS F09/F14: default local mode hides unconfigured auth and mock community; legacy URL redirects without a domain write
+page.waitForFunction: TypeError: Cannot read properties of undefined (reading 'attachments')
+    at eval (eval at predicate (eval at evaluate (:311:30)), <anonymous>:1:82)
+    at predicate (eval at evaluate (:311:30), <anonymous>:7:27)
+    at next (eval at evaluate (:311:30), <anonymous>:29:33)
+    at eval (eval at evaluate (:311:30), <anonymous>:42:13)
+    at UtilityScript.evaluate (<anonymous>:313:16)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+{"pass":1,"fail":1,"evidence":"release-evidence/rc-production-2026-09-05T13-43-24-177Z.json"}

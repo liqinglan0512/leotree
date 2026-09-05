@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "currentTreeId": "tree-6aa4dd66-b391-471c-90c8-c96988a4cc1c",
+  "currentTreeId": "tree-7485c906-44d0-40f2-ad5a-09b6100de522",
   "trees": {
-    "tree-6aa4dd66-b391-471c-90c8-c96988a4cc1c": {
-      "id": "tree-6aa4dd66-b391-471c-90c8-c96988a4cc1c",
+    "tree-7485c906-44d0-40f2-ad5a-09b6100de522": {
+      "id": "tree-7485c906-44d0-40f2-ad5a-09b6100de522",
       "title": "Audit tree",
       "description": "",
-      "createdAt": "2026-09-05T13:35:05.700Z",
-      "updatedAt": "2026-09-05T13:35:41.206Z",
+      "createdAt": "2026-09-05T13:44:58.368Z",
+      "updatedAt": "2026-09-05T13:45:27.366Z",
       "templateId": "blank",
       "sections": [
         {
@@ -19,7 +19,7 @@
       ],
       "nodes": [
         {
-          "id": "node-b895c60b-b2fa-4b1d-b257-c0c98004dd6b",
+          "id": "node-0760e8b3-a5c5-4c1d-b41b-c44261d139a4",
           "sectionId": "sec-1",
           "title": "Evidence node",
           "hint": "",
@@ -28,8 +28,8 @@
           "note": "rescue browser note",
           "tags": [],
           "order": 0,
-          "createdAt": "2026-09-05T13:35:05.700Z",
-          "updatedAt": "2026-09-05T13:35:41.206Z",
+          "createdAt": "2026-09-05T13:44:58.368Z",
+          "updatedAt": "2026-09-05T13:45:27.366Z",
           "statusChangedAt": null,
           "statusHistory": [],
           "firstSeenDoingAt": null,
@@ -45,18 +45,18 @@
       "logs": [],
       "learningHistory": [],
       "historyComplete": true,
-      "historyCompleteSince": "2026-09-05T13:35:05.700Z",
+      "historyCompleteSince": "2026-09-05T13:44:58.368Z",
       "settings": {
         "logFields": [],
         "reviewFields": []
       }
     },
-    "tree-c02017ce-9d5f-4a55-b408-0cb08cd943d5": {
-      "id": "tree-c02017ce-9d5f-4a55-b408-0cb08cd943d5",
+    "tree-b7626dad-fb84-454e-89a7-aeecb0b75226": {
+      "id": "tree-b7626dad-fb84-454e-89a7-aeecb0b75226",
       "title": "Second tree",
       "description": "",
-      "createdAt": "2026-09-05T13:35:05.701Z",
-      "updatedAt": "2026-09-05T13:35:05.701Z",
+      "createdAt": "2026-09-05T13:44:58.369Z",
+      "updatedAt": "2026-09-05T13:44:58.369Z",
       "templateId": "blank",
       "sections": [
         {
@@ -71,7 +71,7 @@
       "logs": [],
       "learningHistory": [],
       "historyComplete": true,
-      "historyCompleteSince": "2026-09-05T13:35:05.701Z",
+      "historyCompleteSince": "2026-09-05T13:44:58.369Z",
       "settings": {
         "logFields": [],
         "reviewFields": []

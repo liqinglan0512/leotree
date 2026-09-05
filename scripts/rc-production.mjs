@@ -79,8 +79,14 @@ try {
   await p.getByRole("button",{name:"在此分区新增节点",exact:true}).click();await p.getByLabel("名称",{exact:true}).fill("跨会话保存证据");
   await p.getByLabel("本枝记录",{exact:true}).fill("退出、切换账号和重启后仍然存在。");
   await p.locator('.node-files input[type=file]').setInputFiles({name:"restart.md",mimeType:"text/markdown",buffer:Buffer.from("Durable bytes across accounts and restart")});
-  await p.waitForFunction(k=>Object.values(JSON.parse(localStorage.getItem(k)).workspace.trees)[0].nodes[0].attachments.length===1,key);await saved(p);
+  await p.waitForFunction(k=>{
+    const record=JSON.parse(localStorage.getItem(k) || "null");
+    const tree=Object.values(record?.workspace?.trees ?? {})[0];
+    return tree?.nodes?.[0]?.attachments?.length===1;
+  },key);await saved(p);
   const knowledge=await raw(p),tree=Object.values(JSON.parse(knowledge).workspace.trees)[0],attachment=tree.nodes[0].attachments[0].id;
+  assert.equal(tree.nodes[0].title,"跨会话保存证据");
+  assert.equal(tree.nodes[0].note,"退出、切换账号和重启后仍然存在。");
   await settings(p);await account(p,emailA,true);await p.getByRole("button",{name:"退出登录",exact:true}).waitFor();
   assert.equal(await raw(p),knowledge);pass("Configured email registration succeeds without moving or rewriting local knowledge");
   await screenshot(p,"configured-account");
