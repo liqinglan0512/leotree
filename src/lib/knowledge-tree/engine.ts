@@ -62,6 +62,7 @@ export function renameTree(ws: Workspace, treeId: string, title: string, descrip
 export function duplicateTree(ws: Workspace, treeId: string): Workspace {
   const tree = ws.trees[treeId];
   if (!tree) return ws;
+  if (tree.nodes.some(n => n.attachments?.length)) throw new DataError("ATTACHMENTS_REQUIRED", "Copy attachment bytes through WorkspaceService");
   const copy: KnowledgeTree = {
     ...structuredClone(tree),
     id: uid("tree"),

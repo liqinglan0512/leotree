@@ -1,4 +1,5 @@
-import { nowISO, uid } from "./ids";
+import { nowISO, uid } from "./ids.ts";
+import { DataError } from "./validation.ts";
 
 export const MAX_FILE_BYTES = 10 * 1024 * 1024;
 export type FileKind = "png" | "md" | "pdf" | "docx";
@@ -17,13 +18,46 @@ const STORE = "blobs";
 function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, 1);
-    req.onupgradeneeded = () => {
-      const db = req.result;
-      if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
-    };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
+    let expired = false;
+    const timer = setTimeout(() => { expired = true; reject(new DataError("STORAGE_ERROR", "IndexedDB open timed out")); }, 8000);
+    req.onupgradeneeded = () => { if (!req.result.objectStoreNames.contains(STORE)) req.result.createObjectStore(STORE); };
+    req.onsuccess = () => { clearTimeout(timer); if (expired) { req.result.close(); return; } req.result.onversionchange = () => req.result.close(); resolve(req.result); };
+    req.onerror = () => { clearTimeout(timer); reject(new DataError("STORAGE_ERROR", String(req.error))); };
+    req.onblocked = () => { clearTimeout(timer); expired = true; reject(new DataError("STORAGE_ERROR", "IndexedDB upgrade blocked by another tab")); };
   });
+}
+
+export interface BlobStore {
+  get(id: string): Promise<Blob | null>;
+  putMany(entries: Array<[string, Blob]>): Promise<void>;
+  deleteMany(ids: string[]): Promise<void>;
+  keys(): Promise<string[]>;
+}
+async function transaction<T>(mode: IDBTransactionMode, body: (store: IDBObjectStore) => IDBRequest<T> | void): Promise<T> {
+  const db = await openDb();
+  try {
+    return await new Promise<T>((resolve, reject) => {
+      const tx = db.transaction(STORE, mode);
+      let value: T;
+      tx.oncomplete = () => resolve(value);
+      tx.onabort = tx.onerror = () => reject(new DataError("STORAGE_ERROR", String(tx.error ?? "IndexedDB transaction aborted")));
+      try { const request = body(tx.objectStore(STORE)); if (request) request.onsuccess = () => { value = request.result; }; }
+      catch (e) { tx.abort(); reject(new DataError("STORAGE_ERROR", String(e))); }
+    });
+  } finally { db.close(); }
+}
+export const indexedBlobStore: BlobStore = {
+  get: async id => (await transaction("readonly", store => store.get(id))) ?? null,
+  // IDs are immutable. add() rejects collisions instead of replacing another tree's bytes.
+  putMany: async entries => { if (entries.length) await transaction("readwrite", store => { for (const [id,blob] of entries) store.add(blob,id); }); },
+  deleteMany: async ids => { if (ids.length) await transaction("readwrite", store => { for (const id of ids) store.delete(id); }); },
+  keys: async () => (await transaction("readonly", store => store.getAllKeys())).map(String),
+};
+export function memoryBlobStore(seed: Array<[string,Blob]> = []): BlobStore {
+  const map = new Map(seed);
+  return { get: async id => map.get(id) ?? null,
+    putMany: async entries => { if (entries.some(([id]) => map.has(id))) throw new DataError("STORAGE_ERROR", "Blob ID collision"); for (const [id,blob] of entries) map.set(id,blob); },
+    deleteMany: async ids => { ids.forEach(id => map.delete(id)); }, keys: async () => [...map.keys()] };
 }
 
 export function sniffKind(file: File): FileKind | null {
@@ -48,42 +82,18 @@ export function validateFile(file: File): { ok: true; kind: FileKind } | { ok: f
   return { ok: true, kind };
 }
 
-export async function putBlob(id: string, blob: Blob) {
-  const db = await openDb();
-  await new Promise<void>((resolve, reject) => {
-    const tx = db.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).put(blob, id);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
-  db.close();
-}
+export const putBlob = (id: string, blob: Blob) => indexedBlobStore.putMany([[id,blob]]);
+export const getBlob = (id: string) => indexedBlobStore.get(id);
+export const deleteBlob = (id: string) => indexedBlobStore.deleteMany([id]);
+export const deleteBlobs = (ids: string[]) => indexedBlobStore.deleteMany(ids);
 
-export async function getBlob(id: string): Promise<Blob | null> {
-  const db = await openDb();
-  const blob = await new Promise<Blob | null>((resolve, reject) => {
-    const tx = db.transaction(STORE, "readonly");
-    const req = tx.objectStore(STORE).get(id);
-    req.onsuccess = () => resolve((req.result as Blob) ?? null);
-    req.onerror = () => reject(req.error);
-  });
-  db.close();
-  return blob;
-}
-
-export async function deleteBlob(id: string) {
-  const db = await openDb();
-  await new Promise<void>((resolve, reject) => {
-    const tx = db.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).delete(id);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
-  db.close();
-}
-
-export async function deleteBlobs(ids: string[]) {
-  await Promise.all(ids.map((id) => deleteBlob(id)));
+export async function prepareFile(file: File): Promise<{ metadata: NodeAttachment; blob: Blob }> {
+  const check = validateFile(file);
+  if (!check.ok) throw new DataError(check.error === "size" ? "FILE_TOO_LARGE" : "FILE_UNSUPPORTED", check.error);
+  const header = new Uint8Array(await file.slice(0,8).arrayBuffer());
+  const starts = (bytes: number[]) => bytes.every((v,i) => header[i] === v);
+  if ((check.kind === "png" && !starts([137,80,78,71,13,10,26,10])) || (check.kind === "pdf" && !starts([37,80,68,70,45])) || (check.kind === "docx" && !starts([80,75,3,4]))) throw new DataError("FILE_UNSUPPORTED", "File content does not match its type");
+  return { metadata: { id: uid("file"), name: file.name, kind: check.kind, size: file.size, addedAt: nowISO() }, blob: file };
 }
 
 export async function addFile(file: File): Promise<NodeAttachment> {

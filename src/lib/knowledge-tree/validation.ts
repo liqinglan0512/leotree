@@ -11,7 +11,7 @@ export type Validation = { valid: boolean; issues: Issue[] };
 export const isRecord = (v: unknown): v is Record<string, unknown> =>
   v !== null && typeof v === "object" && !Array.isArray(v);
 export const validId = (v: unknown): v is string => typeof v === "string" && v.length > 0 && v.length <= 240 &&
-  !/[\u0000-\u001f/\\]/.test(v) && !["__proto__", "prototype", "constructor", ".", ".."].includes(v);
+  !Array.from(v).some(c => c.charCodeAt(0) < 32 || c === "/" || c === "\\") && !["__proto__", "prototype", "constructor", ".", ".."].includes(v);
 const timestamp = (v: unknown) => typeof v === "string" && Number.isFinite(Date.parse(v));
 const strings = (v: unknown): v is string[] => Array.isArray(v) && v.every(x => typeof x === "string");
 const statuses = ["todo", "doing", "done"];
