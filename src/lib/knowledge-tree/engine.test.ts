@@ -124,7 +124,7 @@ describe("import generic tree", () => {
       logs: [],
       settings: { logFields: [], reviewFields: [] },
     });
-    const tree = ws.trees["math-1"];
+    const tree = ws.trees[ws.currentTreeId!];
     assert.equal(tree.title, "高等数学");
     assert.equal(tree.templateId, "blank");
     assert.equal(tree.sections[0].title, "极限");

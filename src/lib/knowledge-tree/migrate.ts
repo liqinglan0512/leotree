@@ -1,6 +1,7 @@
 import { weekIdFromDate } from "./dates.ts";
 import { emptyUi, emptyWorkspace, instantiateTemplate } from "./factory.ts";
-import { nowISO } from "./ids.ts";
+import { assertTree, assertWorkspace, DataError, isRecord, normalizeOrders } from "./validation.ts";
+import { nowISO, uid } from "./ids.ts";
 import { snnTemplate } from "./templates/snn.ts";
 import type {
   KnowledgeNode,
@@ -33,14 +34,14 @@ function mergeUnknown(base: Record<string, unknown>, extra: Record<string, unkno
 export function isWorkspaceV3(raw: unknown): raw is Workspace {
   if (!raw || typeof raw !== "object") return false;
   const o = raw as Record<string, unknown>;
-  return o.schemaVersion === 3 && o.trees !== undefined && typeof o.trees === "object";
+  return o.schemaVersion === 3 && isRecord(o.trees);
 }
 
 function lookLikeV2(raw: unknown): boolean {
   if (!raw || typeof raw !== "object") return false;
   const o = raw as Record<string, unknown>;
-  if (o.schemaVersion === 3) return false;
-  if (o.tree && typeof o.tree === "object") return true;
+  if (o.schemaVersion !== undefined && ![1, 2].includes(o.schemaVersion as number)) return false;
+  if (isRecord(o.tree) || isRecord(o.items)) return true;
   if (o.experiments || o.weeklyReviews) return true;
   const keys = Object.keys(o);
   return keys.some((k) => /^[A-F]\d{2}$/.test(k));
@@ -157,6 +158,19 @@ export function migrateV2ToTree(raw: Record<string, unknown>, treeId = "snn-migr
     description: snnTemplate.description,
   });
   const map = extractV2TreeMap(raw);
+  if (raw.tree !== undefined && !isRecord(raw.tree)) throw new DataError("SCHEMA_INVALID", "Legacy tree must be an object");
+  if (raw.experiments !== undefined && !Array.isArray(raw.experiments)) throw new DataError("SCHEMA_INVALID", "Legacy experiments must be an array");
+  if (raw.weeklyReviews !== undefined && !isRecord(raw.weeklyReviews)) throw new DataError("SCHEMA_INVALID", "Legacy reviews must be an object");
+  if (Object.values(map).some(v => !isRecord(v))) throw new DataError("SCHEMA_INVALID", "Invalid legacy node");
+  const known = new Set(tree.nodes.map(n => n.id));
+  const extraIds = Object.keys(map).filter(id => !known.has(id));
+  if (extraIds.length) {
+    tree.sections.push({ id: "legacy-unmapped", title: "旧版自定义节点", description: "迁移保留", order: tree.sections.length });
+    for (const [order, id] of extraIds.entries()) tree.nodes.push({
+      ...tree.nodes[0], id, sectionId: "legacy-unmapped", order, title: String(map[id].title ?? id), hint: "", parentId: null,
+      attachments: [], relatedNodeIds: [], prerequisiteIds: [], statusHistory: [],
+    });
+  }
   const withProgress = overlayNodeProgress(tree, map);
   const reviews: Record<string, Review> = {};
   if (raw.weeklyReviews && typeof raw.weeklyReviews === "object") {
@@ -167,7 +181,9 @@ export function migrateV2ToTree(raw: Record<string, unknown>, treeId = "snn-migr
   const logs: PracticeLog[] = Array.isArray(raw.experiments)
     ? (raw.experiments as Record<string, unknown>[]).map(mapV2Log)
     : [];
-  return { ...withProgress, reviews, logs };
+  const result = { ...withProgress, reviews, logs, settings: { ...withProgress.settings, legacySource: structuredClone(raw) } };
+  assertTree(result);
+  return normalizeOrders(result);
 }
 
 function hydrateUi(raw: unknown): WorkspaceUi {
@@ -198,135 +214,52 @@ function hydrateUi(raw: unknown): WorkspaceUi {
 }
 
 export function coerceTree(raw: KnowledgeTree, fallbackId: string): KnowledgeTree {
-  const id = raw.id || fallbackId;
-  return {
-    ...raw,
-    id,
-    title: raw.title || "未命名知识树",
-    description: raw.description || "",
-    createdAt: raw.createdAt || nowISO(),
-    updatedAt: raw.updatedAt || nowISO(),
-    templateId: raw.templateId ?? null,
-    sections: Array.isArray(raw.sections) ? raw.sections : [],
-    nodes: Array.isArray(raw.nodes) ? raw.nodes : [],
-    reviews: raw.reviews && typeof raw.reviews === "object" ? raw.reviews : {},
-    logs: Array.isArray(raw.logs) ? raw.logs : [],
-    settings: raw.settings && typeof raw.settings === "object" ? raw.settings : {},
+  if (!isRecord(raw) || !Array.isArray(raw.sections) || !Array.isArray(raw.nodes)) throw new DataError("SCHEMA_INVALID", "Tree needs sections and nodes arrays");
+  const tree = {
+    ...raw, id: raw.id ?? fallbackId,
+    title: raw.title ?? "未命名知识树", description: raw.description ?? "",
+    createdAt: raw.createdAt ?? nowISO(), updatedAt: raw.updatedAt ?? nowISO(),
+    templateId: raw.templateId ?? null, reviews: raw.reviews ?? {}, logs: raw.logs ?? [], settings: raw.settings ?? {},
   };
+  assertTree(tree);
+  return normalizeOrders(tree);
 }
 
 export function migrateToV3(raw: unknown): Workspace {
-  if (!raw) return emptyWorkspace();
-  if (isWorkspaceV3(raw)) {
-    const ws = raw;
-    const trees: Record<string, KnowledgeTree> = {};
-    for (const [id, tree] of Object.entries(ws.trees ?? {})) {
-      trees[id] = coerceTree(tree, id);
-    }
-    return {
-      ...emptyWorkspace(),
-      ...ws,
-      schemaVersion: SCHEMA_VERSION,
-      trees,
-      currentTreeId: ws.currentTreeId && trees[ws.currentTreeId] ? ws.currentTreeId : Object.keys(trees)[0] ?? null,
-      ui: hydrateUi(ws.ui),
-    };
+  if (!isRecord(raw)) throw new DataError("SCHEMA_INVALID", "Expected a workspace object");
+  if (raw.schemaVersion !== undefined && ![1, 2, 3].includes(raw.schemaVersion as number)) throw new DataError("UNSUPPORTED_VERSION", `Unsupported schema ${String(raw.schemaVersion)}`);
+  if (raw.schemaVersion === SCHEMA_VERSION) {
+    assertWorkspace(raw);
+    return { ...raw, ui: hydrateUi(raw.ui), trees: Object.fromEntries(Object.entries(raw.trees).map(([id,t]) => [id, normalizeOrders(t)])) };
   }
-  if (typeof raw === "object" && lookLikeV2(raw)) {
-    const tree = migrateV2ToTree(raw as Record<string, unknown>);
-    return {
-      schemaVersion: SCHEMA_VERSION,
-      currentTreeId: tree.id,
-      trees: { [tree.id]: tree },
-      ui: hydrateUi((raw as { ui?: unknown }).ui),
-    };
+  if (lookLikeV2(raw)) {
+    const tree = migrateV2ToTree(raw);
+    const ws = { ...emptyWorkspace(), currentTreeId: tree.id, trees: { [tree.id]: tree }, ui: hydrateUi(raw.ui) };
+    assertWorkspace(ws); return ws;
   }
-  return emptyWorkspace();
+  throw new DataError("SCHEMA_INVALID", "Unrecognised knowledge data; no empty replacement created");
 }
 
-export function mergeWorkspaces(base: Workspace, incoming: unknown): Workspace {
-  const add = migrateToV3(incoming);
-  const trees = { ...base.trees };
-  for (const [id, tree] of Object.entries(add.trees)) {
-    if (!trees[id]) {
-      trees[id] = tree;
-      continue;
-    }
-    const old = trees[id];
-    trees[id] = {
-      ...old,
-      ...tree,
-      sections: tree.sections?.length ? tree.sections : old.sections,
-      nodes: mergeNodes(old.nodes, tree.nodes),
-      reviews: { ...old.reviews, ...tree.reviews },
-      logs: mergeLogs(old.logs, tree.logs),
-      settings: { ...old.settings, ...tree.settings },
-    };
+/** Parse candidates without writing. Full workspaces and a single exported tree are supported. */
+export function parseImport(raw: unknown): KnowledgeTree[] {
+  if (!isRecord(raw)) throw new DataError("SCHEMA_INVALID", "Expected JSON knowledge data");
+  if (raw.schemaVersion !== undefined && ![1,2,3].includes(raw.schemaVersion as number)) throw new DataError("UNSUPPORTED_VERSION", "Unsupported import schema");
+  if ("trees" in raw) return Object.values(migrateToV3(raw).trees);
+  if (Array.isArray(raw.nodes) || (isRecord(raw.tree) && ("nodes" in raw.tree || "sections" in raw.tree))) {
+    const candidate = (isRecord(raw.tree) ? raw.tree : raw) as unknown as KnowledgeTree;
+    return [coerceTree(candidate, uid("tree"))];
   }
-  return {
-    ...base,
-    ...Object.fromEntries(
-      Object.entries(add).filter(([k]) => !["schemaVersion", "trees", "currentTreeId", "ui"].includes(k)),
-    ),
-    schemaVersion: SCHEMA_VERSION,
-    trees,
-    currentTreeId: add.currentTreeId && trees[add.currentTreeId] ? add.currentTreeId : base.currentTreeId,
-  };
+  return Object.values(migrateToV3(raw).trees);
 }
 
-function mergeNodes(oldNodes: KnowledgeNode[], incoming: KnowledgeNode[]): KnowledgeNode[] {
-  const map = new Map(oldNodes.map((n) => [n.id, n]));
-  for (const n of incoming) {
-    const prev = map.get(n.id);
-    map.set(n.id, prev ? { ...prev, ...n } : n);
-  }
-  return Array.from(map.values());
-}
-
-function mergeLogs(oldLogs: PracticeLog[], incoming: PracticeLog[]): PracticeLog[] {
-  const map = new Map(oldLogs.map((n) => [n.id, n]));
-  for (const n of incoming) {
-    const prev = map.get(n.id);
-    map.set(n.id, prev ? { ...prev, ...n, custom: { ...prev.custom, ...n.custom } } : n);
-  }
-  return Array.from(map.values());
-}
-
+/** Compatibility entry points now default to independent import; replacement requires the import service. */
 export function mergeTreeIntoWorkspace(ws: Workspace, incoming: unknown): Workspace {
-  if (isWorkspaceV3(incoming)) return mergeWorkspaces(ws, incoming);
-  if (incoming && typeof incoming === "object") {
-    const obj = incoming as Record<string, unknown>;
-    const nested = obj.tree;
-    const candidate = (nested && typeof nested === "object" ? nested : obj) as KnowledgeTree;
-    if (Array.isArray(candidate.nodes) && Array.isArray(candidate.sections)) {
-      const id = candidate.id || `tree-${Date.now().toString(36)}`;
-      const prev = ws.trees[id];
-      const incomingTree = coerceTree(candidate, id);
-      const merged: KnowledgeTree = prev
-        ? {
-            ...prev,
-            ...incomingTree,
-            id,
-            reviews: { ...prev.reviews, ...(incomingTree.reviews || {}) },
-            logs: mergeLogs(prev.logs, incomingTree.logs || []),
-            nodes: mergeNodes(prev.nodes, incomingTree.nodes),
-            settings: { ...prev.settings, ...(incomingTree.settings || {}) },
-          }
-        : incomingTree;
-      return {
-        ...ws,
-        trees: { ...ws.trees, [id]: merged },
-        currentTreeId: id,
-      };
-    }
+  const trees = { ...ws.trees }; let currentTreeId = ws.currentTreeId;
+  for (const source of parseImport(incoming)) {
+    if (source.nodes.some(n => n.attachments?.length)) throw new DataError("ATTACHMENTS_REQUIRED", "Import file bytes through the import service");
+    const tree = { ...structuredClone(source), id: uid("tree") };
+    trees[tree.id] = tree; currentTreeId = tree.id;
   }
-  if (lookLikeV2(incoming)) {
-    const tree = migrateV2ToTree(incoming as Record<string, unknown>, `snn-import-${Date.now().toString(36)}`);
-    return {
-      ...ws,
-      trees: { ...ws.trees, [tree.id]: tree },
-      currentTreeId: tree.id,
-    };
-  }
-  return ws;
+  const next = { ...ws, trees, currentTreeId }; assertWorkspace(next); return next;
 }
+export const mergeWorkspaces = mergeTreeIntoWorkspace;

@@ -70,13 +70,13 @@ describe("migrate v2 to v3", () => {
 });
 
 describe("storage adapter", () => {
-  it("loads v2 from adapter and writes v3", () => {
+  it("loads v2 without overwriting or writing any source", () => {
     const adapter = memoryAdapter({ "snn-calib-knowledge-tree-v2": JSON.stringify(v2) });
     const ws = loadWorkspace(adapter);
     assert.equal(ws.schemaVersion, 3);
     assert.equal(ws.trees[ws.currentTreeId!].nodes.find((n) => n.id === "A01")?.note, "膜电位当 logit");
-    const stored = JSON.parse(adapter.read("knowledge-tree-workspace-v3") || "null");
-    assert.equal(stored.schemaVersion, 3);
+    assert.equal(adapter.read("knowledge-tree-workspace-v3"), null);
+    assert.equal(adapter.read("snn-calib-knowledge-tree-v2"), JSON.stringify(v2));
   });
 
   it("roundtrips workspace", () => {
@@ -149,8 +149,8 @@ describe("tree export import", () => {
       },
     };
     const merged = mergeTreeIntoWorkspace(emptyWorkspace(), incoming);
-    assert.equal(merged.trees["math-1"].title, "高等数学");
-    assert.equal(merged.trees["math-1"].templateId, "blank");
+    assert.equal(merged.trees[merged.currentTreeId!].title, "高等数学");
+    assert.equal(merged.trees[merged.currentTreeId!].templateId, "blank");
   });
 });
 
