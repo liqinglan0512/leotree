@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>SNN 校准知识树</title>
+  <meta name="theme-color" content="#8b3a2a" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect fill='%23f4f1ea' width='32' height='32'/%3E%3Ccircle cx='16' cy='16' r='12.5' fill='none' stroke='%238b3a2a' stroke-width='1.6'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-size='13' fill='%238b3a2a' font-family='Georgia,serif'%3E校%3C/text%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --paper: #f4f1ea;
+      --card: #fffdf8;
+      --ink: #2a241c;
+      --muted: #7a7166;
+      --faint: #a3988a;
+      --line: #e4d8c8;
+      --accent: #8b3a2a;
+      --accent-soft: #f3e6e1;
+      --warn: #8b1e1e;
+      --warn-bg: #f7e8e4;
+      --ok: #3f5a3f;
+      --doing: #8a5a2a;
+      --shadow: 0 1px 2px rgba(42,36,28,.05), 0 10px 28px rgba(42,36,28,.06);
+      --serif: Georgia, "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "STSong", serif;
+      --sans: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      --radius: 14px;
+      --radius-sm: 8px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--paper); color: var(--ink); }
+    body {
+      font-family: var(--sans);
+      line-height: 1.55;
+      background-image:
+        radial-gradient(ellipse at 12% -10%, rgba(139,58,42,.05), transparent 42%),
+        radial-gradient(ellipse at 100% 0%, rgba(42,36,28,.03), transparent 36%);
+    }
+    button, [role="button"] { cursor: pointer; font-family: inherit; }
+    button:not(:disabled):active { transform: scale(0.98); }
+    h1, h2, h3, .serif { font-family: var(--serif); font-weight: 600; letter-spacing: .01em; }
+    a { color: var(--accent); }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 28px 20px 80px; }
+    .hero { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
+    .seal {
+      width: 52px; height: 52px; border: 1.5px solid var(--accent); color: var(--accent);
+      border-radius: 50%; display: grid; place-items: center; font-family: var(--serif);
+      font-size: 22px; flex: 0 0 auto; background: rgba(139,58,42,.04);
+    }
+    .hero h1 { margin: 0 0 4px; font-size: clamp(1.55rem, 1.2rem + 1.4vw, 2.05rem); }
+    .hero p { margin: 0; color: var(--muted); font-size: .95rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+    .btn {
+      border: 1px solid var(--line); background: var(--card); color: var(--ink);
+      border-radius: var(--radius-sm); padding: 8px 12px; min-height: 40px; font-size: .88rem;
+      touch-action: manipulation;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn.primary { background: var(--accent); color: #fffdf8; border-color: var(--accent); }
+    .btn.primary:hover { filter: brightness(1.05); color: #fffdf8; }
+    .btn.danger { color: var(--warn); border-color: #e4c4bc; }
+    .btn.ghost { background: transparent; }
+    .tabs {
+      display: flex; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      border-bottom: 1px solid var(--line); margin: 8px 0 20px; scrollbar-width: thin;
+    }
+    .tab {
+      flex: 0 0 auto; background: none; border: 0; color: var(--muted);
+      padding: 12px 16px; min-height: 44px; font-size: .95rem; position: relative;
+      touch-action: manipulation;
+    }
+    .tab.on { color: var(--accent); font-weight: 600; }
+    .tab.on::after {
+      content: ""; position: absolute; left: 12px; right: 12px; bottom: -1px;
+      height: 2px; background: var(--accent); border-radius: 2px;
+    }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+    .stat, .card {
+      background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .stat { padding: 12px 14px; }
+    .stat b { display: block; font-family: var(--serif); font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+    .stat span { color: var(--muted); font-size: .78rem; }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; align-items: center; }
+    .search {
+      flex: 1 1 220px; min-height: 40px; border: 1px solid var(--line); border-radius: var(--radius-sm);
+      padding: 8px 12px; background: var(--card); color: var(--ink); font: inherit;
+    }
+    .search:focus, select:focus, textarea:focus, input:focus { outline: 2px solid color-mix(in oklab, var(--accent) 35%, white); outline-offset: 1px; }
+    .chip {
+      border: 1px solid var(--line); background: var(--card); color: var(--muted);
+      border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: .82rem;
+      touch-action: manipulation;
+    }
+    .chip.on { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+    .section { margin: 18px 0 28px; }
+    .section-hd { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; margin-bottom: 8px; }
+    .section-hd h2 { margin: 0; font-size: 1.15rem; }
+    .section-hd .meta { color: var(--muted); font-size: .8rem; font-variant-numeric: tabular-nums; }
+    .brief { margin: 0 0 10px; color: var(--muted); font-size: .86rem; }
+    .bar { height: 4px; background: #e8e0d4; border-radius: 99px; overflow: hidden; margin: 8px 0 12px; }
+    .bar > i { display: block; height: 100%; background: var(--accent); width: 0; }
+    .item {
+      background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+      padding: 10px 12px; margin: 8px 0; display: grid; grid-template-columns: 44px 1fr auto; gap: 8px;
+      align-items: start;
+    }
+    .item.open { border-color: color-mix(in oklab, var(--accent) 35%, var(--line)); }
+    .mark {
+      width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line);
+      background: #fbf7f0; color: var(--muted); font-size: 1.05rem; touch-action: manipulation;
+    }
+    .mark.doing { color: var(--doing); border-color: #e4d0b4; background: #fbf3e8; }
+    .mark.done { color: var(--ok); border-color: #c9d6c9; background: #eef4ee; }
+    .item h3 { margin: 2px 0 2px; font-size: .98rem; cursor: pointer; }
+    .item .hint { margin: 0; color: var(--muted); font-size: .82rem; }
+    .prio { font-size: .72rem; letter-spacing: .04em; border-radius: 999px; padding: 3px 8px; border: 1px solid var(--line); color: var(--muted); }
+    .prio.p0 { color: #fffdf8; background: var(--accent); border-color: var(--accent); }
+    .prio.p1 { color: var(--accent); border-color: #d7b6ad; }
+    .note { grid-column: 1 / -1; margin-top: 4px; }
+    .note textarea, textarea, input[type="text"], input[type="number"], input[type="date"], select {
+      width: 100%; border: 1px solid var(--line); background: #fffcf7; border-radius: var(--radius-sm);
+      padding: 8px 10px; font: inherit; color: var(--ink);
+    }
+    textarea { min-height: 74px; resize: vertical; }
+    .links { font-size: .84rem; margin-top: 8px; color: var(--muted); }
+    .links button { background: none; border: 0; color: var(--accent); padding: 0; font: inherit; text-decoration: underline; }
+    .empty { color: var(--muted); padding: 18px 4px; font-size: .92rem; }
+    .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+    .list { margin: 0 0 22px; }
+    .list h2 { font-size: 1.05rem; margin: 0 0 8px; }
+    .row {
+      display: flex; justify-content: space-between; gap: 10px; align-items: center;
+      padding: 10px 12px; border: 1px solid var(--line); background: var(--card);
+      border-radius: 10px; margin: 6px 0; text-align: left; width: 100%; font: inherit; color: inherit;
+    }
+    .row small { color: var(--muted); }
+    .week-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
+    .week-nav strong { font-family: var(--serif); }
+    .form { display: grid; gap: 12px; }
+    .form label, .field { display: grid; gap: 5px; font-size: .82rem; color: var(--muted); }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .months { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 8px; opacity: .85; }
+    .month { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 8px; text-align: center; }
+    .month b { display: block; font-family: var(--serif); font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+    .month span { color: var(--muted); font-size: .72rem; }
+    .warn-banner { background: var(--warn-bg); color: var(--warn); border: 1px solid #e4c4bc; border-radius: 10px; padding: 10px 12px; font-size: .88rem; }
+    .exp { padding: 12px 14px; margin: 10px 0; border-radius: var(--radius); border: 1px solid var(--line); background: var(--card); box-shadow: var(--shadow); }
+    .exp.warn { border-color: var(--warn); box-shadow: 0 0 0 1px var(--warn); }
+    .exp-hd { display: grid; grid-template-columns: 1fr auto; gap: 8px; cursor: pointer; }
+    .exp h3 { margin: 0 0 4px; font-size: 1rem; }
+    .exp .meta { color: var(--muted); font-size: .8rem; }
+    .metrics { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; margin-top: 6px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .link-list { max-height: 220px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; background: #fffcf7; padding: 6px; }
+    .link-list label { display: flex; gap: 8px; align-items: flex-start; padding: 6px; font-size: .82rem; color: var(--ink); }
+    .foot { margin-top: 28px; color: var(--faint); font-size: .78rem; }
+    #toast {
+      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(12px);
+      background: var(--ink); color: #f4f1ea; padding: 10px 14px; border-radius: 8px;
+      opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 20; font-size: .88rem;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .radios { display: flex; flex-wrap: wrap; gap: 10px; }
+    .radios label { display: flex; gap: 6px; align-items: center; color: var(--ink); font-size: .9rem; min-height: 36px; }
+    @media (max-width: 720px) {
+      .wrap { padding: 18px 14px 72px; }
+      .hero { flex-direction: column; }
+      .hero-actions { justify-content: flex-start; }
+      .stats, .summary, .form-grid, .months { grid-template-columns: 1fr 1fr; }
+      .months { grid-template-columns: repeat(3, 1fr); }
+      .item { grid-template-columns: 40px 1fr; }
+      .item .prio { grid-column: 2; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap" id="app"></div>
+  <div id="toast" role="status"></div>
+  <input id="import-file" type="file" accept="application/json,.json" hidden />
+  <script>
+(function () {
+  const KEY_V2 = "snn-calib-knowledge-tree-v2";
+  const KEY_V1 = [
+    "snn-calib-knowledge-tree",
+    "snn-calib-knowledge-tree-v1",
+    "snn-calibration-knowledge-tree",
+    "snn-calibration-knowledge-tree-v1"
+  ];
+  const STATUSES = ["todo", "doing", "done"];
+  const STATUS_LABEL = { todo: "未学", doing: "正在学", done: "掌握" };
+  const STATUS_MARK = { todo: "□", doing: "△", done: "✓" };
+  const EXP_STATUS = { idea: "构思", running: "进行中", done: "完成", dropped: "放弃" };
+  const MODELS = { ann: "ANN", convert: "转换SNN", direct: "直接训练SNN" };
+  const READOUTS = { count: "脉冲计数", membrane: "膜电位", temporal: "时间码", other: "其他" };
+  const CALIBRATORS = { "": "（未选）", none: "无", ts: "Temperature Scaling", isotonic: "Isotonic", other: "其他" };
+  const VERDICTS = { "": "（未选）", support: "支持假设", weaken: "削弱假设", invalid: "无效实验" };
+  const LEAK = { no: "否", unsure: "不确定", yes: "是" };
+
+  const SECTIONS = [
+    { id: "A", title: "A · 问题与地图", brief: "先分清「准」和「校准」，再把 SNN 的时间轴放进问题定义里。", items: [
+      { id: "A01", name: "校准 ≠ 准确率", prio: 0, hint: "高 acc 仍可严重过自信；校准问的是置信度是否等于正确率。" },
+      { id: "A02", name: "Proper scoring：NLL 与 Brier", prio: 0, hint: "两者是严格 proper scoring rule，可作校准的可优化代理，但不能互相替代 ECE。" },
+      { id: "A03", name: "ECE / MCE / ACE 与分箱", prio: 0, hint: "等宽箱对过自信敏感；箱数、样本量会改数字。报告时写清协议。" },
+      { id: "A04", name: "Reliability diagram 怎么读", prio: 1, hint: "对角线以上过自信，以下欠自信；只看 ECE 会丢掉形状。" },
+      { id: "A05", name: "过自信与欠自信的形状", prio: 1, hint: "SNN 小 T 时常过自信；转换残差也可能把质量推离对角线。" },
+      { id: "A06", name: "校准器是后处理，不是新骨干", prio: 1, hint: "TS / isotonic 不改变排序时不涨 acc；不要把它写成「免费涨点」。" },
+      { id: "A07", name: "只在 val 上拟合校准器", prio: 0, hint: "test 只评估一次。用 test 选温度 = 泄漏。见 F05 / F10。" },
+      { id: "A08", name: "时间步让 SNN 的 logit 分布随 t 变", prio: 0, hint: "最终一步的校准好，不代表途中每一步都好。这是时间维问题的入口。" },
+      { id: "A09", name: "研究问题：SNN 校准误差从哪来", prio: 1, hint: "分解：转换/训练误差、读出定义、有限 T、校准器拟合、泄漏。" },
+      { id: "A10", name: "六个月主线", prio: 2, hint: "指标协议 → 读出定义 → 时间维曲线 → 泄漏纪律。P2 只作旁支。" }
+    ]},
+    { id: "B", title: "B · ANN 校准工具箱", brief: "把经典后处理校准摸熟，再决定哪些搬得进 SNN。", items: [
+      { id: "B01", name: "Temperature Scaling（Guo 2017）", prio: 0, hint: "一个标量温度除 logits。小校准集上通常最稳。" },
+      { id: "B02", name: "温度的含义：平滑 softmax", prio: 1, hint: "T>1 变软，T<1 变尖。SNN 膜电位尺度会与 T 纠缠。" },
+      { id: "B03", name: "Vector / Matrix scaling", prio: 2, hint: "类相关缩放，参数更多，小 val 易过拟合。" },
+      { id: "B04", name: "Histogram binning", prio: 1, hint: "非参数、依赖箱；与 ECE 的箱定义不要混用同一套却不声明。" },
+      { id: "B05", name: "Isotonic regression", prio: 0, hint: "单调映射，灵活但 val 小时过拟合；SNN 上更要盯校准集大小。" },
+      { id: "B06", name: "Dirichlet calibration", prio: 2, hint: "多类联合校准。作 P2 了解即可，不要变成主线。" },
+      { id: "B07", name: "小校准集：TS 稳、isotonic 险", prio: 0, hint: "先用 TS 做基线，再决定是否上非参数方法。" },
+      { id: "B08", name: "总体校准 vs 类别条件校准", prio: 1, hint: "ECE 低不等于每一类都可靠。classwise ECE 作补充。" },
+      { id: "B09", name: "校准不是免费涨点", prio: 1, hint: "若排序不变，acc 不变。同时报 acc 与校准指标。" },
+      { id: "B10", name: "域偏移下校准会坏", prio: 2, hint: "神经形态数据、传感器漂移都可能让 val 上的 T 失效。" },
+      { id: "B11", name: "置信度 = max softmax", prio: 0, hint: "默认定义。换读出等于换置信度，比较前必须对齐。" },
+      { id: "B12", name: "NLL 下降 ≠ ECE 下降", prio: 1, hint: "proper scoring 与分箱校准误差可分手。两条都报。" }
+    ]},
+    { id: "C", title: "C · SNN 机制与读出", brief: "读出定义了「置信度」是什么；T 和 dt 不是装饰参数。", items: [
+      { id: "C01", name: "LIF / IF：膜电位与发放", prio: 0, hint: "膜电位可当 logit 来源；脉冲是它的事件化。" },
+      { id: "C02", name: "读出：脉冲计数 / 膜电位 / 时间码", prio: 0, hint: "三种读出给出三种置信度。实验卡必须写明。" },
+      { id: "C03", name: "Rate coding：T 增大向 ANN 逼近", prio: 1, hint: "校准变好可能只是「更像 ANN」。要对照同骨干 ANN。" },
+      { id: "C04", name: "转换 SNN vs 直接训练 SNN", prio: 0, hint: "两条线的误校准来源不同，不要混在一张表里只报一个数。" },
+      { id: "C05", name: "转换校准文献在校准什么", prio: 1, hint: "Li et al. 等转换校准多针对发放率近似，不等于置信度校准。" },
+      { id: "C06", name: "替代梯度 / STBP 与置信度", prio: 2, hint: "训练动态会影响 logit 尺度。P2：只在主问题需要时碰。" },
+      { id: "C07", name: "T、dt 与延迟-精度权衡", prio: 0, hint: "T 是自变量。只报一个甜蜜点 T，等于隐瞒曲线。" },
+      { id: "C08", name: "静态图 vs DVS 神经形态数据", prio: 1, hint: "划分、时间窗、重复播放都可能泄漏。见 F03。" },
+      { id: "C09", name: "膜电位尺度与 softmax 温度纠缠", prio: 0, hint: "未归一的膜电位会让 TS 的 T 不可比。记录尺度。" },
+      { id: "C10", name: "早停 / cutoff 改变有效 T", prio: 1, hint: "提前退出等于在另一条 ECE(t) 上取值。协议要写清。" },
+      { id: "C11", name: "稀疏发放 vs 校准", prio: 2, hint: "脉冲太少时计数读出方差大，置信度不可信。" },
+      { id: "C12", name: "量化与低比特 SNN", prio: 2, hint: "量化改变 logit 分辨率。P2 探索项，不要挤占 P0。" }
+    ]},
+    { id: "D", title: "D · 指标与实验协议", brief: "同一套协议才能比较。种子、T、校准集来源都要写进实验卡。", items: [
+      { id: "D01", name: "主指标：acc / NLL / Brier / ECE", prio: 0, hint: "四格都预留。缺的就空着，不要事后用 test 补。" },
+      { id: "D02", name: "多种子：至少 0,1,2", prio: 0, hint: "报 mean±std。只报最好种子 = F08。" },
+      { id: "D03", name: "等宽 ECE vs 等频 ECE", prio: 1, hint: "选一种写进协议并固定；附录可对照，主文不要来回换。" },
+      { id: "D04", name: "同时画 acc(t) 与 ECE(t)", prio: 0, hint: "时间维的最小图。只有终点 ECE 不够。" },
+      { id: "D05", name: "ANN 对照要公平", prio: 1, hint: "同一骨干、预处理、训练预算。否则「SNN 更准」无意义。" },
+      { id: "D06", name: "T 是自变量，不是超参偷看", prio: 0, hint: "曲线优于单点。用 test 选 T 见 F04。" },
+      { id: "D07", name: "校准集来源写进实验卡", prio: 0, hint: "val 划分 / 其他。并勾选「确认未用 test 拟合校准器」。" },
+      { id: "D08", name: "超参搜索只看 val", prio: 0, hint: "包括读出、T、温度、早停阈值。" },
+      { id: "D09", name: "能耗 / 脉冲数与校准一起报", prio: 2, hint: "若论文要谈效率，校准曲线旁加脉冲预算。P2。" },
+      { id: "D10", name: "无效实验也留档", prio: 1, hint: "结论选「无效实验」+ 一句话，避免下周重复踩坑。" }
+    ]},
+    { id: "E", title: "E · 时间维校准", brief: "把时间当作校准轴，而不是只校准最终输出。", items: [
+      { id: "E01", name: "conf(t) 是否单调", prio: 1, hint: "观察平均置信度随 t 的走向，记下反常拐点。" },
+      { id: "E02", name: "acc(t) 曲线", prio: 0, hint: "延迟-精度的底图。与 ECE(t) 共用横轴。" },
+      { id: "E03", name: "ECE(t) 曲线", prio: 0, hint: "核心图。问：校准误差何时下降、是否回升。" },
+      { id: "E04", name: "小 T 过自信假说", prio: 0, hint: "可证伪：小 T 时 conf 高于 acc。被推翻也要记。" },
+      { id: "E05", name: "大 T 变好是否只是更像 ANN", prio: 1, hint: "对照同骨干 ANN 的 ECE。重合则故事要改。" },
+      { id: "E06", name: "逐步温度 τ(t)", prio: 1, hint: "每步一个温度还是共享一个。都只能在 val 上拟合。" },
+      { id: "E07", name: "时间集成 logits", prio: 1, hint: "对 t 积分或平均后再 softmax。记录是否改变 ECE(t) 形状。" },
+      { id: "E08", name: "TTFS / 时间码的置信度", prio: 2, hint: "首脉冲时间如何变成概率。P2。" },
+      { id: "E09", name: "用置信度决定何时停", prio: 2, hint: "自适应 T。阈值必须在 val 上选。" },
+      { id: "E10", name: "时间维 reliability diagram", prio: 1, hint: "若干 t 的可靠性图，比单条 ECE(t) 更露形状。" },
+      { id: "E11", name: "转换误差随 t 的分解", prio: 2, hint: "近似误差 vs 校准误差。P2 分析项。" },
+      { id: "E12", name: "temporal calibration", prio: 0, hint: "把时间当作校准轴：不仅校准最终输出，还校准过程中的置信度。" },
+      { id: "E13", name: "三种读出在同一 t 上是否一致", prio: 1, hint: "计数、膜电位、时间码的置信度若打架，先定主读出。" }
+    ]},
+    { id: "F", title: "F · 风险、泄漏与纪律", brief: "泄漏会让所有 ECE 数字作废。先可审计，再谈方法。", items: [
+      { id: "F01", name: "种子、配置、提交一并记下", prio: 1, hint: "实验卡的种子栏、附件说明写路径即可。" },
+      { id: "F02", name: "超参泄漏：在 test 上挑模型", prio: 0, hint: "看过 test 再选架构/读出，数字不可信。" },
+      { id: "F03", name: "神经形态数据划分陷阱", prio: 1, hint: "同一录音/同一场景进了 val 和 test 就是泄漏。" },
+      { id: "F04", name: "用 test 选 T / 选读出", prio: 0, hint: "T 和读出是协议的一部分，只能用 val。" },
+      { id: "F05", name: "用 test 拟合温度或 isotonic", prio: 0, hint: "最常见的硬泄漏。未勾选确认框时卡片会变警告色。" },
+      { id: "F06", name: "反复偷看 test 的观察泄漏", prio: 1, hint: "「先看一眼 test 曲线再决定」也算。写进周回顾。" },
+      { id: "F07", name: "把 ANN 校准器直接套到 SNN", prio: 1, hint: "尺度不同。要重拟合，并记录来源。" },
+      { id: "F08", name: "只报最好种子", prio: 0, hint: "至少三颗种子。最好结果可作附录，不作主表。" },
+      { id: "F09", name: "附件只写路径，不上传", prio: 2, hint: "本工具不存文件。文件名/路径写在附件说明。" },
+      { id: "F10", name: "data leakage 总则", prio: 0, hint: "校准集来源必须可审计。任何 test 参与拟合/选型都记为泄漏风险。" },
+      { id: "F11", name: "可复现清单", prio: 0, hint: "数据、种子、T、dt、读出、校准器、校准集、是否碰过 test。" },
+      { id: "F12", name: "泄漏后的补救", prio: 1, hint: "作废该次校准，重划 val，周回顾泄漏项选「是」并写一句。" }
+    ]}
+  ];
+
+  const ALL_ITEMS = SECTIONS.flatMap((s) => s.items.map((it) => ({ ...it, section: s.id })));
+  const ITEM_BY_ID = Object.fromEntries(ALL_ITEMS.map((it) => [it.id, it]));
+
+  const emptyReview = () => ({ focus: "", stuck: "", nextMain: "", nextP2: "", leak: "no", leakNote: "", draft: "" });
+  const emptyUi = () => ({
+    tab: "tree",
+    q: "",
+    status: "",
+    prio: "",
+    weekId: weekId(new Date()),
+    openNotes: {},
+    expanded: {},
+    labQ: "",
+    labStatus: "",
+    labModel: "",
+    labLeak: "",
+    linkQ: "",
+    scrollExp: ""
+  });
+
+  let state = {
+    schemaVersion: 2,
+    tree: {},
+    weeklyReviews: {},
+    experiments: [],
+    ui: emptyUi()
+  };
+
+  function esc(s) {
+    return String(s ?? "").replace(/[&<>"']/g, (c) => ({
+      "&": "\u0026amp;",
+      "<": "\u0026lt;",
+      ">": "\u0026gt;",
+      '"': "\u0026quot;",
+      "'": "\u0026#39;"
+    }[c]));
+  }
+  function todayISO() {
+    const d = new Date();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
+  function startOfWeek(d) {
+    const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const day = x.getDay();
+    x.setDate(x.getDate() + (day === 0 ? -6 : 1 - day));
+    x.setHours(0, 0, 0, 0);
+    return x;
+  }
+  function weekId(d) {
+    const x = startOfWeek(d);
+    return x.getFullYear() + "-" + String(x.getMonth() + 1).padStart(2, "0") + "-" + String(x.getDate()).padStart(2, "0");
+  }
+  function parseISODate(id) {
+    const [y, m, da] = id.split("-").map(Number);
+    return new Date(y, m - 1, da);
+  }
+  function addDays(d, n) {
+    const x = new Date(d);
+    x.setDate(x.getDate() + n);
+    return x;
+  }
+  function fmtDay(d) {
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function nowISO() { return new Date().toISOString(); }
+  function inRange(iso, start, end) {
+    if (!iso) return false;
+    const t = new Date(iso).getTime();
+    return t >= start.getTime() && t < end.getTime();
+  }
+  function toast(msg) {
+    const el = document.getElementById("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.classList.remove("show"), 1800);
+  }
+  function uid() {
+    if (crypto.randomUUID) return "e-" + crypto.randomUUID();
+    return "e-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  function normalizeStatus(s) {
+    const x = String(s || "todo").toLowerCase();
+    if (["done", "mastered", "✓", "掌握", "done"].includes(x) || s === "✓") return "done";
+    if (["doing", "learning", "△", "在学", "正在学"].includes(x) || s === "△") return "doing";
+    if (["todo", "none", "□", "未学", "idle"].includes(x) || s === "□") return "todo";
+    if (STATUSES.includes(x)) return x;
+    return "todo";
+  }
+
+  function migrateTreeMap(raw) {
+    const out = {};
+    if (!raw || typeof raw !== "object") return out;
+    const src = raw.tree && typeof raw.tree === "object" && !Array.isArray(raw.tree) ? raw.tree
+      : raw.items && typeof raw.items === "object" ? raw.items
+      : raw;
+    Object.keys(src).forEach((id) => {
+      if (!ITEM_BY_ID[id] && typeof src[id] !== "object") return;
+      const v = src[id] || {};
+      if (typeof v !== "object") return;
+      out[id] = {
+        status: normalizeStatus(v.status),
+        note: v.note || "",
+        statusChangedAt: v.statusChangedAt || null,
+        statusHistory: Array.isArray(v.statusHistory) ? v.statusHistory.slice(-20) : [],
+        firstSeenDoingAt: v.firstSeenDoingAt || null
+      };
+      Object.keys(v).forEach((k) => {
+        if (!(k in out[id])) out[id][k] = v[k];
+      });
+    });
+    return out;
+  }
+
+  function load() {
+    let parsed = null;
+    try { parsed = JSON.parse(localStorage.getItem(KEY_V2) || "null"); } catch (e) { parsed = null; }
+    let fromV1 = false;
+    if (!parsed) {
+      for (const k of KEY_V1) {
+        try { parsed = JSON.parse(localStorage.getItem(k) || "null"); } catch (e) { parsed = null; }
+        if (parsed) { fromV1 = true; break; }
+      }
+    }
+    state = { schemaVersion: 2, tree: {}, weeklyReviews: {}, experiments: [], ui: emptyUi() };
+    if (!parsed || typeof parsed !== "object") {
+      save();
+      return;
+    }
+    state.tree = migrateTreeMap(parsed);
+    if (parsed.weeklyReviews && typeof parsed.weeklyReviews === "object") {
+      state.weeklyReviews = parsed.weeklyReviews;
+    }
+    if (Array.isArray(parsed.experiments)) state.experiments = parsed.experiments;
+    if (parsed.ui && typeof parsed.ui === "object") state.ui = { ...emptyUi(), ...parsed.ui };
+    if (fromV1) {
+      const now = nowISO();
+      Object.keys(state.tree).forEach((id) => {
+        const st = state.tree[id];
+        if (st.status === "doing" && !st.statusChangedAt && !st.firstSeenDoingAt) st.firstSeenDoingAt = now;
+      });
+    }
+    Object.keys(state.tree).forEach((id) => {
+      const st = state.tree[id];
+      if (st.status === "doing" && !st.statusChangedAt && !st.firstSeenDoingAt) st.firstSeenDoingAt = nowISO();
+    });
+    save();
+  }
+
+  function persistable() {
+    return {
+      schemaVersion: 2,
+      tree: state.tree,
+      weeklyReviews: state.weeklyReviews,
+      experiments: state.experiments,
+      ui: state.ui
+    };
+  }
+  function save() {
+    try { localStorage.setItem(KEY_V2, JSON.stringify(persistable())); }
+    catch (e) { toast("保存失败：本地存储已满"); }
+  }
+
+  function getTree(id) {
+    const cur = state.tree[id] || {};
+    return {
+      status: "todo",
+      note: "",
+      statusChangedAt: null,
+      statusHistory: [],
+      firstSeenDoingAt: null,
+      ...cur
+    };
+  }
+  function setTree(id, patch) {
+    state.tree[id] = { ...getTree(id), ...patch };
+    save();
+  }
+
+  function cycleStatus(id) {
+    const cur = getTree(id);
+    const from = STATUSES.includes(cur.status) ? cur.status : "todo";
+    const to = STATUSES[(STATUSES.indexOf(from) + 1) % 3];
+    const at = nowISO();
+    const history = (cur.statusHistory || []).concat([{ from, to, at }]).slice(-20);
+    const extra = {};
+    if (to === "doing" && !cur.firstSeenDoingAt) extra.firstSeenDoingAt = at;
+    setTree(id, { status: to, statusChangedAt: at, statusHistory: history, ...extra });
+  }
+
+  function weightOf(status) {
+    if (status === "done") return 1;
+    if (status === "doing") return 0.4;
+    return 0;
+  }
+  function progressOf(items) {
+    if (!items.length) return { pct: 0, done: 0, doing: 0, todo: 0, w: 0 };
+    let done = 0, doing = 0, todo = 0, w = 0;
+    items.forEach((it) => {
+      const s = getTree(it.id).status;
+      if (s === "done") done++;
+      else if (s === "doing") doing++;
+      else todo++;
+      w += weightOf(s);
+    });
+    return { pct: Math.round((w / items.length) * 100), done, doing, todo, w };
+  }
+
+  function weekBounds(id) {
+    const start = parseISODate(id);
+    start.setHours(0, 0, 0, 0);
+    const end = addDays(start, 7);
+    const now = new Date();
+    const isFuture = start.getTime() > now.getTime();
+    const cap = end.getTime() > now.getTime() ? now : end;
+    return { start, end, cap, isFuture, isCurrent: start <= now && now < end };
+  }
+
+  function firstDoneAt(st) {
+    const hit = (st.statusHistory || []).find((h) => h.to === "done");
+    if (hit && hit.at) return hit.at;
+    if (st.status === "done" && st.statusChangedAt) return st.statusChangedAt;
+    return null;
+  }
+
+  function changedToThisWeek(st, to, start, cap) {
+    const hist = st.statusHistory || [];
+    if (hist.some((h) => h.to === to && inRange(h.at, start, cap))) return true;
+    if (!hist.length && st.status === to && inRange(st.statusChangedAt, start, cap)) return true;
+    return false;
+  }
+
+  function stallInfo(st) {
+    if (st.status !== "doing") return { stall: false, unknown: false, days: 0 };
+    const t = st.statusChangedAt || st.firstSeenDoingAt;
+    if (!t) return { stall: false, unknown: true, days: 0 };
+    const days = (Date.now() - new Date(t).getTime()) / 86400000;
+    return { stall: days >= 14, unknown: false, days };
+  }
+
+  function weekSummary(id) {
+    const { start, cap, isFuture } = weekBounds(id);
+    const newlyDone = [];
+    const newlyDoing = [];
+    const stalled = [];
+    let unknownDoing = 0;
+    if (!isFuture) {
+      ALL_ITEMS.forEach((it) => {
+        const st = getTree(it.id);
+        if (changedToThisWeek(st, "done", start, cap)) newlyDone.push(it);
+        if (changedToThisWeek(st, "doing", start, cap)) newlyDoing.push(it);
+        const info = stallInfo(st);
+        if (info.unknown) unknownDoing++;
+        if (info.stall) stalled.push({ it, days: info.days, at: st.statusChangedAt || st.firstSeenDoingAt });
+      });
+    }
+    const weekExps = isFuture ? [] : state.experiments.filter((e) => inRange(e.createdAt, start, cap) || inRange(e.updatedAt, start, cap));
+    const p0focus = ALL_ITEMS.filter((it) => it.prio === 0 && getTree(it.id).status !== "done")
+      .sort((a, b) => {
+        const sa = getTree(a.id).status === "doing" ? 0 : 1;
+        const sb = getTree(b.id).status === "doing" ? 0 : 1;
+        if (sa !== sb) return sa - sb;
+        return a.id.localeCompare(b.id);
+      })
+      .slice(0, 8);
+    const leakExps = weekExps.filter(expHasLeakRisk);
+    return { newlyDone, newlyDoing, stalled, unknownDoing, weekExps, p0focus, leakExps, isFuture };
+  }
+
+  function expHasLeakRisk(exp) {
+    const text = [exp.title, exp.hypothesis, exp.falsify, exp.calibSource, exp.verdictNote, exp.temporalNote, exp.attachmentNote, exp.dataset].join(" ");
+    const mentions = (exp.linkedIds || []).includes("F10") || /test|泄漏|leak|测试集/i.test(text);
+    return mentions && !exp.noTestLeak;
+  }
+
+  function reviewOf(id) { return { ...emptyReview(), ...(state.weeklyReviews[id] || {}) }; }
+  function patchReview(id, patch) {
+    state.weeklyReviews[id] = { ...reviewOf(id), ...patch };
+    save();
+  }
+
+  function newExp(partial) {
+    const t = nowISO();
+    return {
+      id: uid(),
+      title: "",
+      date: todayISO(),
+      status: "idea",
+      hypothesis: "",
+      falsify: "",
+      models: [],
+      readouts: [],
+      T: "",
+      dt: "",
+      dataset: "",
+      calibrator: "",
+      calibSource: "",
+      noTestLeak: false,
+      seeds: "",
+      acc: "",
+      nll: "",
+      brier: "",
+      ece: "",
+      temporalNote: "",
+      verdict: "",
+      verdictNote: "",
+      linkedIds: [],
+      attachmentNote: "",
+      createdAt: t,
+      updatedAt: t,
+      ...partial
+    };
+  }
+
+  function patchExp(id, patch) {
+    state.experiments = state.experiments.map((e) => e.id === id ? { ...e, ...patch, updatedAt: nowISO() } : e);
+    save();
+  }
+
+  function monthWindow() {
+    const now = new Date();
+    const arr = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      arr.push({ key: "M" + (6 - i), y: d.getFullYear(), m: d.getMonth(), label: (d.getMonth() + 1) + "月" });
+    }
+    return arr;
+  }
+  function doneIncrement(y, m) {
+    let n = 0;
+    Object.keys(state.tree).forEach((id) => {
+      const at = firstDoneAt(state.tree[id]);
+      if (!at) return;
+      const d = new Date(at);
+      if (d.getFullYear() === y && d.getMonth() === m) n++;
+    });
+    return n;
+  }
+
+  function itemMatches(item) {
+    const st = getTree(item.id);
+    if (state.ui.status && st.status !== state.ui.status) return false;
+    if (state.ui.prio !== "" && Number(item.prio) !== Number(state.ui.prio)) return false;
+    const q = (state.ui.q || "").trim().toLowerCase();
+    if (!q) return true;
+    return [item.id, item.name, item.hint, st.note].join(" ").toLowerCase().includes(q);
+  }
+
+  function expMatches(exp) {
+    if (state.ui.labStatus && exp.status !== state.ui.labStatus) return false;
+    if (state.ui.labModel && !(exp.models || []).includes(state.ui.labModel)) return false;
+    if (state.ui.labLeak === "yes" && !exp.noTestLeak) return false;
+    if (state.ui.labLeak === "no" && exp.noTestLeak) return false;
+    const q = (state.ui.labQ || "").trim().toLowerCase();
+    if (!q) return true;
+    return [exp.title, exp.hypothesis, exp.verdictNote, exp.falsify].join(" ").toLowerCase().includes(q);
+  }
+
+  function relatedExps(id) {
+    return state.experiments.filter((e) => (e.linkedIds || []).includes(id));
+  }
+
+  function mergeImport(incoming) {
+    if (!incoming || typeof incoming !== "object") throw new Error("不是对象");
+    const treeIn = migrateTreeMap(incoming);
+    Object.keys(treeIn).forEach((id) => {
+      const old = state.tree[id] || {};
+      const neu = treeIn[id];
+      state.tree[id] = { ...old, ...neu };
+      Object.keys(old).forEach((k) => { if (!(k in state.tree[id])) state.tree[id][k] = old[k]; });
+    });
+    const wr = incoming.weeklyReviews;
+    if (wr && typeof wr === "object") {
+      Object.keys(wr).forEach((id) => {
+        const old = state.weeklyReviews[id] || {};
+        const neu = wr[id] || {};
+        state.weeklyReviews[id] = { ...emptyReview(), ...old, ...neu };
+        Object.keys(old).forEach((k) => { if (!(k in state.weeklyReviews[id])) state.weeklyReviews[id][k] = old[k]; });
+      });
+    }
+    if (Array.isArray(incoming.experiments)) {
+      const map = Object.fromEntries(state.experiments.map((e) => [e.id, e]));
+      incoming.experiments.forEach((e) => {
+        if (!e || !e.id) return;
+        map[e.id] = { ...(map[e.id] || {}), ...e };
+      });
+      state.experiments = Object.values(map);
+    }
+    Object.keys(incoming).forEach((k) => {
+      if (["schemaVersion", "tree", "weeklyReviews", "experiments", "ui", "items"].includes(k)) return;
+      if (state[k] === undefined) state[k] = incoming[k];
+    });
+    state.schemaVersion = 2;
+    save();
+  }
+
+  function render() {
+    const ui = state.ui;
+    const tot = progressOf(ALL_ITEMS);
+    document.getElementById("app").innerHTML = `
+      <header class="hero">
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div class="seal" aria-hidden="true">校</div>
+          <div>
+            <h1>SNN 校准知识树</h1>
+            <p>脉冲神经网络的置信度校准 · 本地学习地图 · 加权进度 ${tot.pct}%</p>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <button class="btn" data-act="export">导出 JSON</button>
+          <button class="btn" data-act="import">导入合并</button>
+          <button class="btn danger" data-act="reset">重置</button>
+        </div>
+      </header>
+      <nav class="tabs" aria-label="页面">
+        <button class="tab ${ui.tab === "tree" ? "on" : ""}" data-act="tab" data-v="tree">知识树</button>
+        <button class="tab ${ui.tab === "week" ? "on" : ""}" data-act="tab" data-v="week">周回顾</button>
+        <button class="tab ${ui.tab === "lab" ? "on" : ""}" data-act="tab" data-v="lab">实验日志</button>
+      </nav>
+      <div id="page">${ui.tab === "tree" ? renderTree() : ui.tab === "week" ? renderWeek() : renderLab()}</div>
+      <p class="foot">数据只存在本机。导出含 tree / weeklyReviews / experiments / schemaVersion=2。双击打开此 HTML 即可离线使用。</p>
+    `;
+    if (ui.scrollExp) {
+      const el = document.getElementById("exp-" + ui.scrollExp);
+      if (el) el.scrollIntoView({ block: "start" });
+      state.ui.scrollExp = "";
+      save();
+    }
+  }
+
+  function renderTree() {
+    const tot = progressOf(ALL_ITEMS);
+    return `
+      <div class="stats">
+        <div class="stat"><b>${tot.pct}%</b><span>加权总进度（掌握=1，在学=0.4）</span></div>
+        <div class="stat"><b>${tot.done}</b><span>掌握 ✓</span></div>
+        <div class="stat"><b>${tot.doing}</b><span>正在学 △</span></div>
+        <div class="stat"><b>${tot.todo}</b><span>未学 □</span></div>
+      </div>
+      <div class="filters">
+        <input class="search" data-act="search-tree" placeholder="搜索 id / 名称 / 笔记" value="${esc(state.ui.q)}" />
+        ${[["", "全部状态"], ["todo", "□ 未学"], ["doing", "△ 在学"], ["done", "✓ 掌握"]].map(([v, l]) =>
+          `<button class="chip ${state.ui.status === v ? "on" : ""}" data-act="filter-status" data-v="${v}">${l}</button>`).join("")}
+        ${[["", "全部优先级"], ["0", "P0"], ["1", "P1"], ["2", "P2"]].map(([v, l]) =>
+          `<button class="chip ${String(state.ui.prio) === v ? "on" : ""}" data-act="filter-prio" data-v="${v}">${l}</button>`).join("")}
+      </div>
+      <div id="tree-list">${renderTreeList()}</div>
+    `;
+  }
+
+  function renderTreeList() {
+    return SECTIONS.map((sec) => {
+      const vis = sec.items.filter(itemMatches);
+      if (!vis.length) return "";
+      const p = progressOf(sec.items);
+      return `
+        <section class="section">
+          <div class="section-hd">
+            <h2>${esc(sec.title)}</h2>
+            <div class="meta">${p.done}/${sec.items.length} 掌握 · 加权 ${p.pct}%</div>
+          </div>
+          <p class="brief">${esc(sec.brief)}</p>
+          <div class="bar"><i style="width:${p.pct}%"></i></div>
+          ${vis.map((it) => {
+            const st = getTree(it.id);
+            const open = !!state.ui.openNotes[it.id];
+            const rel = relatedExps(it.id);
+            return `
+              <article class="item ${open ? "open" : ""}">
+                <button class="mark ${st.status}" data-act="cycle" data-id="${it.id}" title="点击循环：${STATUS_LABEL[st.status]}">${STATUS_MARK[st.status]}</button>
+                <div>
+                  <h3 data-act="toggle-note" data-id="${it.id}">${esc(it.id)} ${esc(it.name)}</h3>
+                  <p class="hint">${esc(it.hint)}</p>
+                </div>
+                <span class="prio p${it.prio}">P${it.prio}</span>
+                ${open ? `
+                  <div class="note">
+                    <label>笔记
+                      <textarea data-act="note" data-id="${it.id}" placeholder="随手记下定义、反例、还缺哪张图">${esc(st.note)}</textarea>
+                    </label>
+                    <div class="links">${rel.length
+                      ? "相关实验：" + rel.map((e) => `<button data-act="open-exp" data-id="${esc(e.id)}">${esc(e.title || "未命名实验")}</button>`).join(" · ")
+                      : "<span>尚无关联实验。可在实验日志里把此节点挂上。</span>"}</div>
+                  </div>` : ""}
+              </article>
+            `;
+          }).join("")}
+        </section>
+      `;
+    }).join("") || `<p class="empty">没有匹配的条目。清空筛选试试。</p>`;
+  }
+
+  function renderWeek() {
+    const id = state.ui.weekId || weekId(new Date());
+    const { start, isFuture, isCurrent } = weekBounds(id);
+    const endShow = addDays(start, 6);
+    const sum = weekSummary(id);
+    const r = reviewOf(id);
+    const months = monthWindow();
+    const list = (title, rows, emptyText) => `
+      <div class="list">
+        <h2>${title}</h2>
+        ${rows.length ? rows.join("") : `<p class="empty">${emptyText}</p>`}
+      </div>
+    `;
+    return `
+      <div class="week-nav">
+        <button class="btn" data-act="week-prev">上一周</button>
+        <strong>${fmtDay(start)} ～ ${fmtDay(endShow)}${isCurrent ? " · 本周" : isFuture ? " · 未来" : ""}</strong>
+        <button class="btn" data-act="week-next">下一周</button>
+      </div>
+      <div class="summary">
+        <div class="stat"><b>${sum.newlyDone.length}</b><span>本周新标 ✓</span></div>
+        <div class="stat"><b>${sum.newlyDoing.length}</b><span>本周新标 △</span></div>
+        <div class="stat"><b>${sum.stalled.length}</b><span>仍在学且超过 14 天</span></div>
+        <div class="stat"><b>${sum.weekExps.length}</b><span>本周实验日志</span></div>
+      </div>
+      ${sum.unknownDoing ? `<p class="empty">另有 ${sum.unknownDoing} 条正在学但时间未知，不计入 14 天预警。</p>` : ""}
+      ${isFuture ? `<p class="empty">未来周只显示空模板，自动摘要为 0。</p>` : ""}
+      ${list("本周新掌握", sum.newlyDone.map((it) => `<div class="row"><span>${esc(it.id)} ${esc(it.name)}</span><small>P${it.prio}</small></div>`),
+        "本周还没有新的 ✓，先去知识树把正在学的项标上。")}
+      ${list("仍在学且超过 14 天", sum.stalled.map(({ it, days }) => `<div class="row"><span>${esc(it.id)} ${esc(it.name)}</span><small>${Math.floor(days)} 天</small></div>`),
+        "没有超过 14 天仍停在 △ 的条目。")}
+      ${list("建议本周只盯的 P0", sum.p0focus.map((it) => `<div class="row"><span>${esc(it.id)} ${esc(it.name)}</span><small>${STATUS_MARK[getTree(it.id).status]} ${STATUS_LABEL[getTree(it.id).status]}</small></div>`),
+        "P0 都已掌握。可以去写下周主问题，或只留一个 P2。")}
+      ${list("本周实验", sum.weekExps.map((e) => `<button class="row" data-act="open-exp" data-id="${esc(e.id)}"><span>${esc(e.title || "未命名实验")}</span><small>${esc(e.date || "")} · ${esc(EXP_STATUS[e.status] || "")}</small></button>`),
+        "本周还没有实验日志。")}
+      ${sum.leakExps.length ? `<div class="warn-banner">本周有 ${sum.leakExps.length} 条实验触及 test/泄漏或 F10，且未勾选「确认未用 test 拟合校准器」。请在下方泄漏项中处理。</div>` : ""}
+      <section class="card" style="padding:16px;margin:18px 0;">
+        <div class="section-hd">
+          <h2>本周手写回顾</h2>
+          <button class="btn" data-act="gen-draft">生成本周草稿</button>
+        </div>
+        <div class="form">
+          <label>本周真正推进的一件事
+            <input type="text" data-act="rev" data-k="focus" value="${esc(r.focus)}" placeholder="只写一件，写具体。" />
+          </label>
+          <label>卡住的地方
+            <textarea data-act="rev" data-k="stuck" placeholder="卡在定义、实现，还是不敢碰 test？">${esc(r.stuck)}</textarea>
+          </label>
+          <div class="form-grid">
+            <label>下周只允许的 1 个主问题
+              <input type="text" data-act="rev" data-k="nextMain" value="${esc(r.nextMain)}" placeholder="一个问句。" />
+            </label>
+            <label>下周只允许的 1 个 P2 探索项（可空）
+              <input type="text" data-act="rev" data-k="nextP2" value="${esc(r.nextP2)}" />
+            </label>
+          </div>
+          <div class="field">是否发生数据泄漏风险
+            <div class="radios">
+              ${["no", "unsure", "yes"].map((v) => `
+                <label><input type="radio" name="leak" data-act="leak" value="${v}" ${r.leak === v ? "checked" : ""} /> ${LEAK[v]}</label>
+              `).join("")}
+            </div>
+          </div>
+          <label>泄漏说明${r.leak === "yes" ? "（选「是」时必填一句）" : ""}
+            <input type="text" data-act="rev" data-k="leakNote" value="${esc(r.leakNote)}" placeholder="${r.leak === "yes" ? "必须写清 test 如何被用到。" : "可空"}" />
+          </label>
+          <label>可编辑草稿
+            <textarea data-act="rev" data-k="draft" placeholder="点「生成本周草稿」会根据自动列表拼一段，不覆盖上方手写，除非你确认覆盖草稿栏。">${esc(r.draft)}</textarea>
+          </label>
+        </div>
+      </section>
+      <section>
+        <h2 class="serif" style="font-size:1.05rem;margin:0 0 4px;">六个月月度进度</h2>
+        <p class="brief">各月新标 ✓ 的增量。没有时间戳的旧掌握不计，显示 0。</p>
+        <div class="months">
+          ${months.map((m) => `<div class="month"><span>${m.key} · ${m.label}</span><b>${doneIncrement(m.y, m.m)}</b></div>`).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderLab() {
+    const list = state.experiments.slice().sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")) || String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+    const vis = list.filter(expMatches);
+    return `
+      <div class="hero-actions" style="margin-bottom:12px;justify-content:flex-start;">
+        <button class="btn primary" data-act="new-exp">新建实验</button>
+        <button class="btn" data-act="gen-exp">从本周主问题生成实验草稿</button>
+      </div>
+      <div class="filters">
+        <input class="search" data-act="search-lab" placeholder="搜索标题 / 假设 / 结论" value="${esc(state.ui.labQ)}" />
+        ${[["", "全部状态"], ["idea", "构思"], ["running", "进行中"], ["done", "完成"], ["dropped", "放弃"]].map(([v, l]) =>
+          `<button class="chip ${state.ui.labStatus === v ? "on" : ""}" data-act="lab-status" data-v="${v}">${l}</button>`).join("")}
+        ${[["", "全部模型"], ["ann", "ANN"], ["convert", "转换SNN"], ["direct", "直接训练SNN"]].map(([v, l]) =>
+          `<button class="chip ${state.ui.labModel === v ? "on" : ""}" data-act="lab-model" data-v="${v}">${l}</button>`).join("")}
+        ${[["", "泄漏确认"], ["yes", "已确认未泄漏"], ["no", "未勾选"]].map(([v, l]) =>
+          `<button class="chip ${state.ui.labLeak === v ? "on" : ""}" data-act="lab-leak" data-v="${v}">${l}</button>`).join("")}
+      </div>
+      ${vis.length ? vis.map(renderExpCard).join("") : `<p class="empty">还没有实验记录。从一条可证伪的假设开始，或从本周主问题生成草稿。</p>`}
+    `;
+  }
+
+  function snippet(s, n) {
+    const t = String(s || "").replace(/\s+/g, " ").trim();
+    return t.length <= n ? t : t.slice(0, n) + "…";
+  }
+
+  function renderExpCard(exp) {
+    const open = !!state.ui.expanded[exp.id];
+    const warn = expHasLeakRisk(exp);
+    const metrics = [["acc", exp.acc], ["NLL", exp.nll], ["Brier", exp.brier], ["ECE", exp.ece]]
+      .filter(([, v]) => v !== "" && v != null)
+      .map(([k, v]) => k + " " + v);
+    return `
+      <article class="exp ${warn ? "warn" : ""}" id="exp-${esc(exp.id)}">
+        <div class="exp-hd" data-act="toggle-exp" data-id="${esc(exp.id)}">
+          <div>
+            <h3>${esc(exp.title || "未命名实验")}</h3>
+            <div class="meta">${esc(exp.date || "")} · ${esc(EXP_STATUS[exp.status] || "")}${warn ? " · 泄漏风险未确认" : ""}</div>
+            <div class="hint">${esc(snippet(exp.hypothesis, 40) || "尚未填写假设")}</div>
+            <div class="metrics">${metrics.length ? metrics.map(esc).join(" · ") : "关键指标未填"}</div>
+          </div>
+          <span class="prio">${open ? "收起" : "展开"}</span>
+        </div>
+        ${open ? renderExpForm(exp) : ""}
+      </article>
+    `;
+  }
+
+  function renderExpForm(exp) {
+    const lq = (state.ui.linkQ || "").trim().toLowerCase();
+    const linkItems = ALL_ITEMS.filter((it) => !lq || (it.id + " " + it.name).toLowerCase().includes(lq));
+    return `
+      <div class="form" style="margin-top:12px;">
+        <div class="form-grid">
+          <label>标题 <input type="text" data-act="exp" data-id="${exp.id}" data-k="title" value="${esc(exp.title)}" /></label>
+          <label>日期 <input type="date" data-act="exp" data-id="${exp.id}" data-k="date" value="${esc(exp.date)}" /></label>
+        </div>
+        <label>状态
+          <select data-act="exp" data-id="${exp.id}" data-k="status">
+            ${Object.entries(EXP_STATUS).map(([k, v]) => `<option value="${k}" ${exp.status === k ? "selected" : ""}>${v}</option>`).join("")}
+          </select>
+        </label>
+        <label>假设（可证伪的一句话）
+          <textarea data-act="exp" data-id="${exp.id}" data-k="hypothesis">${esc(exp.hypothesis)}</textarea>
+        </label>
+        <label>若该假设被推翻，预期会看到什么
+          <textarea data-act="exp" data-id="${exp.id}" data-k="falsify">${esc(exp.falsify)}</textarea>
+        </label>
+        <div class="field">模型
+          <div class="chips">${Object.entries(MODELS).map(([k, v]) =>
+            `<button type="button" class="chip ${(exp.models || []).includes(k) ? "on" : ""}" data-act="toggle-model" data-id="${exp.id}" data-v="${k}">${v}</button>`).join("")}</div>
+        </div>
+        <div class="field">读出（可多选）
+          <div class="chips">${Object.entries(READOUTS).map(([k, v]) =>
+            `<button type="button" class="chip ${(exp.readouts || []).includes(k) ? "on" : ""}" data-act="toggle-readout" data-id="${exp.id}" data-v="${k}">${v}</button>`).join("")}</div>
+        </div>
+        <div class="form-grid">
+          <label>时间步 T <input type="text" data-act="exp" data-id="${exp.id}" data-k="T" value="${esc(exp.T)}" /></label>
+          <label>dt <input type="text" data-act="exp" data-id="${exp.id}" data-k="dt" value="${esc(exp.dt)}" /></label>
+          <label>数据集 <input type="text" data-act="exp" data-id="${exp.id}" data-k="dataset" value="${esc(exp.dataset)}" /></label>
+          <label>校准器
+            <select data-act="exp" data-id="${exp.id}" data-k="calibrator">
+              ${Object.entries(CALIBRATORS).map(([k, v]) => `<option value="${k}" ${exp.calibrator === k ? "selected" : ""}>${v}</option>`).join("")}
+            </select>
+          </label>
+        </div>
+        <label>校准集来源（val 划分 / 其他）
+          <input type="text" data-act="exp" data-id="${exp.id}" data-k="calibSource" value="${esc(exp.calibSource)}" />
+        </label>
+        <label style="display:flex;flex-direction:row;align-items:center;gap:8px;color:var(--ink);">
+          <input type="checkbox" data-act="no-test" data-id="${exp.id}" ${exp.noTestLeak ? "checked" : ""} />
+          确认未用 test 拟合校准器
+        </label>
+        <label>种子（逗号分隔，如 0,1,2）
+          <input type="text" data-act="exp" data-id="${exp.id}" data-k="seeds" value="${esc(exp.seeds)}" />
+        </label>
+        <div class="form-grid">
+          <label>acc <input type="text" data-act="exp" data-id="${exp.id}" data-k="acc" value="${esc(exp.acc)}" /></label>
+          <label>NLL <input type="text" data-act="exp" data-id="${exp.id}" data-k="nll" value="${esc(exp.nll)}" /></label>
+          <label>Brier <input type="text" data-act="exp" data-id="${exp.id}" data-k="brier" value="${esc(exp.brier)}" /></label>
+          <label>ECE <input type="text" data-act="exp" data-id="${exp.id}" data-k="ece" value="${esc(exp.ece)}" /></label>
+        </div>
+        <label>时间校准记录（conf(t) / acc(t) / ECE(t)）
+          <textarea data-act="exp" data-id="${exp.id}" data-k="temporalNote">${esc(exp.temporalNote)}</textarea>
+        </label>
+        <div class="form-grid">
+          <label>结论
+            <select data-act="exp" data-id="${exp.id}" data-k="verdict">
+              ${Object.entries(VERDICTS).map(([k, v]) => `<option value="${k}" ${exp.verdict === k ? "selected" : ""}>${v}</option>`).join("")}
+            </select>
+          </label>
+          <label>结论一句话
+            <input type="text" data-act="exp" data-id="${exp.id}" data-k="verdictNote" value="${esc(exp.verdictNote)}" />
+          </label>
+        </div>
+        <div class="field">关联知识树节点
+          <input type="text" data-act="link-q" placeholder="搜索 id / 名称" value="${esc(state.ui.linkQ)}" />
+          <div class="link-list">
+            ${linkItems.map((it) => `
+              <label>
+                <input type="checkbox" data-act="toggle-link" data-id="${exp.id}" data-v="${it.id}" ${(exp.linkedIds || []).includes(it.id) ? "checked" : ""} />
+                <span>${esc(it.id)} ${esc(it.name)}</span>
+              </label>`).join("") || "<p class='empty'>无匹配节点</p>"}
+          </div>
+        </div>
+        <label>附件说明（文件名或路径，不上传）
+          <input type="text" data-act="exp" data-id="${exp.id}" data-k="attachmentNote" value="${esc(exp.attachmentNote)}" />
+        </label>
+        <div>
+          <button class="btn danger" data-act="del-exp" data-id="${exp.id}">删除实验</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function buildDraft(id) {
+    const s = weekSummary(id);
+    const names = (arr) => arr.length ? arr.map((it) => it.id + " " + it.name).join("；") : "无";
+    const expNames = s.weekExps.length ? s.weekExps.map((e) => e.title || "未命名").join("；") : "无";
+    const leak = s.leakExps.length
+      ? `泄漏提示：本周有 ${s.leakExps.length} 条实验未确认「未用 test 拟合校准器」，且文案/节点触及 test、泄漏或 F10。`
+      : "泄漏提示：本周自动列表未发现未确认的泄漏风险（仍需自己勾选）。";
+    return [
+      "【自动草稿 · 可改】",
+      "本周新掌握 " + s.newlyDone.length + " 条：" + names(s.newlyDone),
+      "本周新标在学 " + s.newlyDoing.length + " 条：" + names(s.newlyDoing),
+      "滞留超过 14 天 " + s.stalled.length + " 条：" + names(s.stalled.map((x) => x.it)),
+      "本周实验 " + s.weekExps.length + " 条：" + expNames,
+      "建议只盯的 P0：" + names(s.p0focus),
+      leak,
+      "把「真正推进的一件事」收成其中最硬的一条，下周主问题只留一个问句。"
+    ].join("\n");
+  }
+
+  function openExp(id) {
+    state.ui.tab = "lab";
+    state.ui.expanded[id] = true;
+    state.ui.scrollExp = id;
+    save();
+    render();
+  }
+
+  function handleClick(e) {
+    const t = e.target.closest("[data-act]");
+    if (!t) return;
+    const act = t.getAttribute("data-act");
+    const id = t.getAttribute("data-id");
+    const v = t.getAttribute("data-v");
+    if (act === "tab") { state.ui.tab = v; save(); render(); return; }
+    if (act === "cycle") { cycleStatus(id); render(); return; }
+    if (act === "toggle-note") {
+      state.ui.openNotes[id] = !state.ui.openNotes[id];
+      save(); render(); return;
+    }
+    if (act === "filter-status") { state.ui.status = v; save(); render(); return; }
+    if (act === "filter-prio") { state.ui.prio = v; save(); render(); return; }
+    if (act === "export") {
+      const blob = new Blob([JSON.stringify({
+        schemaVersion: 2,
+        tree: state.tree,
+        weeklyReviews: state.weeklyReviews,
+        experiments: state.experiments
+      }, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "snn-calib-knowledge-tree-v2.json";
+      a.click();
+      toast("已导出");
+      return;
+    }
+    if (act === "import") { document.getElementById("import-file").click(); return; }
+    if (act === "reset") {
+      if (!confirm("清空树进度、周回顾和实验日志？此操作只影响本机，不可恢复。")) return;
+      state = { schemaVersion: 2, tree: {}, weeklyReviews: {}, experiments: [], ui: emptyUi() };
+      KEY_V1.forEach((k) => localStorage.removeItem(k));
+      save();
+      render();
+      toast("已清空本机数据");
+      return;
+    }
+    if (act === "week-prev") {
+      state.ui.weekId = weekId(addDays(parseISODate(state.ui.weekId), -7));
+      save(); render(); return;
+    }
+    if (act === "week-next") {
+      state.ui.weekId = weekId(addDays(parseISODate(state.ui.weekId), 7));
+      save(); render(); return;
+    }
+    if (act === "gen-draft") {
+      const wid = state.ui.weekId;
+      const r = reviewOf(wid);
+      const has = [r.focus, r.stuck, r.nextMain, r.nextP2, r.leakNote, r.draft].some((x) => String(x || "").trim());
+      if (has && !confirm("已有手写内容。确定覆盖「可编辑草稿」栏？上方各字段不会改。")) return;
+      patchReview(wid, { draft: buildDraft(wid) });
+      render();
+      toast("草稿已填入");
+      return;
+    }
+    if (act === "leak") {
+      patchReview(state.ui.weekId, { leak: t.value });
+      render();
+      return;
+    }
+    if (act === "open-exp") { openExp(id); return; }
+    if (act === "new-exp") {
+      const exp = newExp();
+      state.experiments.unshift(exp);
+      state.ui.expanded[exp.id] = true;
+      save(); render();
+      return;
+    }
+    if (act === "gen-exp") {
+      const r = reviewOf(weekId(new Date()));
+      const q = (r.nextMain || r.focus || "").trim();
+      if (!q) { toast("本周还没有填写主问题或推进的一事，先去周回顾写一句。"); return; }
+      const exp = newExp({ title: q.slice(0, 80), hypothesis: q, status: "idea" });
+      state.experiments.unshift(exp);
+      state.ui.tab = "lab";
+      state.ui.expanded[exp.id] = true;
+      state.ui.scrollExp = exp.id;
+      save(); render();
+      toast("已生成实验草稿");
+      return;
+    }
+    if (act === "toggle-exp") {
+      state.ui.expanded[id] = !state.ui.expanded[id];
+      save(); render(); return;
+    }
+    if (act === "toggle-model" || act === "toggle-readout") {
+      const key = act === "toggle-model" ? "models" : "readouts";
+      const exp = state.experiments.find((e) => e.id === id);
+      if (!exp) return;
+      const set = new Set(exp[key] || []);
+      if (set.has(v)) set.delete(v); else set.add(v);
+      patchExp(id, { [key]: Array.from(set) });
+      render();
+      return;
+    }
+    if (act === "del-exp") {
+      if (!confirm("确定删除这篇实验日志？")) return;
+      state.experiments = state.experiments.filter((e) => e.id !== id);
+      delete state.ui.expanded[id];
+      save(); render();
+      toast("已删除");
+      return;
+    }
+    if (act === "lab-status") { state.ui.labStatus = v; save(); render(); return; }
+    if (act === "lab-model") { state.ui.labModel = v; save(); render(); return; }
+    if (act === "lab-leak") { state.ui.labLeak = v; save(); render(); return; }
+  }
+
+  function handleInput(e) {
+    const t = e.target;
+    const act = t.getAttribute("data-act");
+    if (!act) return;
+    if (act === "search-tree") {
+      state.ui.q = t.value;
+      save();
+      const el = document.getElementById("tree-list");
+      if (el) el.innerHTML = renderTreeList();
+      return;
+    }
+    if (act === "search-lab") {
+      state.ui.labQ = t.value;
+      save();
+      const page = document.getElementById("page");
+      const keep = t.selectionStart;
+      if (page) {
+        const filters = page.querySelector(".filters").outerHTML;
+        const actions = page.querySelector(".hero-actions").outerHTML;
+        const list = state.experiments.slice().sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+        const vis = list.filter(expMatches);
+        page.innerHTML = actions + filters + (vis.length ? vis.map(renderExpCard).join("") : `<p class="empty">没有匹配的实验。</p>`);
+        const inp = page.querySelector("[data-act=search-lab]");
+        if (inp) { inp.focus(); inp.setSelectionRange(keep, keep); }
+      }
+      return;
+    }
+    if (act === "note") {
+      setTree(t.getAttribute("data-id"), { note: t.value });
+      return;
+    }
+    if (act === "rev") {
+      patchReview(state.ui.weekId, { [t.getAttribute("data-k")]: t.value });
+      return;
+    }
+    if (act === "exp") {
+      const k = t.getAttribute("data-k");
+      patchExp(t.getAttribute("data-id"), { [k]: t.value });
+      if (k === "title" || k === "hypothesis") {
+        const card = t.closest(".exp");
+        if (card && k === "title") {
+          const h = card.querySelector("h3");
+          if (h) h.textContent = t.value || "未命名实验";
+        }
+      }
+      const card = t.closest(".exp");
+      if (card) card.classList.toggle("warn", expHasLeakRisk(state.experiments.find((x) => x.id === t.getAttribute("data-id"))));
+      return;
+    }
+    if (act === "link-q") {
+      state.ui.linkQ = t.value;
+      save();
+      const keep = t.selectionStart;
+      const form = t.closest(".form");
+      const expId = form && form.querySelector("[data-act=exp]") && form.querySelector("[data-act=exp]").getAttribute("data-id");
+      const exp = state.experiments.find((x) => x.id === expId);
+      if (exp) {
+        const box = form.querySelector(".link-list");
+        const lq = (state.ui.linkQ || "").trim().toLowerCase();
+        const linkItems = ALL_ITEMS.filter((it) => !lq || (it.id + " " + it.name).toLowerCase().includes(lq));
+        box.innerHTML = linkItems.map((it) => `
+          <label>
+            <input type="checkbox" data-act="toggle-link" data-id="${exp.id}" data-v="${it.id}" ${(exp.linkedIds || []).includes(it.id) ? "checked" : ""} />
+            <span>${esc(it.id)} ${esc(it.name)}</span>
+          </label>`).join("") || "<p class='empty'>无匹配节点</p>";
+        t.focus(); t.setSelectionRange(keep, keep);
+      }
+    }
+  }
+
+  function handleChange(e) {
+    const t = e.target;
+    if (t.id === "import-file") {
+      const file = t.files && t.files[0];
+      t.value = "";
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          mergeImport(JSON.parse(String(reader.result)));
+          render();
+          toast("已合并导入，未丢字段");
+        } catch (err) {
+          toast("导入失败：" + (err.message || "无法解析"));
+        }
+      };
+      reader.readAsText(file);
+      return;
+    }
+    const act = t.getAttribute("data-act");
+    if (act === "exp") {
+      patchExp(t.getAttribute("data-id"), { [t.getAttribute("data-k")]: t.value });
+      return;
+    }
+    if (act === "no-test") {
+      patchExp(t.getAttribute("data-id"), { noTestLeak: !!t.checked });
+      const card = t.closest(".exp");
+      const exp = state.experiments.find((x) => x.id === t.getAttribute("data-id"));
+      if (card && exp) card.classList.toggle("warn", expHasLeakRisk(exp));
+      return;
+    }
+    if (act === "toggle-link") {
+      const id = t.getAttribute("data-id");
+      const v = t.getAttribute("data-v");
+      const exp = state.experiments.find((x) => x.id === id);
+      if (!exp) return;
+      const set = new Set(exp.linkedIds || []);
+      if (t.checked) set.add(v); else set.delete(v);
+      patchExp(id, { linkedIds: Array.from(set) });
+      const card = t.closest(".exp");
+      if (card) card.classList.toggle("warn", expHasLeakRisk(state.experiments.find((x) => x.id === id)));
+      return;
+    }
+    if (act === "leak") {
+      patchReview(state.ui.weekId, { leak: t.value });
+      if (t.value === "yes") render();
+    }
+  }
+
+  let tx = null;
+  document.addEventListener("touchstart", (e) => {
+    if (e.target.closest("input, textarea, select, .link-list, .tabs")) { tx = null; return; }
+    tx = e.changedTouches[0].clientX;
+  }, { passive: true });
+  document.addEventListener("touchend", (e) => {
+    if (tx == null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    tx = null;
+    if (Math.abs(dx) < 72) return;
+    const order = ["tree", "week", "lab"];
+    const i = order.indexOf(state.ui.tab);
+    const n = dx < 0 ? Math.min(2, i + 1) : Math.max(0, i - 1);
+    if (n !== i) { state.ui.tab = order[n]; save(); render(); }
+  }, { passive: true });
+
+  document.addEventListener("click", handleClick);
+  document.addEventListener("input", handleInput);
+  document.addEventListener("change", handleChange);
+
+  load();
+  if (!state.ui.weekId) state.ui.weekId = weekId(new Date());
+  render();
+})();
+  </script>
+</body>
+</html>
