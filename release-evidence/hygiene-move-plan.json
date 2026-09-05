@@ -1,0 +1,15 @@
+[
+  ".output",
+  "release-evidence\\profiles",
+  "release-evidence\\runtime\\account-db-2026-09-05T13-29-26-589Z",
+  "release-evidence\\runtime\\account-db-2026-09-05T13-34-43-659Z",
+  "release-evidence\\runtime\\dev-20260905-060602.stderr.log",
+  "release-evidence\\runtime\\dev-20260905-060602.stdout.log",
+  "release-evidence\\runtime\\dev.stderr.log",
+  "release-evidence\\runtime\\dev.stdout.log",
+  "release-evidence\\runtime\\production-8082-2026-09-05T13-29-26-589Z-1788614970715.log",
+  "release-evidence\\runtime\\production-8082-2026-09-05T13-34-43-659Z-1788615288560.log",
+  "release-evidence\\runtime\\production-8082-2026-09-05T13-34-43-659Z-1788615299331.log",
+  "release-evidence\\runtime\\production-8083-2026-09-05T13-29-26-589Z-1788614966595.log",
+  "release-evidence\\runtime\\production-8083-2026-09-05T13-34-43-659Z-1788615283665.log"
+]
