@@ -8,13 +8,12 @@ import { Modal } from "./modal";
 import { dismissPeachBoot } from "./peach-boot";
 import { SettingsPage } from "./settings";
 import { InkDock, type ShellTab } from "./dock";
-import { CommunityPage } from "./community";
+import { CommunityPreview } from "./community-preview";
 import { GrovePage } from "./grove";
 import { GatePage } from "./gate-page";
 import { I18nProvider, useI18n } from "@/lib/i18n";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { enterGuest, leaveGuest, readGuest } from "@/lib/guest";
-import { loadGardens, type GardenState } from "@/lib/garden-store";
 import { currentTree } from "@/lib/knowledge-tree/engine";
 import { emptyReview, LOG_STATUS_LABEL, NODE_STATUS_MARK } from "@/lib/knowledge-tree/factory";
 import {
@@ -48,7 +47,7 @@ function KnowledgeShell() {
   const { t } = useI18n();
   const { user, isPending } = useCurrentUserState();
   const service = useWorkspaceService();
-  const { pickImport, openImport } = useDataActions();
+  const { pickImport } = useDataActions();
   const { workspace: ws } = useSyncExternalStore(service.subscribe, service.getSnapshot, service.getSnapshot);
   const commit = useMemo(() => service.bind(ws), [service,ws]);
   const [toast, setToast] = useState("");
@@ -58,7 +57,6 @@ function KnowledgeShell() {
   const [confirmReq, setConfirmReq] = useState<ConfirmRequest | null>(null);
   const [guest, setGuest] = useState(() => readGuest());
   const [groveOpen, setGroveOpen] = useState(true);
-  const [gardenState, setGardenState] = useState<GardenState>(() => loadGardens());
   const [shell, setShell] = useState<ShellTab>(() => {
     if (typeof window === "undefined") return "mine";
     try {
@@ -98,7 +96,6 @@ function KnowledgeShell() {
 
   const tree = currentTree(ws);
   const tpl = getTemplate(tree?.templateId);
-  const displayName = user?.displayName?.trim() || t("guestName");
 
   function openGrove() {
     setGroveOpen(true);
@@ -106,10 +103,6 @@ function KnowledgeShell() {
   function openTree(id: string) {
     commit("setCurrentTree", id);
     setGroveOpen(false);
-  }
-  function adoptPlanted(snapshot: KnowledgeTree) {
-    openImport({ schemaVersion: 3, tree: snapshot });
-    changeShell("mine"); setGroveOpen(true);
   }
 
   useEffect(() => {
@@ -152,13 +145,7 @@ function KnowledgeShell() {
       <ConfirmCtx.Provider value={ask}>
         <div className="wrap shell-wrap">
           {shell === "community" ? (
-            <CommunityPage
-              gardens={gardenState}
-              setGardens={setGardenState}
-              myTrees={Object.values(ws.trees)}
-              displayName={displayName}
-              onAdopt={adoptPlanted}
-            />
+            <CommunityPreview onReturn={() => changeShell("mine")} />
           ) : (
             <SettingsPage
               ws={ws}

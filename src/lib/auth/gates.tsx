@@ -92,6 +92,7 @@ export function UserButton() {
   // Sign-out can take a moment (and can fail when deployed), so the control
   // shows it is working and cannot be fired twice.
   const [signingOut, setSigningOut] = useState(false);
+  const [signOutError,setSignOutError] = useState("");
   const gateSession = useSyncExternalStore(
     subscribeToNothing,
     hasGateSessionMarker,
@@ -113,18 +114,19 @@ export function UserButton() {
         </span>
       )}
       <span className="text-sm font-medium">{label}</span>
+      {signOutError && <p role="alert">{signOutError}</p>}
       {authEnabled && !gateSession && (
         <button
           type="button"
           disabled={signingOut}
           onClick={() => {
-            setSigningOut(true);
+            setSigningOut(true); setSignOutError("");
             // Success navigates away; on failure re-enable so it can be retried.
-            void signOut().catch(() => setSigningOut(false));
+            void signOut().catch(() => {setSigningOut(false);setSignOutError("退出未成功，请重试。本机知识仍保留。");});
           }}
           className="cursor-pointer text-sm underline-offset-4 opacity-70 hover:underline disabled:cursor-wait disabled:no-underline"
         >
-          {signingOut ? "Signing out…" : "Sign out"}
+          {signingOut ? "正在退出…" : "退出登录"}
         </button>
       )}
     </div>

@@ -11,3 +11,5 @@ release-evidence/runtime/
 release-evidence/profiles/
 test-results/
 playwright-report/
+
+.local/

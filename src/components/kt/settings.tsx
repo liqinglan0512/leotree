@@ -5,6 +5,7 @@ import { progressOf } from "@/lib/knowledge-tree/progress";
 import type { Workspace } from "@/lib/knowledge-tree/types";
 import { useI18n, type FontSize } from "@/lib/i18n";
 import { SignInPanel } from "./sign-in-panel";
+import { PublicGuide } from "./public-guide";
 
 const FONTS: FontSize[] = ["sm", "md", "lg", "xl"];
 
@@ -58,6 +59,7 @@ export function SettingsPage({
 
       <section className="settings-block">
         <h3>{t("account")}</h3>
+        <p className="brief">登录仅标识账号。本机知识不按账号隔离，不会自动上传、同步或转移。</p>
         <SignInGate
           fallback={
             <div className="settings-auth">
@@ -109,6 +111,7 @@ export function SettingsPage({
           </ul>
         )}
       </section>
+      <PublicGuide />
     </div>
   );
 }

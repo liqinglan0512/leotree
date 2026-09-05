@@ -150,7 +150,7 @@ export default defineConfig(({ command, isPreview }) => ({
     host: "0.0.0.0",
     port: 8080,
     strictPort: true,
-    watch: { ignored: ["**/release-evidence/**", "**/test-results/**", "**/playwright-report/**"] },
+    watch: { ignored: ["**/release-evidence/**", "**/test-results/**", "**/playwright-report/**", "**/.local/**"] },
   },
   preview: {
     host: "127.0.0.1",
@@ -158,6 +158,7 @@ export default defineConfig(({ command, isPreview }) => ({
     strictPort: true,
   },
   resolve: { tsconfigPaths: true },
+  ssr: { external: ["@electric-sql/pglite"] },
   plugins: [
     pgliteBootstrapPlugin(),
     // Before tanstackStart so /auth/popup never falls through to the SPA.
@@ -171,7 +172,9 @@ export default defineConfig(({ command, isPreview }) => ({
     ...(command === "build" || isPreview
       ? [
           nitro({
-            preset: "vercel",
+            preset: process.env.NITRO_PRESET === "vercel" ? "vercel" : "node-server",
+            // PGlite loads .wasm/.data beside its module; preserve that package layout.
+            traceDeps: ["@electric-sql/pglite*"],
             // Auto-registers server/middleware/* (the PWA install page +
             // manifest + head-tag middleware). Nitro v3 defaults serverDir to
             // false, so removing this silently unwires /?install=1 on deploys.

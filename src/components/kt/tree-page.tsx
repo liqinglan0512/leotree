@@ -4,6 +4,7 @@ import { ChevronDown, ChevronRight, FolderTree, Home, MoreHorizontal, Plus } fro
 import { useAsk } from "./confirm";
 import { Modal } from "./modal";
 import * as Popover from "@radix-ui/react-popover";
+import { ProgressDisclosure } from "./public-guide";
 
 import { NODE_STATUS_LABEL, NODE_STATUS_MARK } from "@/lib/knowledge-tree/factory";
 import { nodeLabel, prioLabel } from "@/lib/knowledge-tree/display";
@@ -77,6 +78,7 @@ export function TreePage({
         <div className="stat"><b>{tot.todo}</b><span>{t("notStarted")}</span></div>
       </div>
       ) : null}
+      {!focus && <ProgressDisclosure />}
       <Crumbs tree={tree} focus={focus} ws={ws} commit={commit} onOpenOutline={() => setOutlineOpen(true)} />
       <div className="tree-work">
         <Outline

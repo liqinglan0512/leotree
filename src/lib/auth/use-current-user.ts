@@ -6,23 +6,8 @@ export type AppUser = {
   displayName: string | null;
   primaryEmail: string | null;
   profileImageUrl: string | null;
-  /** True when this is the sandbox/dev fallback (auth not configured). */
+  /** Retained platform shape; RC1 authenticated users always have false here. */
   isDevFallback: boolean;
-};
-
-/**
- * Stable fallback user, used ONLY when auth is disabled
- * (`VITE_AUTH_ENABLED=false`, the shipped default). With auth on, the sandbox
- * live preview does real sign-in via the baked preview client. Its id is
- * `"dev-user"` — the SAME id `verify.server.ts` returns server-side — so per-user
- * rows written in that mode belong to one consistent owner.
- */
-export const DEV_USER: AppUser = {
-  id: "dev-user",
-  displayName: "Dev User",
-  primaryEmail: "dev@example.com",
-  profileImageUrl: null,
-  isDevFallback: true,
 };
 
 /** `useCurrentUserState()` result: the user plus the session-loading flag. */
@@ -40,7 +25,7 @@ export type CurrentUserState = {
  *                            signed out (`isPending: false`). Session comes from
  *                            Better Auth `useSession()` → `/api/auth/get-session`
  *                            (cookie when deployed; bearer in live preview).
- *   - Auth disabled (`VITE_AUTH_ENABLED=false`) -> `DEV_USER`, never pending.
+ *   - Auth disabled -> no authenticated identity, never pending; the local workspace remains available.
  *
  * Protect a route by waiting out `isPending` before acting on `user` —
  * redirecting on `user: null` alone bounces signed-in visitors to sign-in on
@@ -55,7 +40,7 @@ export type CurrentUserState = {
  * call keeps a stable hook order across every render of a given component.
  */
 export function useCurrentUserState(): CurrentUserState {
-  if (!authEnabled) return { user: DEV_USER, isPending: false };
+  if (!authEnabled) return { user: null, isPending: false };
   const { data, isPending } = authClient.useSession();
   const user = data?.user;
   return {

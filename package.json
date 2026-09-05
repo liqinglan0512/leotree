@@ -1,5 +1,5 @@
 {
-  "name": "app-builder-workspace",
+  "name": "leo-tree",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -7,8 +7,8 @@
     "nf3": "0.3.17"
   },
   "scripts": {
-    "dev": "node scripts/with-app-env.mjs vite dev --host 0.0.0.0 --port 8080",
-    "build": "node scripts/with-app-env.mjs vite build",
+    "dev": "node --env-file-if-exists=.env.local scripts/with-app-env.mjs vite dev --host 0.0.0.0 --port 8080",
+    "build": "node --env-file-if-exists=.env.local scripts/with-app-env.mjs vite build",
     "db:migrate": "node scripts/migrate.mjs",
     "build:dev": "node scripts/with-app-env.mjs vite build --mode development",
     "preview": "node scripts/with-app-env.mjs vite preview",
@@ -22,7 +22,11 @@
     "test:product": "node scripts/product-tests.mjs",
     "test:platform": "node scripts/platform-tests.mjs",
     "test:browser:data": "node --experimental-strip-types scripts/rc-data-browser.mjs",
-    "test:browser:learning": "node --experimental-strip-types scripts/rc-learning-browser.mjs"
+    "test:browser:learning": "node --experimental-strip-types scripts/rc-learning-browser.mjs",
+    "test:browser:production": "node --experimental-strip-types scripts/rc-production.mjs",
+    "test:build": "node scripts/verify-build.mjs",
+    "start": "node --env-file-if-exists=.env.local scripts/start.mjs",
+    "setup:account": "node scripts/setup-local-account.mjs"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.4",
@@ -99,5 +103,6 @@
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.56.1",
     "vite": "^8.2.0"
-  }
+  },
+  "version": "1.0.0-rc.1"
 }

@@ -4,7 +4,7 @@ import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { PeachBoot, BOOT_TICK_JS } from "@/components/kt/peach-boot";
 import appCss from "../styles.css?url";
 
-const APP_NAME = "知识树";
+const APP_NAME = "Leo Tree";
 
 function publicShareHost(): string {
   const raw =

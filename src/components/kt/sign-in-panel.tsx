@@ -1,146 +1,36 @@
 import { useState, type FormEvent } from "react";
-import { GROK_PROVIDERS, authClient, signIn } from "@/lib/auth/client";
+import { authClient } from "@/lib/auth/client";
+import { useAuthCapabilities } from "@/lib/auth/capabilities";
 import { useI18n } from "@/lib/i18n";
 
-function providerLabel(id: string, t: (k: "continueGoogle" | "continueX") => string) {
-  if (id.includes("google")) return t("continueGoogle");
-  return t("continueX");
-}
-
-function toEmail(raw: string, mode: "email" | "phone") {
-  const v = raw.trim();
-  if (mode === "email") return v;
-  const digits = v.replace(/\D/g, "");
-  return `${digits}@phone.leotree.app`;
-}
-
-export function SignInPanel({
-  showGuest,
-  onGuest,
-}: {
-  showGuest?: boolean;
-  onGuest?: () => void;
-}) {
-  const { t } = useI18n();
-  const [tab, setTab] = useState<"email" | "phone">("email");
-  const [signup, setSignup] = useState(false);
-  const [account, setAccount] = useState("");
-  const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState("");
-  const [note, setNote] = useState("");
-
-  async function onSubmit(e: FormEvent) {
-    e.preventDefault();
-    setErr("");
-    setNote("");
-    const email = toEmail(account, tab);
-    if (tab === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setErr(t("authInvalidEmail"));
-      return;
-    }
-    if (tab === "phone" && !/^1\d{10}$/.test(account.replace(/\D/g, ""))) {
-      setErr(t("authInvalidPhone"));
-      return;
-    }
-    if (password.length < 8) {
-      setErr(t("authWeakPassword"));
-      return;
-    }
+export function SignInPanel({ showGuest, onGuest }: { showGuest?: boolean; onGuest?: () => void }) {
+  const { t }=useI18n();
+  const capability=useAuthCapabilities();
+  const [signup,setSignup]=useState(false),[account,setAccount]=useState(""),[password,setPassword]=useState("");
+  const [busy,setBusy]=useState(false),[error,setError]=useState("");
+  async function submit(e: FormEvent) {
+    e.preventDefault(); if(!capability.emailPassword)return;
+    setError(""); const email=account.trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setError(t("authInvalidEmail"));return;}
+    if(password.length<8){setError(t("authWeakPassword"));return;}
     setBusy(true);
     try {
-      if (signup) {
-        const { error } = await authClient.signUp.email({
-          email,
-          password,
-          name: tab === "phone" ? account.replace(/\D/g, "") : email.split("@")[0],
-        });
-        if (error) throw new Error(error.message || t("authFailed"));
-      } else {
-        const { error } = await authClient.signIn.email({ email, password });
-        if (error) throw new Error(error.message || t("authFailed"));
-      }
+      const result=signup ? await authClient.signUp.email({email,password,name:email.split("@")[0]}) : await authClient.signIn.email({email,password});
+      if(result.error)throw new Error(result.error.message || t("authFailed"));
       window.location.assign("/");
-    } catch (ex) {
-      setErr(ex instanceof Error ? ex.message : t("authFailed"));
-    } finally {
-      setBusy(false);
-    }
+    } catch(e){setError(e instanceof Error ? e.message : t("authFailed"));} finally{setBusy(false);}
   }
-
-  return (
-    <div className="settings-auth">
-      <p className="brief">{t("signInHint")}</p>
-      <div className="auth-social">
-        {GROK_PROVIDERS.map((p) => (
-          <button
-            key={p.providerId}
-            type="button"
-            className="btn primary"
-            onClick={() => signIn(p.providerId, { callbackURL: "/" })}
-          >
-            {providerLabel(p.providerId, t)}
-          </button>
-        ))}
-        <button type="button" className="btn" onClick={() => setNote(t("comingSoonWechat"))}>
-          {t("continueWechat")}
-        </button>
-        <button type="button" className="btn" onClick={() => setNote(t("comingSoonQQ"))}>
-          {t("continueQQ")}
-        </button>
-      </div>
-      {note ? <p className="empty">{note}</p> : null}
-      {showGuest && onGuest ? (
-        <button type="button" className="btn guest-btn" onClick={onGuest}>
-          {t("guestContinue")}
-        </button>
-      ) : null}
-      {showGuest ? <p className="brief">{t("guestHint")}</p> : null}
-      <p className="auth-or">{t("orAccount")}</p>
-      <div className="seg">
-        <button type="button" className={`chip ${tab === "email" ? "on" : ""}`} onClick={() => setTab("email")}>
-          {t("continueEmail")}
-        </button>
-        <button type="button" className={`chip ${tab === "phone" ? "on" : ""}`} onClick={() => setTab("phone")}>
-          {t("continuePhone")}
-        </button>
-      </div>
-      <form className="auth-form" onSubmit={onSubmit}>
-        <label>
-          {tab === "email" ? t("email") : t("phone")}
-          <input
-            value={account}
-            onChange={(e) => setAccount(e.target.value)}
-            autoComplete={tab === "email" ? "email" : "tel"}
-            inputMode={tab === "phone" ? "tel" : "email"}
-            placeholder={tab === "email" ? "you@example.com" : "13800000000"}
-          />
-        </label>
-        <label>
-          {t("password")}
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete={signup ? "new-password" : "current-password"}
-            minLength={8}
-          />
-        </label>
-        {err ? <p className="empty">{err}</p> : null}
-        <button type="submit" className="btn primary" disabled={busy}>
-          {busy ? "…" : signup ? t("signUpSubmit") : t("signInSubmit")}
-        </button>
-        <button
-          type="button"
-          className="btn ghost"
-          onClick={() => {
-            setSignup((v) => !v);
-            setErr("");
-          }}
-        >
-          {signup ? t("toggleSignIn") : t("toggleSignUp")}
-        </button>
-      </form>
-    </div>
-  );
+  return <div className="settings-auth">
+    <p className="brief">本机空间属于当前浏览器，不按账号隔离。登录不会上传、同步或转移知识；同一浏览器切换账号仍会看到同一份本机数据。</p>
+    {showGuest && onGuest && <button type="button" className="btn primary guest-btn" onClick={onGuest}>打开本机空间（无需登录）</button>}
+    {capability.pending ? <p className="brief">正在检查账号服务…</p> : !capability.emailPassword ? <p className="brief" data-auth-availability="unavailable">{capability.unavailable ? "账号服务暂不可用，本机空间仍可使用。" : "此环境未开放账号登录。"}</p> :
+      <form className="auth-form" onSubmit={submit} data-auth-availability="email">
+        <p className="brief">邮箱与密码登录。当前不提供邮箱验证或密码找回；账号不能用来找回本机知识，请保留完整备份。</p>
+        <label>{t("email")}<input type="email" autoComplete="email" required value={account} onChange={e=>setAccount(e.target.value)} /></label>
+        <label>{t("password")}<input type="password" autoComplete={signup ? "new-password" : "current-password"} required minLength={8} value={password} onChange={e=>setPassword(e.target.value)} /></label>
+        {error && <p role="alert">{error}</p>}
+        <button className="btn primary" type="submit" disabled={busy}>{busy ? "…" : signup ? t("signUpSubmit") : t("signInSubmit")}</button>
+        <button className="btn ghost" type="button" onClick={()=>{setSignup(!signup);setError("");}}>{signup ? t("toggleSignIn") : t("toggleSignUp")}</button>
+      </form>}
+  </div>;
 }

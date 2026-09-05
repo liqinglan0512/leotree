@@ -6,7 +6,8 @@ import { attachmentIds, type WorkspaceService } from "./service.ts";
 import type { KnowledgeTree, Workspace } from "./types.ts";
 import { assertWorkspace, DataError, isRecord, validId, validateTree } from "./validation.ts";
 
-export const APP_VERSION = "1.0.0-rc.1";
+export { APP_VERSION } from "../product-contract.ts";
+import { APP_VERSION } from "../product-contract.ts";
 export interface BackupManifest {
   backupVersion: 1; appVersion: string; createdAt: string; workspaceHash: string; artifactCount: number; attachmentCount: number;
   artifacts: Array<{ path: string; sha256: string; size: number; id?: string; mime?: string }>;
