@@ -6,6 +6,8 @@ import { previewImport, type ImportMode, type ImportPreview } from "@/lib/knowle
 import { createBackup, previewBackupRestore, type BackupPreview } from "@/lib/knowledge-tree/backup";
 import type { Workspace } from "@/lib/knowledge-tree/types";
 import { Modal } from "./modal";
+import { BACKUP_TIME_KEY, writePreference } from "@/lib/ui-preferences";
+import { userMessage, errorMessage, conflictLabels } from "@/lib/user-messages";
 import { dismissPeachBoot } from "./peach-boot";
 
 export function downloadData(name: string, data: string | Uint8Array, type = "application/json") {
@@ -27,8 +29,11 @@ export function DataBoundary({children}: {children: ReactNode}) {
   useEffect(()=>{ if(state.recovery) dismissPeachBoot(); },[state.recovery]);
   async function backup(rescue=false) {
     setBusy(true); setError("");
-    try { downloadData(rescue ? "LeoTree-rescue.zip" : "LeoTree-backup.zip",await createBackup(service,rescue),"application/zip"); }
-    catch(e) { setError(String(e)); }
+    try {
+      downloadData(rescue ? "LeoTree-rescue.zip" : "LeoTree-backup.zip",await createBackup(service,rescue),"application/zip");
+      if(!rescue && !writePreference(BACKUP_TIME_KEY,new Date().toISOString())) setError("备份已开始下载，但未能记住备份时间。请确认文件已保存。");
+    }
+    catch(e) { setError(errorMessage(e)); }
     finally { setBusy(false); }
   }
   const value: Context = {service,openImport:setRaw,pickImport:()=>fileRef.current?.click(),backup:()=>{void backup();}};
@@ -36,7 +41,7 @@ export function DataBoundary({children}: {children: ReactNode}) {
     <div className={`save-notice state-${state.status.toLowerCase()}`} role="status" aria-live="polite" data-save-state={state.status}>
       <span>{state.status === "SAVED" ? "已保存到本机" : state.status === "SAVING" ? "正在保存… 离开前请等待完成" : state.status === "RECOVERY_REQUIRED" ? "需要恢复：原始数据已保留" : "保存需要处理：本页草稿仍保留"}</span>
       {!["SAVED","SAVING"].includes(state.status) && <>
-        <span>{state.errorCode} · {state.message}</span>
+        <span>{userMessage(state.errorCode)}</span><details className="error-details"><summary>查看排查信息</summary><pre>{state.errorCode} · {state.message}</pre></details>
         <button className="btn" onClick={()=>void service.retry()}>重试保存</button>
         <button className="btn" onClick={()=>downloadData("LeoTree-rescue.json",exportWorkspace(state.workspace))}>导出草稿 JSON</button>
         <button className="btn" disabled={busy} onClick={()=>void backup(true)}>救援 ZIP（含可读取附件）</button>
@@ -47,7 +52,7 @@ export function DataBoundary({children}: {children: ReactNode}) {
     {state.recovery ? <RecoveryPanel service={service}/> : children}
     <input ref={fileRef} hidden type="file" accept=".json,.zip,application/json,application/zip" onChange={async event=>{
       const file=event.target.files?.[0]; event.target.value=""; if(!file)return;
-      setError(""); try { if(file.name.toLowerCase().endsWith(".zip")) setZip(new Uint8Array(await file.arrayBuffer())); else setRaw(JSON.parse(await file.text())); } catch(e) { setError(`导入未写入任何内容：${String(e)}`); }
+      setError(""); try { if(file.name.toLowerCase().endsWith(".zip")) setZip(new Uint8Array(await file.arrayBuffer())); else setRaw(JSON.parse(await file.text())); } catch(e) { setError(`导入未写入任何内容：${errorMessage(e)}`); }
     }}/>
     {raw !== null && <ImportDialog raw={raw} onClose={()=>setRaw(null)}/>}
     {zip && <RestoreDialog zip={zip} onClose={()=>setZip(null)}/>}
@@ -63,10 +68,10 @@ function RecoveryPanel({service}:{service:WorkspaceService}) {
   const [confirmed,setConfirmed]=useState(false);
   const candidates=recoveryCandidates(service.adapter);
   return <main className="wrap recovery-panel"><h1>先保全知识，再恢复使用</h1>
-    <p>读取失败不会触发覆盖。错误类型：<strong>{source.code}</strong></p><pre>{source.message}</pre>
+    <p data-error-code={source.code}>{userMessage(source.code)}</p><details className="error-details"><summary>查看排查信息</summary><pre>{source.code} · {source.message}</pre></details>
     <button className="btn" disabled={source.raw===null} onClick={()=>downloadData("LeoTree-original-source.txt",source.raw!,"text/plain")}>下载原始数据</button>
     <h2>生成恢复副本</h2><p>选择候选内容后会显示预览。只有明确确认，副本才会成为当前知识空间；异常原文另存保留。</p>
-    {candidates.map(c=><button className="btn" key={c.key} onClick={()=>{setCandidate(c.workspace!);setConfirmed(false);}}>预览 {c.key}（{Object.keys(c.workspace!.trees).length} 棵树）</button>)}
+    {candidates.map(c=><button className="btn" key={c.key} data-recovery-source={c.key} onClick={()=>{setCandidate(c.workspace!);setConfirmed(false);}}>预览：{c.key.includes("last-good") ? "上次成功保存的副本" : c.key.includes("v3") ? "旧版知识空间" : "早期知识空间"}（{Object.keys(c.workspace!.trees).length} 棵树）</button>)}
     <button className="btn" disabled={source.code==="STORAGE_ERROR"} onClick={()=>{setCandidate(emptyWorkspace());setConfirmed(false);}}>创建空白安全副本</button>
     {candidate && <section><h2>已验证的候选副本</h2><WorkspaceSummary workspace={candidate}/><label className="check-line"><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>我确认启用此副本，保留异常原文</label><button className="btn primary" disabled={!confirmed} onClick={()=>void service.recover(candidate,true)}>确认启用恢复副本</button></section>}
   </main>;
@@ -79,7 +84,7 @@ function ImportDialog({raw,onClose}:{raw:unknown;onClose:()=>void}) {
   const [preferIncoming,setPreferIncoming]=useState(false); const [omitAttachments,setOmitAttachments]=useState(false);
   const [preview,setPreview]=useState<ImportPreview | null>(null); const [error,setError]=useState(""); const [saving,setSaving]=useState(false);
   useEffect(()=>{ let gone=false; setPreview(null);setError("");
-    void previewImport(service,raw,mode,{preferIncoming,omitAttachments}).then(p=>{if(!gone)setPreview(p);}).catch(e=>{if(!gone)setError(String(e));});
+    void previewImport(service,raw,mode,{preferIncoming,omitAttachments}).then(p=>{if(!gone)setPreview(p);}).catch(e=>{if(!gone)setError(errorMessage(e));});
     return ()=>{gone=true;};
   },[service,raw,mode,preferIncoming,omitAttachments]);
   return <Modal title="导入预览" onClose={onClose}><div className="form">
@@ -88,18 +93,18 @@ function ImportDialog({raw,onClose}:{raw:unknown;onClose:()=>void}) {
     <label className="check-line"><input type="checkbox" checked={omitAttachments} onChange={e=>setOmitAttachments(e.target.checked)}/>仅导入知识内容，明确不导入附件。JSON 未携带的字节无法凭空恢复。</label>
     {error && <p role="alert">未写入任何内容：{error}</p>}
     {preview && <><WorkspaceSummary workspace={preview.workspace}/><p>本次略过 {preview.omittedAttachments} 个附件；复制 {preview.files.length} 个附件。确认前不会写入。</p>
-      <details open={mode!=="new"}><summary>身份、时间、结构与附件冲突（{preview.conflicts.length}）</summary><ul>{preview.conflicts.map((c,i)=><li key={i}><strong>{c.kind}</strong> {c.nodeId} — {c.detail}</li>)}</ul></details>
+      <details open={mode!=="new"}><summary>身份、时间、结构与附件冲突（{preview.conflicts.length}）</summary><ul>{preview.conflicts.map((c,i)=><li key={i}><strong>{conflictLabels[c.kind]}</strong> {c.nodeId} — {c.detail}</li>)}</ul></details>
       <details><summary>查看将导入的完整内容</summary><pre className="data-preview">{exportWorkspace(preview.workspace)}</pre></details>
-      <button className="btn primary" disabled={saving} onClick={async()=>{setSaving(true);if(await service.acceptPreview(preview,true))onClose();else setError(service.getSnapshot().message);setSaving(false);}}>确认导入</button></>}
+      <button className="btn primary" disabled={saving} onClick={async()=>{setSaving(true);if(await service.acceptPreview(preview,true))onClose();else setError(userMessage(service.getSnapshot().errorCode));setSaving(false);}}>确认导入</button></>}
   </div></Modal>;
 }
 function RestoreDialog({zip,onClose}:{zip:Uint8Array;onClose:()=>void}) {
   const service=useWorkspaceService();const [preview,setPreview]=useState<BackupPreview | null>(null);const [error,setError]=useState("");const [confirmed,setConfirmed]=useState(false);const [saving,setSaving]=useState(false);
-  useEffect(()=>{let gone=false;void previewBackupRestore(service,zip).then(p=>{if(!gone)setPreview(p);}).catch(e=>{if(!gone)setError(String(e));});return()=>{gone=true;};},[service,zip]);
+  useEffect(()=>{let gone=false;void previewBackupRestore(service,zip).then(p=>{if(!gone)setPreview(p);}).catch(e=>{if(!gone)setError(errorMessage(e));});return()=>{gone=true;};},[service,zip]);
   return <Modal title="完整备份恢复预览" onClose={onClose}>{error && <p role="alert">未写入任何内容：{error}</p>}{preview && <>
     <p>备份版本 {preview.manifest.backupVersion} · {preview.manifest.createdAt} · {preview.files.length} 个附件的 SHA-256 已验证。</p><WorkspaceSummary workspace={preview.workspace}/>
     <p>恢复将用上述完整内容替换当前知识空间；当前已保存版本会保留为恢复候选。建议先下载当前空间的完整备份。</p>
     <label className="check-line"><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>我确认恢复这份完整备份并替换当前知识空间</label>
-    <button className="btn primary" disabled={!confirmed || saving} onClick={async()=>{setSaving(true);if(await service.acceptPreview(preview,true))onClose();else setError(service.getSnapshot().message);setSaving(false);}}>确认完整恢复</button>
+    <button className="btn primary" disabled={!confirmed || saving} onClick={async()=>{setSaving(true);if(await service.acceptPreview(preview,true))onClose();else setError(userMessage(service.getSnapshot().errorCode));setSaving(false);}}>确认完整恢复</button>
   </>}</Modal>;
 }

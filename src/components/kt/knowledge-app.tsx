@@ -1,6 +1,6 @@
 import type { Commit } from "@/lib/knowledge-tree/operations";
 import { DataBoundary, DataTools, useDataActions, useWorkspaceService, downloadData } from "./data-boundary";
-import { useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { CustomFields } from "./custom-fields";
 import { ConfirmCtx, ConfirmModal, useAsk, type ConfirmRequest } from "./confirm";
 import { TreePage } from "./tree-page";
@@ -28,6 +28,11 @@ import { nodeLabel } from "@/lib/knowledge-tree/display";
 import { treeLogFields, treeReviewFields } from "@/lib/knowledge-tree/fields";
 import type { KnowledgeTree, LogStatus, PracticeLog, Workspace } from "@/lib/knowledge-tree/types";
 
+import { Welcome, type StartChoice } from "./welcome";
+import { NewTreeDialog, TemplateDialog } from "./new-tree-dialog";
+import { INTRO_KEY, LOCAL_HINT_KEY, readPreference, writePreference } from "@/lib/ui-preferences";
+import { createTreeFromDraft } from "@/lib/create-tree-draft";
+
 const download = downloadData;
 
 function snippet(s: string, n: number) {
@@ -48,7 +53,19 @@ function KnowledgeShell() {
   const { user, isPending } = useCurrentUserState();
   const service = useWorkspaceService();
   const { pickImport } = useDataActions();
-  const { workspace: ws } = useSyncExternalStore(service.subscribe, service.getSnapshot, service.getSnapshot);
+  const workspaceState = useSyncExternalStore(service.subscribe, service.getSnapshot, service.getSnapshot);
+  const { workspace: ws } = workspaceState;
+  const [introDone,setIntroDone] = useState(() => readPreference(INTRO_KEY) === "done");
+  const [creation,setCreation] = useState<{templateId?:string} | null>(null);
+  const [templateOpen,setTemplateOpen] = useState(false);
+  const [localHint,setLocalHint] = useState(false);
+  const initiallyEmpty = useRef(Object.keys(ws.trees).length === 0);
+  useEffect(() => {
+    if(initiallyEmpty.current && Object.keys(ws.trees).length > 0 && workspaceState.status === "SAVED") {
+      initiallyEmpty.current = false;
+      if(readPreference(LOCAL_HINT_KEY) !== "shown") {setLocalHint(true);writePreference(LOCAL_HINT_KEY,"shown");}
+    }
+  },[ws.trees,workspaceState.status]);
   const commit = useMemo(() => service.bind(ws), [service,ws]);
   const [toast, setToast] = useState("");
   const [renameId, setRenameId] = useState<string | null>(null);
@@ -68,6 +85,18 @@ function KnowledgeShell() {
     return "mine";
   });
   const ask = (req: ConfirmRequest) => setConfirmReq(req);
+  useEffect(() => {
+    if(new URLSearchParams(window.location.search).get("start") === "web") {
+      writePreference(INTRO_KEY,"done");setIntroDone(true);enterGuest();setGuest(true);
+      setShell("mine");setGroveOpen(true);writePreference("leo-shell-tab-v1","mine");
+    }
+  },[]);
+  function startUsing(choice:StartChoice) {
+    writePreference(INTRO_KEY,"done");setIntroDone(true);enterGuest();setGuest(true);changeShell("mine");
+    if(choice === "blank")setCreation({});
+    if(choice === "template")setTemplateOpen(true);
+    if(choice === "import")pickImport();
+  }
 
   useEffect(() => {
     if (!isPending) dismissPeachBoot();
@@ -120,6 +149,8 @@ function KnowledgeShell() {
 
   if (isPending) return null;
 
+  if (!user && !guest && !introDone && !Object.keys(ws.trees).length) return <Welcome onStart={startUsing}/>;
+
   if (!user && !guest) {
     return (
       <GatePage
@@ -131,10 +162,18 @@ function KnowledgeShell() {
     );
   }
 
+  const creationUi = <>
+    {creation && <NewTreeDialog templateId={creation.templateId} onClose={()=>setCreation(null)} onEnter={(title,description)=>{
+      if(createTreeFromDraft(service,title,description,creation.templateId)) {setCreation(null);setGroveOpen(false);}
+    }}/>}
+    {templateOpen && <TemplateDialog onClose={()=>setTemplateOpen(false)} onPick={id=>{setTemplateOpen(false);setCreation({templateId:id});}}/>}
+    {localHint && <aside className="local-first-reminder" role="status"><p>知识保存在当前浏览器，建议定期完整备份。</p><button className="btn" onClick={()=>setLocalHint(false)}>知道了</button></aside>}
+  </>;
   const chrome = (
     <>
       <InkDock tab={shell} onChange={changeShell} />
       <DataTools />
+      {creationUi}
       <div className={`toast ${toast ? "show" : ""}`}>{toast}</div>
       <ConfirmModal req={confirmReq} onClose={() => setConfirmReq(null)} />
     </>
@@ -174,14 +213,8 @@ function KnowledgeShell() {
           <GrovePage
             ws={ws}
             onOpen={openTree}
-            onNewBlank={() => {
-              commit("createBlankTree", t("untitled"));
-              setGroveOpen(false);
-            }}
-            onFromTemplate={(id) => {
-              commit("createTreeFromTemplate", id);
-              setGroveOpen(false);
-            }}
+            onNewBlank={() => setCreation({})}
+            onFromTemplate={(id) => setCreation({templateId:id})}
             onImport={() => pickImport()}
           />
         </div>
@@ -265,6 +298,7 @@ function KnowledgeShell() {
           ws={ws}
           commit={commit}
           onImport={pickImport}
+          onCreate={(templateId)=>{commit("patchUi",{switcherOpen:false});setCreation({templateId});}}
           onClose={() => commit("patchUi", { switcherOpen: false })}
           onRename={(id) => {
             const t = ws.trees[id];
@@ -286,6 +320,7 @@ function KnowledgeShell() {
         </Modal>
       )}
       <DataTools />
+      {creationUi}
       <div className={`toast ${toast ? "show" : ""}`}>{toast}</div>
       <ConfirmModal req={confirmReq} onClose={() => setConfirmReq(null)} />
     </div>
@@ -298,12 +333,14 @@ function Switcher({
   ws,
   commit,
   onImport,
+  onCreate,
   onClose,
   onRename,
 }: {
   ws: Workspace;
   commit: Commit;
   onImport: () => void;
+  onCreate: (templateId?:string) => void;
   onClose: () => void;
   onRename: (id: string) => void;
 }) {
@@ -339,9 +376,9 @@ function Switcher({
           </div>
         ))}
         <div className="hero-actions" style={{ marginTop: 14, justifyContent: "flex-start" }}>
-          <button className="btn primary" onClick={() => commit("createBlankTree")}>{t("newBlankShort")}</button>
+          <button className="btn primary" onClick={() => onCreate()}>{t("newBlankShort")}</button>
           {TEMPLATES.filter((tpl) => tpl.id !== "blank").map((tpl) => (
-            <button key={tpl.id} className="btn" onClick={() => commit("createTreeFromTemplate", tpl.id)}>
+            <button key={tpl.id} className="btn" onClick={() => onCreate(tpl.id)}>
               {t("fromTemplate", { title: tpl.title })}
             </button>
           ))}
@@ -389,8 +426,8 @@ function WeekPage({
         <button className="btn" onClick={() => commit("shiftWeek", 1)}>{t("nextWeek")}</button>
       </div>
       <div className="summary">
-        <div className="stat"><b>{sum.historyKnown ? sum.newlyDone.length : "未知"}</b><span>{t("newlyDone")}</span></div>
-        <div className="stat"><b>{sum.historyKnown ? sum.newlyDoing.length : "未知"}</b><span>{t("newlyDoing")}</span></div>
+        <div className="stat"><b>{sum.historyKnown ? sum.newlyDone.length : "记录不足"}</b><span>{t("newlyDone")}</span></div>
+        <div className="stat"><b>{sum.historyKnown ? sum.newlyDoing.length : "记录不足"}</b><span>{t("newlyDoing")}</span></div>
         <div className="stat"><b>{sum.stalled.length}</b><span>当前滞留</span></div>
         <div className="stat"><b>{sum.weekLogs.length}</b><span>{t("weekLogs")}</span></div>
       </div>
@@ -457,7 +494,7 @@ function WeekPage({
         <p className="brief">各月可确认的首次标为掌握数量，复学或重复标记不重复计数。历史不完整或首次时间无法确认时显示“未知”。</p>
         <div className="months">
           {months.map((m) => (
-            <div className="month" key={m.key}><span>{m.key} · {m.label}</span><b>{doneIncrement(tree, m.y, m.m) ?? "未知"}</b></div>
+            <div className="month" key={m.key}><span>{m.key} · {m.label}</span><b>{doneIncrement(tree, m.y, m.m) ?? "记录不足"}</b></div>
           ))}
         </div>
       </section>

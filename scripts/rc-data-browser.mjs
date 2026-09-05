@@ -15,7 +15,7 @@ ws=createBlankTree(ws,"Second tree"); ws=setCurrentTree(ws,treeId);
 const seed={ [ACTIVE_KEY]:encodeRecord(ws,1) };
 async function context(data=seed) {
   const c=await browser.newContext({viewport:{width:1280,height:900},acceptDownloads:true});
-  await c.addInitScript(data=>{if(!localStorage.getItem("_rc_seed_loaded")){ for(const [k,v] of Object.entries(data))localStorage.setItem(k,v);localStorage.setItem("leo-tree-guest-v1","1");localStorage.setItem("_rc_seed_loaded","1");}},data);
+  await c.addInitScript(data=>{if(!localStorage.getItem("_rc_seed_loaded")){ for(const [k,v] of Object.entries(data))localStorage.setItem(k,v);localStorage.setItem("leo-tree-guest-v1","1");localStorage.setItem("leo-tree-local-hint-v1","shown");localStorage.setItem("_rc_seed_loaded","1");}},data);
   return c;
 }
 async function pageIn(c) {const p=await c.newPage();p.setDefaultTimeout(15000);await p.goto(origin,{waitUntil:"networkidle"});return p;}
@@ -34,7 +34,7 @@ async function run(name,fn) {
 try {
 await run("Empty profile creates, writes and reloads durable knowledge",async c=>{
   await c.close();c=await context({});try{
-    const p=await pageIn(c);await p.getByRole("button",{name:"新建知识树",exact:true}).click();await saved(p);
+    const p=await pageIn(c);await p.getByRole("button",{name:"新建知识树",exact:true}).click();await p.getByRole("button",{name:"进入知识树",exact:true}).click();await saved(p);
     await p.getByRole("button",{name:"在此分区新增节点"}).click();await p.getByLabel(/本枝记录/).waitFor();
     await p.getByLabel(/本枝记录/).fill("今天写下的知识，明天还在。");await saved(p);
     const before=await stored(p);await p.reload({waitUntil:"networkidle"});await p.locator(".grove-card").click();await p.locator(".node-enter").click();
@@ -57,9 +57,9 @@ await run("Legacy v2 custom node and SNN template survive migration",async c=>{
 });
 await run("Corrupt source recovery downloads exact raw and requires validated confirmation",async c=>{
   await c.close();const raw="{ unique broken payload";c=await context({[ACTIVE_KEY]:raw,"knowledge-tree-workspace-v3":JSON.stringify(ws)});try{
-    const p=await pageIn(c);assert.equal(await p.locator(".recovery-panel strong").innerText(),"PARSE_ERROR");
+    const p=await pageIn(c);assert.equal(await p.locator(".recovery-panel [data-error-code]").getAttribute("data-error-code"),"PARSE_ERROR");
     const download=p.waitForEvent("download");await p.getByRole("button",{name:"下载原始数据"}).click();const file=await download;await file.saveAs(`${out}/downloads/recovery-original.txt`);assert.equal(fs.readFileSync(`${out}/downloads/recovery-original.txt`,"utf8"),raw);
-    await p.getByRole("button",{name:/预览 knowledge-tree-workspace-v3/}).click();assert.equal(await p.getByRole("button",{name:"确认启用恢复副本"}).isDisabled(),true);
+    await p.locator('[data-recovery-source="knowledge-tree-workspace-v3"]').click();assert.equal(await p.getByRole("button",{name:"确认启用恢复副本"}).isDisabled(),true);
     assert.equal(await p.evaluate(k=>localStorage.getItem(k),ACTIVE_KEY),raw);
     await p.getByRole("checkbox").check();await p.getByRole("button",{name:"确认启用恢复副本"}).click();await saved(p);
     assert.equal((await stored(p)).workspace.trees[treeId].nodes[0].note,"original note");
@@ -72,7 +72,7 @@ await run("Real two-tab concurrent fields and UI-only search/tab cannot erase do
   await Promise.all([a.getByLabel(/本枝记录/).fill("A concurrent note"),b.getByLabel("名称",{exact:true}).fill("B concurrent title")]);await Promise.all([saved(a),saved(b)]);
   const t=(await stored(a)).workspace.trees[treeId];assert.equal(t.nodes[0].note,"A concurrent note");assert.equal(t.nodes[0].title,"B concurrent title");
   await b.getByRole("button",{name:"实践日志",exact:true}).click();
-  await a.getByRole("button",{name:/切换知识树/}).click();await a.getByRole("button",{name:"+ 新建空白",exact:true}).click();await saved(a);
+  await a.getByRole("button",{name:/切换知识树/}).click();await a.getByRole("button",{name:"+ 新建空白",exact:true}).click();await a.getByRole("button",{name:"进入知识树",exact:true}).click();await saved(a);
   await b.getByRole("button",{name:"知识树",exact:true}).click();await b.locator("input.search").fill("search only");
   assert.equal(Object.keys((await stored(b)).workspace.trees).length,3);
 });

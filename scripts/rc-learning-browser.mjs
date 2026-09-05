@@ -78,7 +78,10 @@ for(const [width,height] of (debug ? [[390,844],[430,932]] : [[390,844],[430,932
   await p.keyboard.press("Escape");await dialog.waitFor({state:"hidden"});assert.equal(await p.getByRole("button",{name:"目录",exact:true}).evaluate(e=>e===document.activeElement),true);step("20-level outline has bounded indentation; dialog traps and restores focus");
   await p.getByRole("button",{name:"编辑节点",exact:true}).click();
   const toggle=p.locator(".branch-head .struct-toggle");await toggle.click();await visible(p,p.locator(".struct-sheet"));
-  await screenshot(p,`${width}-structure`);await p.keyboard.press("Escape");assert.equal(await toggle.evaluate(e=>e===document.activeElement),true);
+  await screenshot(p,`${width}-structure`);await p.keyboard.press("Escape");
+  // Radix restores focus during its close lifecycle; wait for the observable result.
+  await p.waitForFunction(()=>document.activeElement?.matches(".branch-head .struct-toggle"));
+  assert.equal(await toggle.evaluate(e=>e===document.activeElement),true);
   await p.getByRole("button",{name:"完成编辑",exact:true}).click();
   await p.locator(".crumb-full summary").click();await noOverflow(p);assert.equal(await p.locator(".crumb-full li").count(),20);await p.locator(".crumb-full summary").click();
   await p.getByRole("button",{name:"编辑节点",exact:true}).click();

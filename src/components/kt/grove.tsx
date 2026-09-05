@@ -56,6 +56,7 @@ export function GrovePage({
       ) : (
         <p className="empty">{t("groveEmpty")}</p>
       )}
+      <div className="product-entries"><button className="btn" onClick={()=>document.querySelector<HTMLButtonElement>(".grove-cta button")?.focus()}>立即使用网页版</button><a className="btn" href="/download">下载本地版</a><small>Windows 本地版即将开放</small></div>
       {tplOpen ? (
         <Modal title={t("fromTemplateStart")} onClose={() => setTplOpen(false)}>
             <ul className="tpl-list">

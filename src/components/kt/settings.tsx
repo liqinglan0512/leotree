@@ -7,6 +7,8 @@ import { useI18n, type FontSize } from "@/lib/i18n";
 import { SignInPanel } from "./sign-in-panel";
 import { PublicGuide } from "./public-guide";
 
+import { EssentialInfo, BackupRecency, FeedbackEntry } from "./release-info";
+
 const FONTS: FontSize[] = ["sm", "md", "lg", "xl"];
 
 export function SettingsPage({
@@ -34,6 +36,7 @@ export function SettingsPage({
         </div>
       </header>
 
+      <EssentialInfo/><BackupRecency/><div className="hero-actions"><FeedbackEntry/><a className="btn" href="/download">下载本地版</a></div>
       <section className="settings-block">
         <h3>{t("language")}</h3>
         <div className="seg">

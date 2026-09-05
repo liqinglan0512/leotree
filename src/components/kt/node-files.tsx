@@ -1,5 +1,6 @@
 import { useWorkspaceService } from "./data-boundary";
 import { useEffect, useRef, useState } from "react";
+import { userMessage } from "@/lib/user-messages";
 import { Trash2 } from "lucide-react";
 import {
   formatSize,
@@ -30,7 +31,7 @@ export function NodeFiles({
     const ok = await service.addFiles(treeId,nodeId,Array.from(list));
     if (!ok) {
       const state = service.getSnapshot();
-      setErr(state.errorCode === "FILE_TOO_LARGE" ? t("fileTooBig") : state.errorCode === "FILE_UNSUPPORTED" ? t("fileTypeDenied") : `附件未保存：${state.message}。请重试或使用救援导出。`);
+      setErr(state.errorCode === "FILE_TOO_LARGE" ? t("fileTooBig") : state.errorCode === "FILE_UNSUPPORTED" ? t("fileTypeDenied") : `附件未保存：${userMessage(state.errorCode)}`);
     }
     setBusy(false); if(inputRef.current) inputRef.current.value="";
   }

@@ -58,9 +58,8 @@ async function regression(script,name,url) {
 try {
   const localServer=await start(base+1,false);
   const b=await chromium.launch({channel:"chrome",headless:true});context=await b.newContext({viewport:{width:430,height:932},hasTouch:true,isMobile:true});p=await context.newPage();p.setDefaultTimeout(15000);
-  await p.goto(localOrigin,{waitUntil:"networkidle"});await p.locator('[data-auth-availability="unavailable"]').waitFor();
+  await p.goto(localOrigin,{waitUntil:"networkidle"});await p.getByRole("button",{name:"立即使用网页版",exact:true}).click();await settings(p);await p.locator('[data-auth-availability="unavailable"]').waitFor();
   assert.equal(await p.locator(".auth-form").count(),0);assert.equal(await p.locator(".auth-social").count(),0);
-  await p.getByRole("button",{name:"打开本机空间（无需登录）",exact:true}).tap();
   await settings(p);assert.equal(await p.locator(".public-guide details").count(),9);assert.match(await p.locator(".settings-page").innerText(),/不按账号隔离/);
   await screenshot(p,"public-data-guide");
   await p.locator(".ink-dock").getByRole("button",{name:"社区",exact:true}).tap();await p.locator('[data-community-state="preview"]').waitFor();
@@ -74,8 +73,8 @@ try {
 
   let accountServer=await start(base,true);
   ({c:context,page:p}=await browser());await p.goto(accountOrigin,{waitUntil:"networkidle"});
-  await p.getByRole("button",{name:"打开本机空间（无需登录）",exact:true}).click();
-  await p.getByRole("button",{name:"新建知识树",exact:true}).click();await saved(p);
+  await p.getByRole("button",{name:"立即使用网页版",exact:true}).click();
+  await p.getByRole("button",{name:"新建知识树",exact:true}).click();await p.getByRole("button",{name:"进入知识树",exact:true}).click();await saved(p);
   await p.getByRole("button",{name:"在此分区新增节点",exact:true}).click();await p.getByLabel("名称",{exact:true}).fill("跨会话保存证据");
   await p.getByLabel("本枝记录",{exact:true}).fill("退出、切换账号和重启后仍然存在。");
   await p.locator('.node-files input[type=file]').setInputFiles({name:"restart.md",mimeType:"text/markdown",buffer:Buffer.from("Durable bytes across accounts and restart")});
@@ -90,16 +89,16 @@ try {
   await settings(p);await account(p,emailA,true);await p.getByRole("button",{name:"退出登录",exact:true}).waitFor();
   assert.equal(await raw(p),knowledge);pass("Configured email registration succeeds without moving or rewriting local knowledge");
   await screenshot(p,"configured-account");
-  await p.getByRole("button",{name:"退出登录",exact:true}).click();await p.getByRole("button",{name:"打开本机空间（无需登录）",exact:true}).waitFor();assert.equal(await raw(p),knowledge);
+  await p.getByRole("button",{name:"退出登录",exact:true}).click();await p.getByRole("button",{name:"立即使用网页版",exact:true}).waitFor();assert.equal(await raw(p),knowledge);
   await account(p,emailA,false,"Wrong-password-for-regression");await p.locator('.auth-form [role=alert]').waitFor();assert.equal(await raw(p),knowledge);
   await account(p,emailA);await p.getByRole("button",{name:"退出登录",exact:true}).waitFor();assert.equal(await raw(p),knowledge);
-  await p.getByRole("button",{name:"退出登录",exact:true}).click();await p.getByRole("button",{name:"打开本机空间（无需登录）",exact:true}).waitFor();
+  await p.getByRole("button",{name:"退出登录",exact:true}).click();await p.getByRole("button",{name:"立即使用网页版",exact:true}).waitFor();
   await account(p,emailB,true);await p.getByRole("button",{name:"退出登录",exact:true}).waitFor();assert.equal(await raw(p),knowledge);
   pass("F09: logout, rejected password, relogin and second account all preserve the same local space");
   await context.close();context=null;p=null;await stop(accountServer);
   accountServer=await start(base,true);
   ({c:context,page:p}=await browser());await p.goto(accountOrigin,{waitUntil:"networkidle"});await p.getByRole("button",{name:"退出登录",exact:true}).waitFor();assert.equal(await raw(p),knowledge);
-  await p.getByRole("button",{name:"退出登录",exact:true}).click();await p.getByRole("button",{name:"打开本机空间（无需登录）",exact:true}).waitFor();
+  await p.getByRole("button",{name:"退出登录",exact:true}).click();await p.getByRole("button",{name:"立即使用网页版",exact:true}).waitFor();
   await account(p,emailB);await p.getByRole("button",{name:"退出登录",exact:true}).waitFor();assert.equal(await raw(p),knowledge);
   const bytes=await fileText(p,attachment);assert.equal(bytes,"Durable bytes across accounts and restart");
   pass("Actual Chrome and production-server restart retain account credentials, local knowledge and IndexedDB bytes",{workspaceSha256:createHash("sha256").update(knowledge).digest("hex"),attachmentSha256:createHash("sha256").update(bytes).digest("hex")});
