@@ -1,74 +1,56 @@
-# Leo Tree — Astra Review Snapshot
+# Leo Tree v1.0 RC1
 
-This archive is a curated, review-only snapshot of the current Leo Tree repository. It was prepared for a repository-wide Product / UX / Architecture audit. The source application code was copied without refactoring or feature changes.
+Leo Tree 是保存和整理个人知识树的本机应用。围绕「查找 → 记录 → 实践 → 回顾 → 返回节点 → 修整结构」工作，保留纸墨视觉、我的 / 社区 / 设置导航和 SNN 模板。
 
-The review instructions are supplied separately as `ASTRA_REVIEW_BRIEF.md`. The governing rule is: **audit first; do not implement until explicitly authorized.**
+本包是 **1.0.0-rc.1**。发布判定与证据见 [RELEASE_STATUS.md](RELEASE_STATUS.md) 和 [release-evidence](release-evidence/)。未执行公开部署。原 review README 保存在 [docs/archive/REVIEW_SNAPSHOT_README.md](docs/archive/REVIEW_SNAPSHOT_README.md)，审计简报不能代替本轮实现授权。
 
-## What is included
+## 启动
 
-- Product orientation: `PRODUCT_VISION.md`
-- Architecture orientation: `ARCHITECTURE.md`
-- Application source: `src/`
-- Runtime public assets: `public/`
-- Existing colocated tests plus a test index: `tests/README.md`
-- Schema and migration index: `schemas/README.md`
-- Persistence index: `storage/README.md`
-- Pre-existing implementation report, clearly marked as unverified: `docs/`
-- Four representative mobile screenshots: `screenshots/`
-- The package manifest, TypeScript/Vite/ESLint/Prettier configuration, lockfile, and the scripts/server/migrations that those files actually reference
+已验证环境：Windows、Node.js 24.16.0、npm 锁定安装、Chrome 152。在本目录打开 PowerShell：
 
-The simplified handoff layout requested `src/`, `public/`, `tests/`, `schemas/`, `storage/`, `docs/`, and `screenshots/`. A few additional root items are intentionally retained because omitting them would hide real architecture or make build and test commands misleading: `scripts/`, `server/`, `migrations/`, `vite.config.ts`, `eslint.config.mjs`, `.prettierrc`, `package-lock.json`, and `startup.sh`.
-
-## What was excluded
-
-- Dependency and build output directories such as `node_modules/`, `dist/`, `build/`, and `coverage/`
-- `.grok/`, `.tanstack/`, `.vercel/`, cache/tmp/backup material, and repository metadata
-- Generated artifact pools and raw prompt attachments
-- Ad hoc debug files and lock markers
-- 92 redundant or intermediate screenshots; only four representative screens remain
-
-Runtime images under `public/theme/` are retained. They are referenced by the application and define the paper/ink/botanical visual system; they are not the discarded raw generation pool.
-
-## Representative screenshots
-
-- `screenshots/garden.png` — My Garden at a 390 × 844 mobile viewport
-- `screenshots/community.png` — Community/search at a 390 × 844 mobile viewport
-- `screenshots/node.png` — Node detail and structural controls at a 390 × 844 mobile viewport
-- `screenshots/settings.png` — Settings at a 390 × 844 mobile viewport
-
-## Review entry points
-
-Start with:
-
-1. `PRODUCT_VISION.md`
-2. `ARCHITECTURE.md`
-3. `src/lib/knowledge-tree/types.ts`
-4. `src/lib/knowledge-tree/storage.ts`
-5. `src/lib/knowledge-tree/migrate.ts`
-6. `src/lib/knowledge-tree/engine.ts`
-7. `src/components/kt/knowledge-app.tsx`
-8. `src/components/kt/tree-page.tsx`
-9. `src/styles.css`
-
-## Local checks
-
-No dependencies are bundled. In a disposable checkout with the required environment available:
-
-```bash
-npm ci
-npm run typecheck
-npm test
-npm run lint
-npm run build:dev
+```powershell
+npm.cmd ci
+npm.cmd run build
+npm.cmd run test:build
+npm.cmd start
 ```
 
-Use `npm run build:dev` for a non-deploy build check. The repository's `npm run build` command also invokes `db:migrate`, so reviewers should inspect the environment and migration target before running it.
+访问 **http://localhost:8080**，选择「打开本机空间（无需登录）」。开发模式是 `npm.cmd run dev`。启动前确认端口未被其他程序使用。知识按浏览器资料和网站 origin 保存；更换端口、localhost / 127.0.0.1 或浏览器都会进入不同空间。切换地址前先下载完整备份。
 
-## Provenance
+便携运行包解压后只需 Node.js 24，在包根目录执行 `node --env-file-if-exists=.env.local start.mjs`，不需要安装源代码依赖。默认监听本机 127.0.0.1:8080。
 
-- Source archive: `H8nHgGPEjrf4zYeA-grok-workspace.zip`
-- Source archive SHA-256: `C0A153F8A7278FDAF8A45C66DABFE6E05521F69C74CCC16ADA862191FC65AD0C`
-- Source archive inventory: 492 files, 108,277,158 uncompressed bytes
-- Curation date: 2026-09-05
+## 账号可选
 
-See `docs/CURATION_MANIFEST.md` for the precise curation boundary and validation notes.
+默认只提供本机空间，不显示未配置的账号表单。需要本机邮箱密码身份登录时，先停止服务，在源码根目录执行：
+
+```powershell
+npm.cmd run setup:account
+npm.cmd start
+```
+
+脚本仅在 `.env.local` 不存在时创建配置，生成随机稳定密钥，将账号数据库保存到 `.local/account-db`；已有配置不会被覆盖。便携包执行 `node setup-local-account.mjs`。保护这些本机文件，不要提交或公开分享。账号配置不需要重新构建，需要重启服务；仅在配置与数据库探测通过后才显示表单。
+
+账号仅代表登录身份。**登录不会自动把本机知识同步到云端；同一浏览器空间不按账号隔离。** 没有邮箱所有权验证、找回密码、短信验证或公开 OAuth 入口；邮箱密码身份不能证明邮箱已验证，也不能找回知识。退出、切换账号和服务重启不修改本机知识。
+
+## 数据与恢复
+
+[USER_GUIDE.md](USER_GUIDE.md) 和设置页提供相同的九项说明。JSON 只导出知识结构与元数据；携带附件必须用 **完整备份 ZIP**，包含 SHA-256 清单、工作区、实际附件及保留的旧园子资源，不含账号数据库、登录凭据和浏览器偏好。
+
+读取异常进入恢复页，保留源数据。先下载原文或救援包，再预览、确认候选副本。保存失败保留内存草稿；关闭页面前完成重试或救援导出。导入默认创建独立新树，覆盖或合并必须查看冲突并确认。详见 [数据安全协议](docs/DATA_SAFETY_PROTOCOL.md)。
+
+## 复验
+
+```powershell
+npm.cmd run typecheck
+npm.cmd run lint
+npm.cmd test
+npm.cmd run build
+npm.cmd run test:build
+npm.cmd run test:browser:production
+```
+
+`npm test` 依次执行产品和适用平台测试，自动纳入 `tree.test.ts`。精简包缺少的四项生成文档检查显式跳过，见 [平台测试范围](release-evidence/PLATFORM_TEST_SCOPE.md)。浏览器脚本使用已安装的 Chrome，启动独立生产服务（端口 8082、8083），使用合成数据、独立浏览器资料和临时账号数据库；不会连接个人账号。结果写入 `release-evidence/`，运行资料与凭据在已忽略的 `runtime/`、`profiles/` 中。
+
+已有服务的单独检查是 `npm.cmd run test:browser:data` 和 `npm.cmd run test:browser:learning`，默认目标 http://localhost:8080；`RC_URL` 可指定本机测试实例。`RC_TEST_PORT_BASE` 可改验收端口，`RC_SERVER_ROOT` 可指向独立解压的运行包根目录。
+
+390/430px 验收使用真实桌面 Chrome 的移动视口、触屏和输入，键盘占用通过缩小视口模拟。未声称验证实体手机、原生软键盘、iOS Safari、离线运行或公网部署。

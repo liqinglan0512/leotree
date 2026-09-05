@@ -1,0 +1,36 @@
+{
+  "build": ".output/nitro.json",
+  "node": "v24.16.0",
+  "scope": "Built Node server; local loopback; synthetic email identities; isolated persistent Chrome profile",
+  "results": [
+    {
+      "name": "F09/F14: default local mode hides unconfigured auth and mock community; legacy URL redirects without a domain write",
+      "status": "PASS",
+      "browser": "152.0.7977.77"
+    },
+    {
+      "name": "Configured email registration succeeds without moving or rewriting local knowledge",
+      "status": "PASS"
+    },
+    {
+      "name": "F09: logout, rejected password, relogin and second account all preserve the same local space",
+      "status": "PASS"
+    },
+    {
+      "name": "Actual Chrome and production-server restart retain account credentials, local knowledge and IndexedDB bytes",
+      "status": "PASS",
+      "workspaceSha256": "1c0d98ecc4f34dbd760cac31702fb546b59f8e2eb857f97b2f434c1d7f521370",
+      "attachmentSha256": "cff6b4418ccded375fc795c5c21791ca4024d58ebf62a2b3a6ba1cbdfde12520"
+    },
+    {
+      "name": "Production data regressions",
+      "status": "PASS",
+      "log": "release-evidence/production-data-2026-09-05T13-34-43-659Z.txt"
+    },
+    {
+      "name": "Production learning regressions",
+      "status": "PASS",
+      "log": "release-evidence/production-learning-2026-09-05T13-34-43-659Z.txt"
+    }
+  ]
+}

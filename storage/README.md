@@ -1,13 +1,11 @@
-# Storage Index
+# Storage index
 
-Leo Tree does not currently have a standalone `storage/` implementation directory. Active persistence code remains at its real source paths:
+Active code remains under `src/lib/knowledge-tree/`:
 
-- Workspace storage adapter, load/save, and JSON export: `src/lib/knowledge-tree/storage.ts`
-- Workspace migration and merge behavior: `src/lib/knowledge-tree/migrate.ts`
-- Attachment metadata and IndexedDB blob operations: `src/lib/knowledge-tree/files.ts`
-- Garden state: `src/lib/garden-store.ts`
-- Guest marker: `src/lib/guest.ts`
-- Shell-tab persistence: `src/components/kt/knowledge-app.tsx`
-- Authentication/application data boundary: `src/lib/app-data/`, `src/lib/auth/`, and `src/lib/db.ts`
+- `service.ts`, `operations.ts`: commands, field preconditions, Web Locks, revision checks, drafts and peer refresh.
+- `storage.ts`: adapter, active envelope, last-good and raw recovery copies, typed failures.
+- `migrate.ts`: candidate migration; `import.ts`: conflict preview and explicit activation.
+- `files.ts`: immutable IndexedDB transactions; `cover-draft.ts`: cancellation without writes.
+- `backup.ts`: ZIP manifest, hashes, validation and restore.
 
-This index is intentionally non-duplicative. Review the actual files above for overwrite behavior, malformed-data handling, identity stability, migration safety, import semantics, and orphaned attachment risks.
+Legacy `src/lib/garden-store.ts` remains inactive in public UI and is retained in full backup. Guest/UI preferences are separate. `src/lib/db.ts` serves identities/platform facilities, not knowledge. See [protocol](../docs/DATA_SAFETY_PROTOCOL.md).

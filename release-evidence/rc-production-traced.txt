@@ -1,0 +1,7 @@
+PASS F09/F14: default local mode hides unconfigured auth and mock community; legacy URL redirects without a domain write
+PASS Configured email registration succeeds without moving or rewriting local knowledge
+PASS F09: logout, rejected password, relogin and second account all preserve the same local space
+PASS Actual Chrome and production-server restart retain account credentials, local knowledge and IndexedDB bytes
+PASS Production data regressions
+PASS Production learning regressions
+{"pass":6,"fail":0,"evidence":"release-evidence/rc-production-2026-09-05T13-34-43-659Z.json"}

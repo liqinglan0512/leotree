@@ -1,76 +1,25 @@
-# Leo Tree — Current Architecture Map
+# Leo Tree RC1 architecture
 
-This is an orientation map for audit work, not a favorable architecture verdict. Claims below point to files included in this snapshot. Where behavior has not been executed during packaging, it should be treated as source-inspected rather than runtime-verified.
+The product retains React 19 / TanStack Start / Vite / Nitro, pure domain functions and a StorageAdapter. Tree → Section → flat Node[] + parentId supports arbitrary depth. Node identity is (treeId, nodeId). SNN is template data.
 
-## Application shell and routes
+## Writes and recovery
 
-- `src/routes/index.tsx` renders the main Leo Tree application.
-- `src/components/kt/knowledge-app.tsx` owns the main workspace state, shell navigation, import/export flows, review/log screens, and persistence commits.
-- `src/components/kt/grove.tsx`, `community.tsx`, and `settings.tsx` implement the three bottom-navigation product areas.
-- `src/components/kt/tree-page.tsx` implements the knowledge-tree and node experience.
-- `src/components/kt/dock.tsx` implements the floating bottom navigation.
-- `src/styles.css` contains the shared visual and responsive system.
+`knowledge-app.tsx` subscribes to `WorkspaceService` in `src/lib/knowledge-tree/service.ts`. Components submit named commands through `operations.ts`, not workspace snapshots. Search, filter, selected tree, focus and dialogs are view state; text commands coalesce for 300ms.
 
-## Knowledge-tree domain
+The service takes a Web Lock, rereads the latest revision, checks command preconditions, applies pure engine functions, validates, stages immutable bytes in IndexedDB, then atomically changes the active localStorage envelope. BroadcastChannel and storage events refresh peers. Conflicts/failures retain drafts and expose retry/rescue. Missing Web Locks disables unsafe writes.
 
-The primary domain code is under `src/lib/knowledge-tree/`:
+`validation.ts` checks schema and domain relationships. `storage.ts` owns typed reads, revision CAS, last-good candidates and raw recovery copies. `migrate.ts` validates v3/v2 candidates without writing on read. `import.ts` separates independent import, restore and merge and requires an unchanged confirmed preview. `backup.ts` hashes and validates ZIP payloads before activation. `files.ts` stores immutable Blobs; `cover-draft.ts` keeps cancelled selections in memory.
 
-| Concern | Evidence |
-|---|---|
-| Domain types and schema constants | `types.ts` |
-| Tree/workspace factories and labels | `factory.ts` |
-| Tree, section, node, review, and log operations | `engine.ts` |
-| Parent/child traversal and cycle checks | `tree.ts` |
-| Progress and review calculations | `progress.ts` |
-| Version migration and import merging | `migrate.ts` |
-| Storage adapters and JSON import/export | `storage.ts` |
-| Attachment metadata and IndexedDB blobs | `files.ts` |
-| Stable domain-facing export surface | `api.ts` |
-| Blank and SNN templates | `templates/` |
+Active key: `leo-tree-workspace-v1`, envelope format 1, domain schema 3. `knowledge-tree-workspace-v3` and v2 keys remain legacy read sources. Attachment database: `leo-tree-files-v1`, store `blobs`. Last-good and retained garden references protect recovery bytes until unreferenced. See [data protocol](docs/DATA_SAFETY_PROTOCOL.md).
 
-The source declares `SCHEMA_VERSION = 3` and uses `knowledge-tree-workspace-v3` as the current workspace storage key. Prior v2 keys are enumerated in `types.ts`; migration behavior is implemented in `migrate.ts` and exercised in colocated tests.
+## Learning and public surfaces
 
-## Persistence boundaries
+`history.ts` maintains immutable learning facts with completeness provenance; `firstDoneAt` survives compact-history trimming and reset. `progress.ts` separates historical totals from current diagnostics. Incomplete legacy evidence is unknown, never invented zero.
 
-There are several persistence mechanisms to audit separately:
+`tree-page.tsx` links search → node → practice → review → node, exposes filters, reading titles and bounded indentation. Native dialogs provide Escape, focus containment/restoration; popovers stay within the viewport. `grove.tsx`, `community-preview.tsx`, `settings.tsx` implement the three destinations. Original community code remains inactive; the old standalone SNN URL is a script-free redirect with its original archived.
 
-- Knowledge workspace JSON: `src/lib/knowledge-tree/storage.ts` using a `StorageAdapter`, with localStorage as the default adapter.
-- Attachment blobs: `src/lib/knowledge-tree/files.ts` using IndexedDB database `leo-tree-files-v1`.
-- Garden/community-facing local state: `src/lib/garden-store.ts` using localStorage.
-- Guest and shell UI flags: `src/lib/guest.ts` and `src/components/kt/knowledge-app.tsx` using localStorage.
-- Authentication/application data: `src/lib/auth/`, `src/lib/app-data/`, `src/lib/db.ts`, and SQL under `migrations/`.
+`product-contract.ts` owns version, progress explanation and nine user answers. Knowledge never enters auth SQL. Public email/password requires opt-in persistent storage, stable secret, valid origin and DB probe; no phone/OAuth simulation is exposed. The portable Node build traces the full PGLite package so WASM/data survive extraction. `scripts/verify-build.mjs` rejects dependencies resolved outside the output.
 
-The audit should verify whether these boundaries form one coherent product data lifecycle, especially during import, migration, reset, delete, and sign-in transitions.
+## Verification
 
-## UI-to-domain flow
-
-The intended flow is:
-
-```text
-React routes and components
-        ↓
-knowledge-tree engine / helpers
-        ↓
-storage adapter and migration layer
-        ↓
-localStorage / IndexedDB
-```
-
-`src/lib/knowledge-tree/api.ts` exposes domain and persistence operations intended to be callable without scraping the DOM. The review should verify how consistently current UI code uses this boundary and whether important business logic remains embedded in component event handlers.
-
-## Build and platform layer
-
-- Framework/runtime: React 19, TanStack Start/Router, Vite, Nitro, Tailwind CSS, and TypeScript.
-- `vite.config.ts` imports utilities from `scripts/` and registers application/platform middleware.
-- `server/middleware/grok-pwa.ts` and `public/__grok/` support the current PWA/container environment.
-- `src/lib/db.ts` and `scripts/migrate.mjs` consume SQL under `migrations/`.
-
-These platform files were kept because removing them would conceal real coupling. They may be product-essential, environment-essential, stale scaffolding, or some mixture; that is a review question, not a packaging assumption.
-
-## Test topology
-
-Tests are colocated with the code they exercise and also live under `scripts/`. They were not moved because moving them would alter imports and package scripts. See `tests/README.md` for the inventory.
-
-## Visual assets
-
-The production visual system is under `public/theme/` and is referenced directly by CSS and components. Four representative rendered screens are in `screenshots/`. Raw generation pools and intermediate QA captures are intentionally absent.
+Product tests discover all `src/lib/knowledge-tree/*.test.ts`; platform/inherited helpers run separately. Production browser scripts cover data failures, learning loops, accounts and actual browser/server restart. [tests/README.md](tests/README.md) and [RELEASE_STATUS.md](RELEASE_STATUS.md) define evidence; this description alone is not a gate result.
