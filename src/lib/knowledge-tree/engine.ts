@@ -5,9 +5,12 @@ import { getTemplate } from "./templates/index.ts";
 import { blankTemplate } from "./templates/blank.ts";
 import { childrenOf, parentIdOf, subtreeIds, wouldCycle } from "./tree.ts";
 import type { KnowledgeNode, KnowledgeTree, NodeStatus, PracticeLog, Review, Workspace } from "./types.ts";
+import { assertTree, DataError, normalizeOrders } from "./validation.ts";
 import { STATUS_CYCLE } from "./factory.ts";
 
 function replaceTree(ws: Workspace, tree: KnowledgeTree): Workspace {
+  assertTree(tree);
+  tree = normalizeOrders(tree);
   return {
     ...ws,
     trees: { ...ws.trees, [tree.id]: touchTree(tree) },
@@ -86,33 +89,42 @@ export function deleteTree(ws: Workspace, treeId: string): Workspace {
 }
 
 export function cycleNodeStatus(ws: Workspace, nodeId: string): Workspace {
-  const tree = currentTree(ws);
-  if (!tree) return ws;
-  const nodes = tree.nodes.map((n) => {
-    if (n.id !== nodeId) return n;
-    const from: NodeStatus = STATUS_CYCLE.includes(n.status) ? n.status : "todo";
-    const to = STATUS_CYCLE[(STATUS_CYCLE.indexOf(from) + 1) % 3];
-    const at = nowISO();
-    const history = [...(n.statusHistory || []), { from, to, at }].slice(-20);
-    return {
-      ...n,
-      status: to,
-      statusChangedAt: at,
-      statusHistory: history,
-      firstSeenDoingAt: to === "doing" && !n.firstSeenDoingAt ? at : n.firstSeenDoingAt,
-      updatedAt: at,
-    };
-  });
-  return replaceTree(ws, { ...tree, nodes });
+  const node = currentTree(ws)?.nodes.find(n => n.id === nodeId);
+  if (!node) return ws;
+  return setNodeStatus(ws, nodeId, STATUS_CYCLE[(STATUS_CYCLE.indexOf(node.status) + 1) % 3]);
 }
 
-export function patchNode(ws: Workspace, nodeId: string, patch: Partial<KnowledgeNode>): Workspace {
+export function setNodeStatus(ws: Workspace, nodeId: string, to: NodeStatus): Workspace {
   const tree = currentTree(ws);
   if (!tree) return ws;
-  return replaceTree(ws, {
-    ...tree,
-    nodes: tree.nodes.map((n) => (n.id === nodeId ? { ...n, ...patch, updatedAt: nowISO() } : n)),
-  });
+  if (!STATUS_CYCLE.includes(to)) throw new DataError("SCHEMA_INVALID", "Invalid learning state");
+  const at = nowISO();
+  return replaceTree(ws, { ...tree, nodes: tree.nodes.map(n => {
+    if (n.id !== nodeId || n.status === to) return n;
+    return { ...n, status: to, statusChangedAt: at,
+      statusHistory: [...n.statusHistory, { from: n.status, to, at }].slice(-20),
+      firstSeenDoingAt: to === "doing" && !n.firstSeenDoingAt ? at : n.firstSeenDoingAt,
+      updatedAt: at };
+  }) });
+}
+
+export type NodeContentPatch = Partial<Pick<KnowledgeNode, "title" | "hint" | "note" | "priority" | "tags" | "relatedNodeIds" | "prerequisiteIds">>;
+export function patchNode(ws: Workspace, nodeId: string, patch: NodeContentPatch): Workspace {
+  const allowed = new Set(["title", "hint", "note", "priority", "tags", "relatedNodeIds", "prerequisiteIds"]);
+  if (Object.keys(patch).some(k => !allowed.has(k))) throw new DataError("SCHEMA_INVALID", "Content patch cannot change identity, structure, learning history or files");
+  const tree = currentTree(ws);
+  if (!tree) return ws;
+  return replaceTree(ws, { ...tree, nodes: tree.nodes.map(n => n.id === nodeId ? { ...n, ...patch, updatedAt: nowISO() } : n) });
+}
+
+function removeNodes(tree: KnowledgeTree, ids: Set<string>): KnowledgeTree {
+  return { ...tree,
+    nodes: tree.nodes.filter(n => !ids.has(n.id)).map(n => ({ ...n,
+      relatedNodeIds: n.relatedNodeIds?.filter(id => !ids.has(id)),
+      prerequisiteIds: n.prerequisiteIds?.filter(id => !ids.has(id)),
+    })),
+    logs: tree.logs.map(l => ({ ...l, linkedNodeIds: l.linkedNodeIds.filter(id => !ids.has(id)) })),
+  };
 }
 
 export function addSection(ws: Workspace, title = "未命名分区"): Workspace {
@@ -160,15 +172,15 @@ export function deleteSection(ws: Workspace, sectionId: string): Workspace {
   const tree = currentTree(ws);
   if (!tree) return ws;
   return replaceTree(ws, {
-    ...tree,
+    ...removeNodes(tree, new Set(tree.nodes.filter(n => n.sectionId === sectionId).map(n => n.id))),
     sections: tree.sections.filter((s) => s.id !== sectionId),
-    nodes: tree.nodes.filter((n) => n.sectionId !== sectionId),
   });
 }
 
 export function addNode(ws: Workspace, sectionId: string, parentId: string | null = null): Workspace {
   const tree = currentTree(ws);
   if (!tree) return ws;
+  if (!tree.sections.some(s => s.id === sectionId)) throw new DataError("RELATION_INVALID", "Missing section");
   let parent: KnowledgeNode | undefined;
   if (parentId) {
     parent = tree.nodes.find((n) => n.id === parentId);
@@ -214,12 +226,7 @@ export function deleteNode(ws: Workspace, nodeId: string): Workspace {
   const nextFocus =
     ws.ui.focusNodeId && ids.has(ws.ui.focusNodeId) ? parentIdOf(node) : ws.ui.focusNodeId;
   const next = replaceTree(ws, {
-    ...tree,
-    nodes: tree.nodes.filter((n) => !ids.has(n.id)),
-    logs: tree.logs.map((l) => ({
-      ...l,
-      linkedNodeIds: (l.linkedNodeIds || []).filter((id) => !ids.has(id)),
-    })),
+    ...removeNodes(tree, ids),
   });
   return { ...next, ui: { ...next.ui, focusNodeId: nextFocus } };
 }
@@ -251,6 +258,7 @@ export function moveNode(ws: Workspace, nodeId: string, dir: -1 | 1): Workspace 
 export function moveNodeToSection(ws: Workspace, nodeId: string, sectionId: string): Workspace {
   const tree = currentTree(ws);
   if (!tree) return ws;
+  if (!tree.sections.some(s => s.id === sectionId)) throw new DataError("RELATION_INVALID", "Missing section");
   const node = tree.nodes.find((n) => n.id === nodeId);
   if (!node) return ws;
   const ids = new Set(subtreeIds(tree.nodes, nodeId));
@@ -381,6 +389,7 @@ export function addLog(ws: Workspace, partial: Partial<PracticeLog> = {}): Works
 }
 
 export function patchLog(ws: Workspace, logId: string, patch: Partial<PracticeLog>): Workspace {
+  if ("id" in patch || "createdAt" in patch) throw new DataError("SCHEMA_INVALID", "Log identity is immutable");
   const tree = currentTree(ws);
   if (!tree) return ws;
   return replaceTree(ws, {
@@ -422,12 +431,9 @@ export function resetCurrentTreeProgress(ws: Workspace): Workspace {
     nodes: tree.nodes.map((n) => ({
       ...n,
       status: "todo" as const,
-      note: "",
       statusChangedAt: null,
       statusHistory: [],
       firstSeenDoingAt: null,
     })),
-    reviews: {},
-    logs: [],
   });
 }

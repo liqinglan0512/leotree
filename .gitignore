@@ -1,0 +1,13 @@
+node_modules/
+.output/
+.vercel/
+.nitro/
+dist/
+.tanstack/
+.env
+.env.*
+!.env.example
+release-evidence/runtime/
+release-evidence/profiles/
+test-results/
+playwright-report/
