@@ -1,0 +1,62 @@
+{
+  "origin": "http://localhost:8080",
+  "browser": "152.0.7977.77",
+  "results": [
+    {
+      "name": "Empty profile creates, writes and reloads durable knowledge",
+      "status": "PASS",
+      "durationMs": 3315
+    },
+    {
+      "name": "Existing v3 loads without source writes and preserves migration source",
+      "status": "PASS",
+      "durationMs": 2550
+    },
+    {
+      "name": "Legacy v2 custom node and SNN template survive migration",
+      "status": "PASS",
+      "durationMs": 2774
+    },
+    {
+      "name": "Corrupt source recovery downloads exact raw and requires validated confirmation",
+      "status": "PASS",
+      "durationMs": 2158
+    },
+    {
+      "name": "Real two-tab concurrent fields and UI-only search/tab cannot erase domain",
+      "status": "FAIL",
+      "durationMs": 2561,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8080/\", waiting until \"networkidle\"\u001b[22m\n\n    at pageIn (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:21:88)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:71:11\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:30:26)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:70:1"
+    },
+    {
+      "name": "Upload + note + tree switch keeps target identity and committed note",
+      "status": "FAIL",
+      "durationMs": 2526,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8080/\", waiting until \"networkidle\"\u001b[22m\n\n    at pageIn (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:21:88)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:80:11\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:30:26)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:79:1"
+    },
+    {
+      "name": "UI copy has independent attachment IDs and deleting copy preserves original",
+      "status": "FAIL",
+      "durationMs": 2558,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8080/\", waiting until \"networkidle\"\u001b[22m\n\n    at pageIn (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:21:88)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:89:11\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:30:26)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:88:1"
+    },
+    {
+      "name": "Import preview commits only after confirmation and default creates new ID",
+      "status": "FAIL",
+      "durationMs": 2531,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8080/\", waiting until \"networkidle\"\u001b[22m\n\n    at pageIn (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:21:88)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:98:11\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:30:26)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:97:1"
+    },
+    {
+      "name": "Quota failure exposes rescue export and retains draft, retry succeeds",
+      "status": "FAIL",
+      "durationMs": 2541,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8080/\", waiting until \"networkidle\"\u001b[22m\n\n    at pageIn (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:21:88)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:106:11\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:30:26)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:105:1"
+    },
+    {
+      "name": "Browser ZIP download restores exact notes and real IndexedDB bytes into empty profile",
+      "status": "FAIL",
+      "durationMs": 2577,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8080/\", waiting until \"networkidle\"\u001b[22m\n\n    at pageIn (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:21:88)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:115:11\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:30:26)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:114:1"
+    }
+  ]
+}

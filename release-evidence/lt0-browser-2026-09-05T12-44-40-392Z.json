@@ -1,0 +1,21 @@
+{
+  "origin": "http://localhost:8080",
+  "browser": "152.0.7977.77",
+  "results": [
+    {
+      "name": "Empty profile creates, writes and reloads durable knowledge",
+      "status": "PASS",
+      "durationMs": 3814
+    },
+    {
+      "name": "Existing v3 loads without source writes and preserves migration source",
+      "status": "PASS",
+      "durationMs": 2502
+    },
+    {
+      "name": "Legacy v2 custom node and SNN template survive migration",
+      "status": "PASS",
+      "durationMs": 2117
+    }
+  ]
+}

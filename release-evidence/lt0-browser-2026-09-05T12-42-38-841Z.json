@@ -1,0 +1,24 @@
+{
+  "origin": "http://localhost:8080",
+  "browser": "152.0.7977.77",
+  "results": [
+    {
+      "name": "Empty profile creates, writes and reloads durable knowledge",
+      "status": "FAIL",
+      "durationMs": 18703,
+      "error": "locator.inputValue: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('本枝记录', { exact: true })\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:41:58\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:30:26)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:35:1"
+    },
+    {
+      "name": "Existing v3 loads without source writes and preserves migration source",
+      "status": "FAIL",
+      "durationMs": 16924,
+      "error": "locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('本枝记录', { exact: true }) to be visible\u001b[22m\n\n    at openNode (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:25:142)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:47:5\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:30:26)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:44:1"
+    },
+    {
+      "name": "Legacy v2 custom node and SNN template survive migration",
+      "status": "FAIL",
+      "durationMs": 16811,
+      "error": "locator.inputValue: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('本枝记录', { exact: true })\u001b[22m\n\n    at C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:53:169\n    at async run (C:\\Users\\lijiahao\\Desktop\\LeoTree-v1.0\\scripts\\rc-data-browser.mjs:30:26)\n    at async file:///C:/Users/lijiahao/Desktop/LeoTree-v1.0/scripts/rc-data-browser.mjs:51:1"
+    }
+  ]
+}

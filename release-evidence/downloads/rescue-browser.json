@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 3,
+  "currentTreeId": "tree-8fc7ad2d-fe3b-4d2e-a08c-9890b6c9f051",
+  "trees": {
+    "tree-8fc7ad2d-fe3b-4d2e-a08c-9890b6c9f051": {
+      "id": "tree-8fc7ad2d-fe3b-4d2e-a08c-9890b6c9f051",
+      "title": "Audit tree",
+      "description": "",
+      "createdAt": "2026-09-05T12:48:51.216Z",
+      "updatedAt": "2026-09-05T12:49:24.343Z",
+      "templateId": "blank",
+      "sections": [
+        {
+          "id": "sec-1",
+          "title": "未命名分区",
+          "description": "先写这个领域要拆成哪几块。",
+          "order": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "node-d174f9ed-50c3-496a-98ee-fabe96d3d98a",
+          "sectionId": "sec-1",
+          "title": "Evidence node",
+          "hint": "",
+          "status": "todo",
+          "priority": 1,
+          "note": "rescue browser note",
+          "tags": [],
+          "order": 0,
+          "createdAt": "2026-09-05T12:48:51.216Z",
+          "updatedAt": "2026-09-05T12:49:24.343Z",
+          "statusChangedAt": null,
+          "statusHistory": [],
+          "firstSeenDoingAt": null,
+          "parentId": null,
+          "prerequisiteIds": [],
+          "relatedNodeIds": [],
+          "attachments": []
+        }
+      ],
+      "reviews": {},
+      "logs": [],
+      "settings": {
+        "logFields": [],
+        "reviewFields": []
+      }
+    },
+    "tree-aa5d6a1b-6d61-4baf-bcf5-d5b32efa3b93": {
+      "id": "tree-aa5d6a1b-6d61-4baf-bcf5-d5b32efa3b93",
+      "title": "Second tree",
+      "description": "",
+      "createdAt": "2026-09-05T12:48:51.218Z",
+      "updatedAt": "2026-09-05T12:48:51.218Z",
+      "templateId": "blank",
+      "sections": [
+        {
+          "id": "sec-1",
+          "title": "未命名分区",
+          "description": "先写这个领域要拆成哪几块。",
+          "order": 0
+        }
+      ],
+      "nodes": [],
+      "reviews": {},
+      "logs": [],
+      "settings": {
+        "logFields": [],
+        "reviewFields": []
+      }
+    }
+  }
+}
