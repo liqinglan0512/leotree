@@ -1,0 +1,81 @@
+npm notice run test:product
+npm notice run node scripts/product-tests.mjs
+▶ engine structure edit
+  ✔ adds sections and nodes on a blank tree (13.3968ms)
+  ✔ isolates two trees (3.2001ms)
+  ✔ duplicate, delete, reset progress (4.1192ms)
+✔ engine structure edit (22.3617ms)
+▶ template custom fields
+  ✔ SNN template still has A-F, E12, F10 and leak fields (0.6798ms)
+  ✔ blank tree log/review fields contain no SNN vocabulary (0.5806ms)
+  ✔ snn leak detector is template runtime, not core (0.374ms)
+✔ template custom fields (2.1565ms)
+▶ import generic tree
+  ✔ does not force SNN template onto a custom tree (1.3216ms)
+  ✔ export filename uses the tree title (0.5654ms)
+✔ import generic tree (2.2399ms)
+✔ F06/F08: IndexedDB batch atomicity and immutable IDs prevent partial bytes writes (14.8514ms)
+✔ F06: cancelled cover draft and cancelled async completion leave zero blobs (5.7183ms)
+✔ F08: unsupported bytes differ from storage error, exact 10 MiB boundary (11.4893ms)
+✔ F02: default import is independent and leaves newer original untouched (16.3384ms)
+✔ F02: restore/merge require explicit collision choice and stale previews conflict (2.5924ms)
+✔ F02/F04: section mismatch, duplicate IDs, cycles and unrelated imports are rejected before writes (0.8106ms)
+✔ F01/F02: legacy source changes at revision zero still invalidate an import preview (1.2271ms)
+✔ F07: full ZIP → empty storage → restore keeps all knowledge, metadata and byte hashes (21.2547ms)
+✔ F07: retained garden snapshots/covers also roundtrip atomically (6.5091ms)
+✔ F07: corrupt or incomplete ZIP fails before any activation (6.4692ms)
+✔ F08: rescue ZIP preserves an uncommitted attachment when IndexedDB rejects storage (4.0123ms)
+✔ F04: duplicate IDs, cycles, missing section, parent and cross-section edges rejected (6.4461ms)
+✔ F04: content patch cannot mutate identity/structure/status/history/files (1.0951ms)
+✔ F04: deleting a section or subtree repairs practice and node links (1.8515ms)
+✔ F05: reset learning state preserves knowledge, reviews, logs, attachments, structure (1.0792ms)
+✔ F13: delete → add → move → reparent maintains contiguous effective order (0.9743ms)
+▶ migrate v2 to v3
+  ✔ keeps SNN node progress, notes, reviews and logs (5.6705ms)
+  ✔ does not invent this-week completion for untimestamped done nodes (0.6564ms)
+✔ migrate v2 to v3 (7.0939ms)
+▶ storage adapter
+  ✔ loads v2 without overwriting or writing any source (2.1427ms)
+  ✔ roundtrips workspace (2.5083ms)
+✔ storage adapter (4.862ms)
+▶ progress and isolation
+  ✔ weighted progress treats doing as 0.4 (0.2722ms)
+  ✔ two trees do not share node status (0.2078ms)
+✔ progress and isolation (0.6639ms)
+▶ merge
+  ✔ keeps unknown fields (7.0893ms)
+✔ merge (7.3386ms)
+▶ tree export import
+  ✔ accepts nested exportTree shape without forcing SNN (0.5179ms)
+✔ tree export import (0.6406ms)
+▶ ui hydration
+  ✔ maps lab tab from v2 onto log (0.7999ms)
+✔ ui hydration (0.9101ms)
+✔ F03: corrupted/future/invalid containers retain byte-identical source, never fall back or write (7.8268ms)
+✔ F03: recovery candidate needs confirmation and preserves unique corrupt active envelope (7.0156ms)
+✔ F03/F08: valid read requires no writes, inaccessible storage differs from missing (0.4942ms)
+✔ F03/F04: legacy unknown nodes and original payload survive migration (2.0032ms)
+✔ F01: A creates a tree, stale B search/tab never writes domain (6.6426ms)
+✔ F01: two stale tabs safely rebase different fields, same-field changes CONFLICT (2.4168ms)
+✔ F01: old content callback cannot overwrite a newer note (0.4841ms)
+✔ F01: upload racing note edits and tree switch keeps explicit (treeId,nodeId) (1.4704ms)
+✔ F01: delete races upload completion without resurrecting node or orphan bytes (1.2145ms)
+✔ F06: independent tree bytes survive deleting copied attachment (1.9983ms)
+✔ F08: quota failure retains draft, no false saved, retry persists (0.5426ms)
+✔ F08: IndexedDB failure retains attachment metadata and rescue bytes, not unsupported-type error (0.4273ms)
+✔ F01/F08: coalesced text changes and structural operations replay stable IDs (0.8401ms)
+✔ F08: serialization failure precedes writes and preserves rescueable draft (0.9391ms)
+✔ F05: command replay preserves reset null timestamps and notes (0.8664ms)
+▶ nested nodes
+  ✔ adds children infinitely and keeps sibling order (4.6994ms)
+  ✔ delete cascades through descendants and unlinks logs (0.602ms)
+  ✔ rejects cyclic reparent and moves among siblings only (0.5746ms)
+✔ nested nodes (6.6368ms)
+ℹ tests 51
+ℹ suites 10
+ℹ pass 51
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 365.8227

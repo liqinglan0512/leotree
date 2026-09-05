@@ -99,6 +99,8 @@ export function instantiateTemplate(
         statusChangedAt: null,
         statusHistory: [],
         firstSeenDoingAt: null,
+        firstDoneAt: null,
+        firstDoneExact: true,
         parentId: null,
         prerequisiteIds: [],
         relatedNodeIds: [],
@@ -118,6 +120,9 @@ export function instantiateTemplate(
     nodes,
     reviews: {},
     logs: [],
+    learningHistory: [],
+    historyComplete: true,
+    historyCompleteSince: t,
     settings: {
       logFields: template.logFields,
       reviewFields: template.reviewFields,

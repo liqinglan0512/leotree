@@ -41,6 +41,14 @@ export interface StatusChange {
   at: string;
 }
 
+export interface LearningEvent extends StatusChange {
+  id: string;
+  nodeId: string;
+  title: string;
+  priority: Priority;
+  firstDone: boolean;
+}
+
 export interface KnowledgeNode {
   id: string;
   sectionId: string;
@@ -56,6 +64,8 @@ export interface KnowledgeNode {
   statusChangedAt: string | null;
   statusHistory: StatusChange[];
   firstSeenDoingAt: string | null;
+  firstDoneAt?: string | null;
+  firstDoneExact?: boolean;
   parentId?: string | null;
   prerequisiteIds?: string[];
   relatedNodeIds?: string[];
@@ -120,6 +130,9 @@ export interface KnowledgeTree {
   reviews: Record<string, Review>;
   logs: PracticeLog[];
   settings: Record<string, unknown>;
+  learningHistory?: LearningEvent[];
+  historyComplete?: boolean;
+  historyCompleteSince?: string | null;
   [key: string]: unknown;
 }
 

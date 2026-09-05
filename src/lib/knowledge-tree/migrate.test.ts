@@ -49,7 +49,7 @@ describe("migrate v2 to v3", () => {
     assert.equal(a01?.note, "膜电位当 logit");
     assert.equal(a01?.statusHistory?.length, 2);
     assert.equal(a02?.status, "doing");
-    assert.ok(a02?.firstSeenDoingAt);
+    assert.equal(a02?.firstSeenDoingAt, null);
     const review = tree.reviews["2026-08-31"];
     assert.equal(review.focus, "推进 A01");
     assert.equal(review.custom.leak, "no");

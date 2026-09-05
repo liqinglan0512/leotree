@@ -7,6 +7,7 @@ import { childrenOf, parentIdOf, subtreeIds, wouldCycle } from "./tree.ts";
 import type { KnowledgeNode, KnowledgeTree, NodeStatus, PracticeLog, Review, Workspace } from "./types.ts";
 import { assertTree, DataError, normalizeOrders } from "./validation.ts";
 import { STATUS_CYCLE } from "./factory.ts";
+import { hydrateHistory } from "./history.ts";
 
 function replaceTree(ws: Workspace, tree: KnowledgeTree): Workspace {
   assertTree(tree);
@@ -96,15 +97,22 @@ export function cycleNodeStatus(ws: Workspace, nodeId: string): Workspace {
 }
 
 export function setNodeStatus(ws: Workspace, nodeId: string, to: NodeStatus): Workspace {
-  const tree = currentTree(ws);
-  if (!tree) return ws;
+  const source = currentTree(ws);
+  if (!source) return ws;
+  const tree = hydrateHistory(source);
   if (!STATUS_CYCLE.includes(to)) throw new DataError("SCHEMA_INVALID", "Invalid learning state");
+  const target = tree.nodes.find(n => n.id === nodeId);
+  if (!target || target.status === to) return ws;
   const at = nowISO();
-  return replaceTree(ws, { ...tree, nodes: tree.nodes.map(n => {
+  return replaceTree(ws, { ...tree,
+    historyCompleteSince: tree.historyCompleteSince ?? at,
+    learningHistory: [...tree.learningHistory!, { id: uid("event"), nodeId, title: target.title, priority: target.priority, from: target.status, to, at, firstDone: to === "done" && !target.firstDoneAt && target.firstDoneExact === true }],
+    nodes: tree.nodes.map(n => {
     if (n.id !== nodeId || n.status === to) return n;
     return { ...n, status: to, statusChangedAt: at,
       statusHistory: [...n.statusHistory, { from: n.status, to, at }].slice(-20),
       firstSeenDoingAt: to === "doing" && !n.firstSeenDoingAt ? at : n.firstSeenDoingAt,
+      firstDoneAt: to === "done" && !n.firstDoneAt ? at : n.firstDoneAt,
       updatedAt: at };
   }) });
 }
@@ -207,15 +215,18 @@ export function addNode(ws: Workspace, sectionId: string, parentId: string | nul
     statusChangedAt: null,
     statusHistory: [],
     firstSeenDoingAt: null,
+    firstDoneAt: null,
+    firstDoneExact: true,
     parentId: parentId ?? null,
     prerequisiteIds: [],
     relatedNodeIds: [],
     attachments: [],
   };
-  return replaceTree(ws, {
+  const next = replaceTree(ws, {
     ...tree,
     nodes: [...tree.nodes, node],
   });
+  return { ...next, ui: { ...next.ui, treeQuery: "", treeStatus: "", treePrio: "", focusNodeId: node.id, editing: true, tab: "tree" } };
 }
 
 export function deleteNode(ws: Workspace, nodeId: string): Workspace {
@@ -329,7 +340,7 @@ export function focusNode(ws: Workspace, nodeId: string | null): Workspace {
     const tree = currentTree(ws);
     if (!tree?.nodes.some((n) => n.id === nodeId)) return patchUi(ws, { focusNodeId: null, tab: "tree" });
   }
-  return patchUi(ws, { focusNodeId: nodeId, tab: "tree" });
+  return patchUi(ws, { focusNodeId: nodeId, treeQuery: "", tab: "tree" });
 }
 
 export function focusParent(ws: Workspace): Workspace {
@@ -385,7 +396,7 @@ export function addLog(ws: Workspace, partial: Partial<PracticeLog> = {}): Works
   };
   return {
     ...replaceTree(ws, { ...tree, logs: [log, ...tree.logs] }),
-    ui: { ...ws.ui, tab: "log", expandedLogs: { ...ws.ui.expandedLogs, [log.id]: true }, scrollLogId: log.id },
+    ui: { ...ws.ui, tab: "log", logQuery: "", logStatus: "", expandedLogs: { ...ws.ui.expandedLogs, [log.id]: true }, scrollLogId: log.id },
   };
 }
 

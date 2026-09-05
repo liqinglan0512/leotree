@@ -1,7 +1,7 @@
 import { weekIdFromDate } from "./dates.ts";
 import { emptyUi, emptyWorkspace, instantiateTemplate } from "./factory.ts";
 import { assertTree, assertWorkspace, DataError, isRecord, normalizeOrders } from "./validation.ts";
-import { nowISO, uid } from "./ids.ts";
+import { uid } from "./ids.ts";
 import { snnTemplate } from "./templates/snn.ts";
 import type {
   KnowledgeNode,
@@ -14,6 +14,8 @@ import type {
   WorkspaceUi,
 } from "./types.ts";
 import { SCHEMA_VERSION } from "./types.ts";
+import { hydrateHistory } from "./history.ts";
+const LEGACY_UNKNOWN_DATE = "1970-01-01T00:00:00.000Z";
 
 export function normalizeStatus(s: unknown): NodeStatus {
   const x = String(s ?? "todo").toLowerCase();
@@ -65,7 +67,6 @@ function extractV2TreeMap(raw: Record<string, unknown>): Record<string, Record<s
 }
 
 function overlayNodeProgress(tree: KnowledgeTree, map: Record<string, Record<string, unknown>>): KnowledgeTree {
-  const now = nowISO();
   const nodes = tree.nodes.map((n) => {
     const v = map[n.id];
     if (!v) return n;
@@ -75,12 +76,9 @@ function overlayNodeProgress(tree: KnowledgeTree, map: Record<string, Record<str
       status,
       note: String(v.note ?? n.note ?? ""),
       statusChangedAt: (v.statusChangedAt as string) || null,
-      statusHistory: Array.isArray(v.statusHistory) ? (v.statusHistory as KnowledgeNode["statusHistory"]).slice(-20) : [],
+      statusHistory: Array.isArray(v.statusHistory) ? (v.statusHistory as KnowledgeNode["statusHistory"]) : [],
       firstSeenDoingAt: (v.firstSeenDoingAt as string) || null,
     };
-    if (next.status === "doing" && !next.statusChangedAt && !next.firstSeenDoingAt) {
-      next.firstSeenDoingAt = now;
-    }
     mergeUnknown(next as unknown as Record<string, unknown>, v);
     return next;
   });
@@ -100,13 +98,13 @@ function mapV2Review(weekId: string, raw: Record<string, unknown>): Review {
       leak: raw.leak ?? "no",
       leakNote: raw.leakNote ?? "",
     },
-    updatedAt: nowISO(),
+    updatedAt: LEGACY_UNKNOWN_DATE,
   };
   mergeUnknown(r as unknown as Record<string, unknown>, raw);
   return r;
 }
 
-function mapV2Log(raw: Record<string, unknown>): PracticeLog {
+function mapV2Log(raw: Record<string, unknown>, index: number): PracticeLog {
   const statusMap: Record<string, LogStatus> = {
     idea: "idea",
     running: "running",
@@ -114,7 +112,7 @@ function mapV2Log(raw: Record<string, unknown>): PracticeLog {
     dropped: "dropped",
   };
   const log: PracticeLog = {
-    id: String(raw.id ?? `log-${Math.random().toString(36).slice(2)}`),
+    id: String(raw.id ?? `legacy-log-${index}`),
     title: String(raw.title ?? ""),
     date: String(raw.date ?? ""),
     status: statusMap[String(raw.status)] ?? "idea",
@@ -144,8 +142,8 @@ function mapV2Log(raw: Record<string, unknown>): PracticeLog {
       verdict: raw.verdict ?? "",
       verdictNote: raw.verdictNote ?? "",
     },
-    createdAt: String(raw.createdAt ?? nowISO()),
-    updatedAt: String(raw.updatedAt ?? nowISO()),
+    createdAt: String(raw.createdAt ?? LEGACY_UNKNOWN_DATE),
+    updatedAt: String(raw.updatedAt ?? LEGACY_UNKNOWN_DATE),
   };
   mergeUnknown(log as unknown as Record<string, unknown>, raw);
   return log;
@@ -157,6 +155,9 @@ export function migrateV2ToTree(raw: Record<string, unknown>, treeId = "snn-migr
     title: "SNN",
     description: snnTemplate.description,
   });
+  tree.createdAt = tree.updatedAt = LEGACY_UNKNOWN_DATE;
+  tree.nodes = tree.nodes.map(n => ({ ...n, createdAt: LEGACY_UNKNOWN_DATE, updatedAt: LEGACY_UNKNOWN_DATE, firstDoneExact: false }));
+  delete tree.learningHistory; delete tree.historyComplete; delete tree.historyCompleteSince;
   const map = extractV2TreeMap(raw);
   if (raw.tree !== undefined && !isRecord(raw.tree)) throw new DataError("SCHEMA_INVALID", "Legacy tree must be an object");
   if (raw.experiments !== undefined && !Array.isArray(raw.experiments)) throw new DataError("SCHEMA_INVALID", "Legacy experiments must be an array");
@@ -183,7 +184,7 @@ export function migrateV2ToTree(raw: Record<string, unknown>, treeId = "snn-migr
     : [];
   const result = { ...withProgress, reviews, logs, settings: { ...withProgress.settings, legacySource: structuredClone(raw) } };
   assertTree(result);
-  return normalizeOrders(result);
+  return normalizeOrders(hydrateHistory(result));
 }
 
 function hydrateUi(raw: unknown): WorkspaceUi {
@@ -218,11 +219,11 @@ export function coerceTree(raw: KnowledgeTree, fallbackId: string): KnowledgeTre
   const tree = {
     ...raw, id: raw.id === undefined ? fallbackId : raw.id,
     title: raw.title ?? "未命名知识树", description: raw.description ?? "",
-    createdAt: raw.createdAt ?? nowISO(), updatedAt: raw.updatedAt ?? nowISO(),
+    createdAt: raw.createdAt ?? LEGACY_UNKNOWN_DATE, updatedAt: raw.updatedAt ?? LEGACY_UNKNOWN_DATE,
     templateId: raw.templateId ?? null, reviews: raw.reviews === undefined ? {} : raw.reviews, logs: raw.logs === undefined ? [] : raw.logs, settings: raw.settings === undefined ? {} : raw.settings,
   };
   assertTree(tree);
-  return normalizeOrders(tree);
+  return normalizeOrders(hydrateHistory(tree));
 }
 
 export function migrateToV3(raw: unknown): Workspace {
@@ -230,7 +231,7 @@ export function migrateToV3(raw: unknown): Workspace {
   if (raw.schemaVersion !== undefined && ![1, 2, 3].includes(raw.schemaVersion as number)) throw new DataError("UNSUPPORTED_VERSION", `Unsupported schema ${String(raw.schemaVersion)}`);
   if (raw.schemaVersion === SCHEMA_VERSION) {
     assertWorkspace(raw);
-    return { ...raw, ui: hydrateUi(raw.ui), trees: Object.fromEntries(Object.entries(raw.trees).map(([id,t]) => [id, normalizeOrders(t)])) };
+    return { ...raw, ui: hydrateUi(raw.ui), trees: Object.fromEntries(Object.entries(raw.trees).map(([id,t]) => [id, normalizeOrders(hydrateHistory(t))])) };
   }
   if (lookLikeV2(raw)) {
     const tree = migrateV2ToTree(raw);

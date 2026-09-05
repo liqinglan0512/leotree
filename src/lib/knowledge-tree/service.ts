@@ -76,7 +76,7 @@ export class WorkspaceService {
   private enqueue(entry: Pending, blobs: Array<[string,Blob]> = []) {
     if (this.state.recovery) throw new DataError("RECOVERY_REQUIRED", "Confirm a recovery candidate before editing");
     let next = entry.apply(this.state.workspace); assertWorkspace(next);
-    if (!["createBlankTree", "createTreeFromTemplate", "CopyTree", "addLog", "AcceptImportPreview"].includes(entry.label)) next = this.preserveView(next);
+    if (!["createBlankTree", "createTreeFromTemplate", "CopyTree", "addNode", "addLog", "AcceptImportPreview"].includes(entry.label)) next = this.preserveView(next);
     for (const [id,blob] of blobs) this.staged.set(id,blob);
     this.pending.push(entry);
     const blocked = ["SAVE_FAILED", "DEGRADED"].includes(this.state.status);

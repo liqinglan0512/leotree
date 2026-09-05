@@ -1,0 +1,86 @@
+npm notice run test:product
+npm notice run node scripts/product-tests.mjs
+▶ engine structure edit
+  ✔ adds sections and nodes on a blank tree (11.9658ms)
+  ✔ isolates two trees (2.8337ms)
+  ✔ duplicate, delete, reset progress (6.9365ms)
+✔ engine structure edit (23.095ms)
+▶ template custom fields
+  ✔ SNN template still has A-F, E12, F10 and leak fields (0.6609ms)
+  ✔ blank tree log/review fields contain no SNN vocabulary (0.4606ms)
+  ✔ snn leak detector is template runtime, not core (0.5848ms)
+✔ template custom fields (2.4707ms)
+▶ import generic tree
+  ✔ does not force SNN template onto a custom tree (2.2977ms)
+  ✔ export filename uses the tree title (0.5702ms)
+✔ import generic tree (3.309ms)
+✔ F06/F08: IndexedDB batch atomicity and immutable IDs prevent partial bytes writes (8.6129ms)
+✔ F06: cancelled cover draft and cancelled async completion leave zero blobs (6.0354ms)
+✔ F08: unsupported bytes differ from storage error, exact 10 MiB boundary (18.1237ms)
+✔ F02: default import is independent and leaves newer original untouched (17.3952ms)
+✔ F02: restore/merge require explicit collision choice and stale previews conflict (6.2977ms)
+✔ F02/F04: section mismatch, duplicate IDs, cycles and unrelated imports are rejected before writes (1.3282ms)
+✔ F01/F02: legacy source changes at revision zero still invalidate an import preview (1.4973ms)
+✔ F07: full ZIP → empty storage → restore keeps all knowledge, metadata and byte hashes (27.8889ms)
+✔ F07: retained garden snapshots/covers also roundtrip atomically (7.3056ms)
+✔ F07: corrupt or incomplete ZIP fails before any activation (7.3567ms)
+✔ F08: rescue ZIP preserves an uncommitted attachment when IndexedDB rejects storage (4.6518ms)
+✔ F04: duplicate IDs, cycles, missing section, parent and cross-section edges rejected (6.0651ms)
+✔ F04: content patch cannot mutate identity/structure/status/history/files (0.9904ms)
+✔ F04: deleting a section or subtree repairs practice and node links (1.6711ms)
+✔ F05: reset learning state preserves knowledge, reviews, logs, attachments, structure (1.0883ms)
+✔ F13: delete → add → move → reparent maintains contiguous effective order (1.3301ms)
+✔ F12: first completion and old-week facts survive 20-history trim, rename, reset and deletion (35.8563ms)
+✔ F12: partial legacy evidence is UNKNOWN, never known zero; current diagnostics ignore chosen week (11.5757ms)
+✔ F03/F12: repeated v2 reads are deterministic and preserve all available status events (3.9496ms)
+✔ F10: search drilldown clears overlay and adding under active filters exposes the new node (1.7066ms)
+✔ F10: practice draft captures the source node and opens even with old log filters (1.5624ms)
+▶ migrate v2 to v3
+  ✔ keeps SNN node progress, notes, reviews and logs (9.2131ms)
+  ✔ does not invent this-week completion for untimestamped done nodes (1.6509ms)
+✔ migrate v2 to v3 (12.1336ms)
+▶ storage adapter
+  ✔ loads v2 without overwriting or writing any source (2.8038ms)
+  ✔ roundtrips workspace (3.3253ms)
+✔ storage adapter (6.4189ms)
+▶ progress and isolation
+  ✔ weighted progress treats doing as 0.4 (0.2753ms)
+  ✔ two trees do not share node status (0.2248ms)
+✔ progress and isolation (0.7071ms)
+▶ merge
+  ✔ keeps unknown fields (4.6887ms)
+✔ merge (5.0379ms)
+▶ tree export import
+  ✔ accepts nested exportTree shape without forcing SNN (0.5919ms)
+✔ tree export import (0.74ms)
+▶ ui hydration
+  ✔ maps lab tab from v2 onto log (0.9301ms)
+✔ ui hydration (1.076ms)
+✔ F03: corrupted/future/invalid containers retain byte-identical source, never fall back or write (7.2506ms)
+✔ F03: recovery candidate needs confirmation and preserves unique corrupt active envelope (6.297ms)
+✔ F03/F08: valid read requires no writes, inaccessible storage differs from missing (0.5389ms)
+✔ F03/F04: legacy unknown nodes and original payload survive migration (2.1345ms)
+✔ F01: A creates a tree, stale B search/tab never writes domain (10.9248ms)
+✔ F01: two stale tabs safely rebase different fields, same-field changes CONFLICT (7.7736ms)
+✔ F01: old content callback cannot overwrite a newer note (0.8761ms)
+✔ F01: upload racing note edits and tree switch keeps explicit (treeId,nodeId) (3.0188ms)
+✔ F01: delete races upload completion without resurrecting node or orphan bytes (1.3265ms)
+✔ F06: independent tree bytes survive deleting copied attachment (2.5457ms)
+✔ F08: quota failure retains draft, no false saved, retry persists (0.753ms)
+✔ F08: IndexedDB failure retains attachment metadata and rescue bytes, not unsupported-type error (0.5308ms)
+✔ F01/F08: coalesced text changes and structural operations replay stable IDs (1.188ms)
+✔ F08: serialization failure precedes writes and preserves rescueable draft (1.9582ms)
+✔ F05: command replay preserves reset null timestamps and notes (1.626ms)
+▶ nested nodes
+  ✔ adds children infinitely and keeps sibling order (6.8014ms)
+  ✔ delete cascades through descendants and unlinks logs (0.6515ms)
+  ✔ rejects cyclic reparent and moves among siblings only (0.4574ms)
+✔ nested nodes (8.9107ms)
+ℹ tests 56
+ℹ suites 10
+ℹ pass 56
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 350.1483

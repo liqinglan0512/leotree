@@ -1,6 +1,7 @@
 import type { KnowledgeNode, KnowledgeTree, NodeStatus, PracticeLog } from "./types.ts";
-import { inRange, parseISODate, weekBounds } from "./dates.ts";
+import { inRange, weekBounds } from "./dates.ts";
 import { nodeLabel } from "./display.ts";
+import { hydrateHistory, historyKnownSince } from "./history.ts";
 
 export function weightOf(status: NodeStatus): number {
   if (status === "done") return 1;
@@ -49,48 +50,40 @@ export function stallInfo(node: KnowledgeNode): { stall: boolean; unknown: boole
 }
 
 export function firstDoneAt(node: KnowledgeNode): string | null {
-  const hit = (node.statusHistory || []).find((h) => h.to === "done");
-  if (hit?.at) return hit.at;
-  if (node.status === "done" && node.statusChangedAt) return node.statusChangedAt;
-  return null;
+  // The durable field survives relearning and the compact display history's trim.
+  return node.firstDoneAt ?? null;
 }
 
 function logInWeek(log: PracticeLog, start: Date, cap: Date): boolean {
-  if (inRange(log.createdAt, start, cap) || inRange(log.updatedAt, start, cap)) return true;
-  if (!log.date) return false;
-  const d = parseISODate(log.date);
-  d.setHours(12, 0, 0, 0);
-  return d.getTime() >= start.getTime() && d.getTime() < cap.getTime();
+  return inRange(log.createdAt, start, cap);
 }
 
-export function weekSummary(tree: KnowledgeTree, weekId: string) {
+export function weekSummary(source: KnowledgeTree, weekId: string) {
+  const tree = hydrateHistory(source);
   const { start, cap, isFuture } = weekBounds(weekId);
-  const newlyDone: KnowledgeNode[] = [];
-  const newlyDoing: KnowledgeNode[] = [];
+  const historical = (status: NodeStatus) => {
+    const nodes = new Map<string, { id: string; title: string; priority: KnowledgeNode["priority"]; exists: boolean }>();
+    for (const h of tree.learningHistory!) {
+      if (!isFuture && h.to === status && inRange(h.at, start, cap) && !nodes.has(h.nodeId))
+        nodes.set(h.nodeId, { id: h.nodeId, title: h.title, priority: h.priority, exists: tree.nodes.some(n => n.id === h.nodeId) });
+    }
+    return [...nodes.values()];
+  };
+  const newlyDone = historical("done");
+  const newlyDoing = historical("doing");
   const stalled: Array<{ node: KnowledgeNode; days: number }> = [];
   let unknownDoing = 0;
-  if (!isFuture) {
-    for (const node of tree.nodes) {
-      if (changedToThisWeek(node, "done", start, cap)) newlyDone.push(node);
-      if (changedToThisWeek(node, "doing", start, cap)) newlyDoing.push(node);
-      const info = stallInfo(node);
-      if (info.unknown) unknownDoing += 1;
-      if (info.stall) stalled.push({ node, days: info.days });
-    }
+  // Diagnostics always describe today's state, independent of the selected week.
+  for (const node of tree.nodes) {
+    const info = stallInfo(node);
+    if (info.unknown) unknownDoing += 1;
+    if (info.stall) stalled.push({ node, days: info.days });
   }
-  const weekLogs: PracticeLog[] = isFuture ? [] : tree.logs.filter((e) => logInWeek(e, start, cap));
-  const p0focus = tree.nodes
-    .filter((n) => n.priority === 0 && n.status !== "done")
-    .sort((a, b) => {
-      const sa = a.status === "doing" ? 0 : 1;
-      const sb = b.status === "doing" ? 0 : 1;
-      if (sa !== sb) return sa - sb;
-      const sec = a.sectionId.localeCompare(b.sectionId);
-      if (sec !== 0) return sec;
-      return a.order - b.order || a.id.localeCompare(b.id);
-    })
-    .slice(0, 8);
-  return { newlyDone, newlyDoing, stalled, unknownDoing, weekLogs, p0focus, isFuture };
+  const weekLogs = isFuture ? [] : tree.logs.filter(e => logInWeek(e, start, cap));
+  const p0focus = tree.nodes.filter(n => n.priority === 0 && n.status !== "done")
+    .sort((a,b) => (a.status === "doing" ? 0 : 1) - (b.status === "doing" ? 0 : 1) || a.sectionId.localeCompare(b.sectionId) || a.order - b.order || a.id.localeCompare(b.id)).slice(0,8);
+  return { newlyDone, newlyDoing, stalled, unknownDoing, weekLogs, p0focus, isFuture,
+    historyKnown: !isFuture && historyKnownSince(tree,start) };
 }
 
 export function monthWindow(now = new Date()) {
@@ -107,31 +100,28 @@ export function monthWindow(now = new Date()) {
   return arr;
 }
 
-export function doneIncrement(tree: KnowledgeTree, y: number, m: number): number {
-  let n = 0;
-  for (const node of tree.nodes) {
-    const at = firstDoneAt(node);
-    if (!at) continue;
-    const d = new Date(at);
-    if (d.getFullYear() === y && d.getMonth() === m) n += 1;
-  }
-  return n;
+export function doneIncrement(tree: KnowledgeTree, y: number, m: number): number | null {
+  const start = new Date(y,m,1), end = new Date(y,m+1,1);
+  if (!historyKnownSince(tree,start)) return null;
+  // An observed legacy completion cannot establish that it was the first one.
+  if (tree.nodes.some(n => !n.firstDoneExact && n.firstDoneAt && inRange(n.firstDoneAt,start,end))) return null;
+  return new Set((tree.learningHistory ?? []).filter(h => h.firstDone && inRange(h.at,start,end)).map(h => h.nodeId)).size;
 }
 
 export function buildWeekDraft(tree: KnowledgeTree, weekId: string, leakHint = ""): string {
   const s = weekSummary(tree, weekId);
-  const names = (arr: KnowledgeNode[]) =>
+  const names = (arr: Array<{ id: string; title: string }>) =>
     arr.length ? arr.map((it) => nodeLabel(it)).join("；") : "无";
   const logNames = s.weekLogs.length
     ? s.weekLogs.map((e) => e.title || "未命名记录").join("；")
     : "无";
   return [
     "【自动草稿 · 可改】",
-    `本周新掌握 ${s.newlyDone.length} 条：${names(s.newlyDone)}`,
-    `本周新标在学 ${s.newlyDoing.length} 条：${names(s.newlyDoing)}`,
-    `滞留超过 14 天 ${s.stalled.length} 条：${names(s.stalled.map((x) => x.node))}`,
-    `本周实践日志 ${s.weekLogs.length} 条：${logNames}`,
-    `建议只盯的 P0：${names(s.p0focus)}`,
+    `所选周标为掌握 ${s.historyKnown ? s.newlyDone.length : "总数未知；已知 " + s.newlyDone.length} 条：${names(s.newlyDone)}`,
+    `所选周标为在学 ${s.historyKnown ? s.newlyDoing.length : "总数未知；已知 " + s.newlyDoing.length} 条：${names(s.newlyDoing)}`,
+    `当前诊断（今天）：滞留超过 14 天 ${s.stalled.length} 条：${names(s.stalled.map((x) => x.node))}`,
+    `所选周创建的实践记录 ${s.weekLogs.length} 条：${logNames}`,
+    `当前建议关注的 P0：${names(s.p0focus)}`,
     leakHint || "把「真正推进的一件事」收成其中最硬的一条，下周主问题只留一个问句。",
   ].join("\n");
 }

@@ -44,6 +44,17 @@ export function validateTree(value: unknown, prefix = "tree"): Validation {
   const sectionIds = unique(sections, "sections");
   const nodeIds = unique(nodes, "nodes");
   unique(logs, "logs");
+  if (t.historyComplete !== undefined && typeof t.historyComplete !== "boolean") issue("historyComplete", "Expected boolean");
+  if (t.historyCompleteSince != null && !timestamp(t.historyCompleteSince)) issue("historyCompleteSince", "Invalid timestamp");
+  if (t.learningHistory !== undefined) {
+    if (!Array.isArray(t.learningHistory)) issue("learningHistory", "Expected immutable event array");
+    else {
+      unique(t.learningHistory, "learningHistory");
+      t.learningHistory.forEach((h,i) => {
+        if (!isRecord(h) || !validId(h.nodeId) || typeof h.title !== "string" || ![0,1,2,3].includes(h.priority as number) || !statuses.includes(h.from as string) || !statuses.includes(h.to as string) || !timestamp(h.at) || typeof h.firstDone !== "boolean") issue(`learningHistory[${i}]`, "Invalid historical event");
+      });
+    }
+  }
   const order = (v: unknown, path: string) => {
     if (!Number.isSafeInteger(v) || (v as number) < 0) issue(path, "Expected nonnegative integer order");
   };
@@ -65,6 +76,7 @@ export function validateTree(value: unknown, prefix = "tree"): Validation {
     if (!statuses.includes(n.status as string)) issue(`${p}.status`, "Invalid status");
     if (![0, 1, 2, 3].includes(n.priority as number)) issue(`${p}.priority`, "Invalid priority");
     if (!strings(n.tags)) issue(`${p}.tags`, "Expected text array");
+    if (n.firstDoneExact !== undefined && typeof n.firstDoneExact !== "boolean") issue(`${p}.firstDoneExact`, "Expected boolean");
     if (!sectionIds.has(n.sectionId as string)) issue(`${p}.sectionId`, "Missing section", true);
     order(n.order, `${p}.order`);
     for (const k of ["createdAt", "updatedAt"]) if (!timestamp(n[k])) issue(`${p}.${k}`, "Invalid timestamp");

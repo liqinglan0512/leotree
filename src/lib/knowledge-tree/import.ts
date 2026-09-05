@@ -53,6 +53,12 @@ export async function previewImport(service: WorkspaceService, raw: unknown, mod
         logs: mergeById(old.logs,tree.logs,!!options.preferIncoming),
         reviews: options.preferIncoming ? { ...old.reviews,...tree.reviews } : { ...tree.reviews,...old.reviews },
         settings: options.preferIncoming ? { ...old.settings,...tree.settings } : { ...tree.settings,...old.settings },
+        learningHistory: [...(old.learningHistory ?? []), ...(tree.learningHistory ?? []).flatMap(h => {
+          const previous = old.learningHistory?.find(e => e.id === h.id);
+          return previous ? same(previous,h) ? [] : [{ ...h, id: uid("import-event") }] : [h];
+        })],
+        historyComplete: old.historyComplete === true && tree.historyComplete === true,
+        historyCompleteSince: old.historyCompleteSince && tree.historyCompleteSince ? [old.historyCompleteSince,tree.historyCompleteSince].sort().at(-1)! : null,
       };
     }
     // Only incoming nodes need new attachment ownership; retained local nodes keep theirs.

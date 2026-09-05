@@ -1,6 +1,7 @@
 import * as engine from "./engine.ts";
 import type { KnowledgeTree, Workspace } from "./types.ts";
 import { assertWorkspace, DataError } from "./validation.ts";
+import { uid } from "./ids.ts";
 
 export const operations = {
   createBlankTree: engine.createBlankTree, createTreeFromTemplate: engine.createTreeFromTemplate,
@@ -19,6 +20,7 @@ export type Invocation = Calls<typeof operations>;
 export type UiInvocation = Calls<typeof uiOperations>;
 export type Commit = (...call: Invocation | UiInvocation) => void;
 export interface Operation {
+  id: string;
   name: keyof typeof operations;
   args: unknown[];
   treeId: string | null;
@@ -51,7 +53,7 @@ function expectation(ws: Workspace, op: Operation): unknown {
 }
 export function prepareOperation(snapshot: Workspace, call: Invocation): Operation {
   const [name, ...args] = call;
-  const op: Operation = { name, args: structuredClone(args), treeId: snapshot.currentTreeId, baseRevision: Number(snapshot.workspaceRevision ?? 0), at: new Date().toISOString(), expected: null };
+  const op: Operation = { id: uid("op"), name, args: structuredClone(args), treeId: snapshot.currentTreeId, baseRevision: Number(snapshot.workspaceRevision ?? 0), at: new Date().toISOString(), expected: null };
   op.expected = structuredClone(expectation(snapshot, op));
   const next = invoke(snapshot, op);
   if (name.startsWith("create") || name === "duplicateTree") op.created = next.trees[next.currentTreeId!];
@@ -65,12 +67,16 @@ function invoke(ws: Workspace, op: Operation): Workspace {
   const next = fn({ ...ws, currentTreeId: op.treeId }, ...op.args);
   for (const [id, tree] of Object.entries(next.trees)) {
     const before = ws.trees[id]; if (!before || before === tree) continue;
-    next.trees[id] = { ...tree, updatedAt: op.at, nodes: tree.nodes.map(n => {
+    next.trees[id] = { ...tree, updatedAt: op.at,
+      historyCompleteSince: tree.historyCompleteSince && !before.historyCompleteSince ? op.at : tree.historyCompleteSince,
+      learningHistory: tree.learningHistory?.map((h,i) => before.learningHistory?.some(x => x.id === h.id) || h.id.startsWith("legacy-") ? h : { ...h, id: `${op.id}-${i}`, at: op.at }),
+      nodes: tree.nodes.map(n => {
       const old = before.nodes.find(x => x.id === n.id);
-      if (!old || old.updatedAt === n.updatedAt) return n;
+      if (!old || same(old, n)) return n;
       return { ...n, updatedAt: op.at,
         statusChangedAt: n.statusChangedAt && n.statusChangedAt !== old.statusChangedAt ? op.at : n.statusChangedAt,
         firstSeenDoingAt: n.firstSeenDoingAt && !old.firstSeenDoingAt ? op.at : n.firstSeenDoingAt,
+        firstDoneAt: n.firstDoneAt && !old.firstDoneAt ? op.at : n.firstDoneAt,
         statusHistory: n.statusHistory.length && n.statusHistory !== old.statusHistory ? n.statusHistory.map((h,i) => i === n.statusHistory.length - 1 ? { ...h, at: op.at } : h) : n.statusHistory,
       };
     }), logs: tree.logs.map(l => { const old = before.logs.find(x => x.id === l.id); return old && old.updatedAt !== l.updatedAt ? { ...l, updatedAt: op.at } : l; }),
@@ -96,7 +102,8 @@ export function applyOperation(latest: Workspace, op: Operation): Workspace {
         n.order = tree.nodes.filter(x => x.sectionId === n.sectionId && (x.parentId ?? null) === (n.parentId ?? null)).length;
       } else if (key === "sections") (item as KnowledgeTree["sections"][number]).order = tree.sections.length;
       next = { ...latest, trees: { ...latest.trees, [tree.id]: { ...tree, [key]: [...tree[key], item], updatedAt: op.at } } };
-      if (key === "logs") next.ui = { ...latest.ui, tab: "log", expandedLogs: { ...latest.ui.expandedLogs, [item.id]: true }, scrollLogId: item.id };
+      if (key === "logs") next.ui = { ...latest.ui, tab: "log", logQuery: "", logStatus: "", expandedLogs: { ...latest.ui.expandedLogs, [item.id]: true }, scrollLogId: item.id };
+      if (key === "nodes") next.ui = { ...latest.ui, treeQuery: "", treeStatus: "", treePrio: "", focusNodeId: item.id, editing: true, tab: "tree" };
     }
   } else next = invoke(latest, op);
   assertWorkspace(next); return next;
