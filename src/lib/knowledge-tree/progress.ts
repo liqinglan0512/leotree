@@ -86,15 +86,15 @@ export function weekSummary(source: KnowledgeTree, weekId: string) {
     historyKnown: !isFuture && historyKnownSince(tree,start) };
 }
 
-export function monthWindow(now = new Date()) {
+export function yearWindow(now = new Date()) {
+  const y = now.getFullYear();
   const arr: Array<{ key: string; y: number; m: number; label: string }> = [];
-  for (let i = 5; i >= 0; i -= 1) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+  for (let m = 0; m < 12; m += 1) {
     arr.push({
-      key: `M${6 - i}`,
-      y: d.getFullYear(),
-      m: d.getMonth(),
-      label: `${d.getMonth() + 1}月`,
+      key: `${y}-${m + 1}`,
+      y,
+      m,
+      label: `${m + 1}月`,
     });
   }
   return arr;

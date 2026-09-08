@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 3,
+  "tree": {
+    "id": "standard-empty-knowledge-tree",
+    "title": "未命名知识树",
+    "description": "",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z",
+    "templateId": null,
+    "sections": [],
+    "nodes": [],
+    "reviews": {},
+    "logs": [],
+    "learningHistory": [],
+    "historyComplete": true,
+    "historyCompleteSince": "2026-01-01T00:00:00.000Z",
+    "settings": {
+      "logFields": [],
+      "reviewFields": []
+    }
+  }
+}

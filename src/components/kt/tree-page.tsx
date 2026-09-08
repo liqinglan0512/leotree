@@ -303,12 +303,40 @@ function RootView({
   setPendingDel: (id: string | null) => void;
   ask: ReturnType<typeof useAsk>;
 }) {
+  const [naming, setNaming] = useState(false);
+  const [name, setName] = useState("");
+  const createSection = () => {
+    commit("addSection", name.trim() || undefined);
+    setName("");
+    setNaming(false);
+  };
   return (
     <>
-      {ws.ui.editing && (
+      {(ws.ui.editing || tree.sections.length === 0) && (
         <div className="hero-actions" style={{ justifyContent: "flex-start", marginBottom: 12 }}>
-          <button className="btn" onClick={() => commit("addSection")}>新增分区</button>
+          <button className="btn" onClick={() => setNaming(true)}>新增分区</button>
         </div>
+      )}
+      {naming ? (
+        <Modal title="新增分区" onClose={() => { setName(""); setNaming(false); }}>
+          <div className="form">
+            <label>分区名称
+              <input
+                autoFocus
+                value={name}
+                placeholder="例如：基础数学"
+                onChange={(e) => setName(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") createSection(); }}
+              />
+            </label>
+            <div className="edit-row">
+              <button className="btn primary" onClick={createSection}>创建分区</button>
+            </div>
+          </div>
+        </Modal>
+      ) : null}
+      {tree.sections.length === 0 && (
+        <p className="empty">还没有分区。先创建一个分区，再往里添加节点。</p>
       )}
       {tree.sections
         .slice()

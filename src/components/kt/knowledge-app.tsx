@@ -21,7 +21,7 @@ import {
   exportWorkspace,
   filenameForTree,
 } from "@/lib/knowledge-tree/storage";
-import { buildWeekDraft, doneIncrement, monthWindow, progressOf, weekSummary } from "@/lib/knowledge-tree/progress";
+import { buildWeekDraft, doneIncrement, yearWindow, progressOf, weekSummary } from "@/lib/knowledge-tree/progress";
 import { addDays, fmtDay, weekBounds, weekIdFromDate } from "@/lib/knowledge-tree/dates";
 import { getRuntime, getTemplate, TEMPLATES } from "@/lib/knowledge-tree/templates";
 import { nodeLabel } from "@/lib/knowledge-tree/display";
@@ -172,7 +172,6 @@ function KnowledgeShell() {
   const chrome = (
     <>
       <InkDock tab={shell} onChange={changeShell} />
-      <DataTools />
       {creationUi}
       <div className={`toast ${toast ? "show" : ""}`}>{toast}</div>
       <ConfirmModal req={confirmReq} onClose={() => setConfirmReq(null)} />
@@ -409,7 +408,7 @@ function WeekPage({
   const runtime = getRuntime(tree.templateId);
   const leakHint = runtime.reviewRiskHint?.(sum.weekLogs) ?? "";
   const reviewFields = treeReviewFields(tree);
-  const months = monthWindow();
+  const months = yearWindow();
   const ask = useAsk();
   const { t } = useI18n();
   const list = (title: string, rows: ReactNode[], empty: string) => (
@@ -490,11 +489,11 @@ function WeekPage({
         </div>
       </section>
       <section>
-        <h2 className="serif" style={{ fontSize: "1.05rem", margin: "0 0 4px" }}>六个月月度进度</h2>
-        <p className="brief">各月可确认的首次标为掌握数量，复学或重复标记不重复计数。历史不完整或首次时间无法确认时显示“未知”。</p>
+        <h2 className="serif" style={{ fontSize: "1.05rem", margin: "0 0 4px" }}>{months[0].y} 全年阅读进度</h2>
+        <p className="brief">按自然年统计各月可确认的首次标为掌握数量，复学或重复标记不重复计数；无记录月份计 0。历史不完整或首次时间无法确认时显示“未知”。</p>
         <div className="months">
           {months.map((m) => (
-            <div className="month" key={m.key}><span>{m.key} · {m.label}</span><b>{doneIncrement(tree, m.y, m.m) ?? "记录不足"}</b></div>
+            <div className="month" key={m.key}><span>{m.label}</span><b>{doneIncrement(tree, m.y, m.m) ?? "记录不足"}</b></div>
           ))}
         </div>
       </section>
