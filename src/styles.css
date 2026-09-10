@@ -1515,3 +1515,25 @@ button.row:disabled { opacity:.7; cursor:default; }
 @media(max-width:600px) { .edition-grid { grid-template-columns:1fr; gap:0; } .first-minute .hero-actions { justify-content:flex-start; } .first-minute .btn, .download-page .btn { min-height:44px; white-space:normal; } }
 
 .native-modal:has(.new-tree-form) { margin: auto; }
+
+/* LaTeX math: KaTeX rendering, live preview and the formula palette. */
+.math-inline .katex, .math-block .katex { font-size: 1.04em; }
+.math-block { display: block; margin: 10px 0; text-align: center; overflow-x: auto; }
+.math-src { font-size: .86em; color: var(--muted); background: var(--accent-soft); border-radius: 4px; padding: 0 4px; }
+.math-src.math-bad { color: var(--warn); background: var(--warn-bg); }
+.math-field { display: grid; gap: 5px; }
+.math-field-hd { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.math-field-label { color: inherit; }
+.math-hint { font-size: .72rem; color: var(--faint); }
+.math-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.math-chip { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; min-height: 32px; padding: 2px 11px; font-size: .8rem; font-family: var(--serif); }
+.math-chip:hover { border-color: var(--accent); color: var(--accent); }
+.math-pop-trigger { border: 1px solid var(--line); background: var(--card); color: var(--muted); border-radius: 999px; min-height: 26px; padding: 1px 10px; font-size: .74rem; white-space: nowrap; }
+.math-pop-trigger:hover { border-color: var(--accent); color: var(--accent); }
+.math-preview { margin-top: 4px; padding: 10px 12px; border: 1px dashed var(--line); border-radius: var(--radius-sm); background: #fffcf7; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.9; }
+.math-preview-cap { display: block; font-size: .72rem; letter-spacing: .08em; color: var(--faint); margin-bottom: 4px; }
+.math-sheet { z-index: 50; width: min(320px, calc(100vw - 24px)); max-height: var(--radix-popover-content-available-height); overflow: auto; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--card); box-shadow: 0 10px 30px #33220d22; }
+.math-cat { font-size: .72rem; letter-spacing: .1em; color: var(--faint); margin: 12px 0 6px; }
+.math-palette .math-cat:first-child { margin-top: 0; }
+.math-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.math-tip { margin: 12px 0 0; font-size: .74rem; color: var(--muted); line-height: 1.7; }

@@ -11,6 +11,7 @@ import { nodeLabel, prioLabel } from "@/lib/knowledge-tree/display";
 import { nodeAttachments } from "@/lib/knowledge-tree/files";
 import { PrioSeal } from "./prio-seal";
 import { NodeFiles } from "./node-files";
+import { MathEditor, MathText } from "./math";
 import { progressOf } from "@/lib/knowledge-tree/progress";
 import {
   ancestorChain,
@@ -438,7 +439,7 @@ function BranchView({
               value={node.title}
               onChange={(e) => commit("patchNode", node.id, { title: e.target.value })}
               aria-label={t("name")}
-            /> : <span className="branch-title-text">{node.title}</span>}
+            /> : <span className="branch-title-text"><MathText text={node.title} /></span>}
           </h2>
           {ws.ui.editing ? <textarea rows={2}
             className="hint-input"
@@ -446,7 +447,7 @@ function BranchView({
             placeholder={t("hintEmpty")}
             onChange={(e) => commit("patchNode", node.id, { hint: e.target.value })}
             aria-label={t("intro")}
-          /> : node.hint ? <p className="hint">{node.hint}</p> : null}
+          /> : node.hint ? <p className="hint"><MathText text={node.hint} /></p> : null}
           <p className="branch-meta">
             {allKids.length} {t("childNodes")} · {sub.done}/{sub.done + sub.doing + sub.todo} {t("masteredShort")} · {sub.pct}%
           </p>
@@ -463,15 +464,13 @@ function BranchView({
           <StructureMenu node={node} tree={tree} ws={ws} commit={commit} pendingDel={pendingDel} setPendingDel={setPendingDel} />
         </div>
         <div className="note">
-          <label>
-            {t("branchNote")}
-            <textarea
-              aria-label={t("branchNote")}
-              value={node.note}
-              placeholder={t("branchNoteHint")}
-              onChange={(e) => commit("patchNode", node.id, { note: e.target.value })}
-            />
-          </label>
+          <MathEditor
+            label={t("branchNote")}
+            ariaLabel={t("branchNote")}
+            value={node.note}
+            placeholder={t("branchNoteHint")}
+            onChange={(note) => commit("patchNode", node.id, { note })}
+          />
           <div className="links">
             {rel.length
               ? <>{t("relatedLogs")}{rel.map((l) => (
@@ -578,10 +577,10 @@ function NodeCard({
         <h3>
           <PrioSeal priority={n.priority} />
           <button type="button" className="node-enter" onClick={enter}>
-            {nodeLabel(n)}
+            <MathText text={nodeLabel(n)} />
           </button>
         </h3>
-        {n.hint ? <p className="hint">{n.hint}</p> : null}
+        {n.hint ? <p className="hint"><MathText text={n.hint} /></p> : null}
         {kids ? <p className="branch-meta">{kids} {t("twigs")} · {sub!.pct}%</p> : <p className="branch-meta faint">{t("canBranch")}</p>}
         {files.length ? <p className="attach-count">{t("attachCount", { n: files.length })}</p> : null}
       </div>

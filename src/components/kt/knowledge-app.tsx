@@ -2,6 +2,7 @@ import type { Commit } from "@/lib/knowledge-tree/operations";
 import { DataBoundary, DataTools, useDataActions, useWorkspaceService, downloadData } from "./data-boundary";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { CustomFields } from "./custom-fields";
+import { MathEditor } from "./math";
 import { ConfirmCtx, ConfirmModal, useAsk, type ConfirmRequest } from "./confirm";
 import { TreePage } from "./tree-page";
 import { Modal } from "./modal";
@@ -607,10 +608,10 @@ function LogCard({
               {Object.entries(LOG_STATUS_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           </label>
-          <label>问题 / 目标 <textarea value={exp.question} onChange={(e) => commit("patchLog", exp.id, { question: e.target.value })} /></label>
-          <label>假设 / 预期 <textarea value={exp.hypothesis} onChange={(e) => commit("patchLog", exp.id, { hypothesis: e.target.value })} /></label>
-          <label>过程 / 证据 <textarea value={exp.process} onChange={(e) => commit("patchLog", exp.id, { process: e.target.value })} /></label>
-          <label>结论 <textarea value={exp.conclusion} onChange={(e) => commit("patchLog", exp.id, { conclusion: e.target.value })} /></label>
+          <MathEditor variant="compact" label="问题 / 目标" value={exp.question} onChange={(question) => commit("patchLog", exp.id, { question })} />
+          <MathEditor variant="compact" label="假设 / 预期" value={exp.hypothesis} onChange={(hypothesis) => commit("patchLog", exp.id, { hypothesis })} />
+          <MathEditor variant="compact" label="过程 / 证据" value={exp.process} onChange={(process) => commit("patchLog", exp.id, { process })} />
+          <MathEditor variant="compact" label="结论" value={exp.conclusion} onChange={(conclusion) => commit("patchLog", exp.id, { conclusion })} />
           {logFields.length ? (
             <CustomFields
               defs={logFields}
