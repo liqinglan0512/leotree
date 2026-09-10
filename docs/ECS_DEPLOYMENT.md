@@ -1,6 +1,6 @@
 # ECS 部署与维护
 
-目标：https://8.130.33.10/ 。当前运行版本：1.0.0-beta.2，源代码提交 750937f（运行目录 `/opt/leotree/releases/leotree-beta2-20260908`）。首个公网版本为 1.0.0-beta.1 / cc8ba79。
+目标：https://8.130.33.10/ 。当前运行版本：1.0.0-beta.3，源代码提交 b81bc13（运行目录 `/opt/leotree/releases/leotree-beta3-20260908`）。历史公网版本：1.0.0-beta.1 / cc8ba79、1.0.0-beta.2 / 750937f。
 
 已上线。用户放行安全组后，2026-09-05 15:28 UTC 从外网直接访问 HTTPS 返回 200；Chrome 正常验证证书，TLS 1.3、安全上下文、Web Locks 实际获取锁均通过。HTTP 自动转向 HTTPS，下载页返回 200。证据见 release-evidence/beta-public-https.json；未使用 SSH 隧道或跳过证书校验。早期端口未放行时的超时记录保留为历史证据。
 
@@ -8,12 +8,13 @@
 
 ## 更新记录
 
-- **1.0.0-beta.2 / 750937f（2026-09-08）**：幽灵控件修复、分区命名弹窗、全年阅读进度、标准空白模板、下载页间距调整。tar.gz SHA256 `aff3b28c…209430`（13,313,439 字节，410 文件），上传后服务器端校验通过。旧版 `beta1-20260905` 目录保留，回退目标记录在 `/opt/leotree/backups/previous-release.txt`。线上实测：下载页间距 margin 20px 生效，空园子 `.data-tools`=0。本地构建用 Windows 时须以 `tar -czf` 打包（`Compress-Archive` 会写入反斜杠路径导致解压错乱）。
+- **1.0.0-beta.3 / b81bc13（2026-09-08）**：LaTeX 公式支持——节点笔记公式工具栏 + 实时预览、实践日志四字段紧凑公式面板、标题/摘要/节点卡片读取态公式渲染（KaTeX 懒加载）。数据模型零改动（公式以 `$…$` 文本存于现有字段，无 migration）。tar.gz SHA256 `9a7853d1…644f0`（14,364,523 字节，472 文件，新增 KaTeX 字体），服务器端校验通过。旧版 `leotree-beta2-20260908` 目录保留。公网实测 `node scripts/math-check.mjs`（RC_URL=https://8.130.33.10）6/6 通过。
+- **1.0.0-beta.2 / 750937f（2026-09-08）**：幽灵控件修复、分区命名弹窗、全年阅读进度、标准空白模板、下载页间距调整。tar.gz SHA256 `aff3b28c…209430`（13,313,439 字节，410 文件），上传后服务器端校验通过。旧版 `beta1-20260905` 目录保留。线上实测：下载页间距 margin 20px 生效，空园子 `.data-tools`=0。本地构建用 Windows 时须以 `tar -czf` 打包（`Compress-Archive` 会写入反斜杠路径导致解压错乱）。
 
 ## 布局
 
 - 系统：Ubuntu 22.04.5，Node 24.16.0（官方 SHA256 核对后安装）。
-- 应用：/opt/leotree/releases/<版本目录>；current 符号链接指向当前运行版本（现指向 leotree-beta2-20260908；历史：beta1-20260905）。
+- 应用：/opt/leotree/releases/<版本目录>；current 符号链接指向当前运行版本（现指向 leotree-beta3-20260908；历史：beta1-20260905、leotree-beta2-20260908）。
 - Node：/opt/leotree/node-v24.16.0-linux-x64/bin/node。
 - 用户：leotree；systemd 服务 leotree，只监听 127.0.0.1:3008；开机启动、失败重启。
 - 服务配置：/etc/systemd/system/leotree.service；环境文件 /etc/leotree.env，root-only，随机服务密钥不写入代码或交付包。
